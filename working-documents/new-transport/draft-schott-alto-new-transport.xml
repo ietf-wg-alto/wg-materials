@@ -1,0 +1,889 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
+     by Daniel M Kohn (private) -->
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+]>
+<rfc category="std" docName="draft-schott-alto-new-transport-01"
+     ipr="trust200902">
+  <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+
+  <?rfc toc="yes" ?>
+
+  <?rfc symrefs="yes" ?>
+
+  <?rfc sortrefs="yes"?>
+
+  <?rfc iprnotified="no" ?>
+
+  <?rfc strict="yes" ?>
+
+  <front>
+    <title abbrev="ALTO New Protocol">ALTO New Protocol using HTTP/2</title>
+    <author fullname="Roland Schott" initials="R." surname="Schott">
+      <organization>Deutsche Telekom</organization>
+
+      <address>
+        <postal>
+          <street>Heinrich-Hertz-Strasse 3-7</street>
+
+          <city>64295 Darmstadt</city>
+
+          <country>Germany</country>
+        </postal>
+
+        <email>Roland.Schott@telekom.de</email>
+      </address>
+    </author>
+
+    <author fullname="Y. Richard Yang" initials="Y." surname="Yang">
+      <organization>Yale University</organization>
+
+      <address>
+        <postal>
+          <street>51 Prospect St</street>
+
+          <city>New Haven</city>
+
+          <region>CT</region>
+
+          <code>06520</code>
+
+          <country>USA</country>
+        </postal>
+
+        <email>yry@cs.yale.edu</email>
+      </address>
+    </author>
+
+    <author fullname="Kai Gao" initials="K." surname="Gao">
+      <organization>Sichuan University</organization>
+
+      <address>
+        <postal>
+
+          <street></street>
+          <city>Chengdu</city>
+
+          <code>201804</code>
+
+          <country>China</country>
+        </postal>
+
+        <email>kgao@scu.edu.cn</email>
+      </address>
+    </author>
+
+    <author fullname="Jingxuan Jensen Zhang" initials="J." surname="Zhang">
+      <organization>Tongji University</organization>
+
+      <address>
+        <postal>
+          <street>4800 Cao'An Hwy</street>
+
+          <city>Shanghai</city>
+
+          <code>201804</code>
+
+          <country>China</country>
+        </postal>
+
+        <email>jingxuan.n.zhang@gmail.com</email>
+      </address>
+    </author>
+
+    <date day="21" month="March" year="2022"/>
+
+    <area>TSV Area</area>
+
+    <workgroup>ALTO Working Group</workgroup>
+
+    <keyword>RFC</keyword>
+
+    <keyword>Request for Comments</keyword>
+
+    <keyword>I-D</keyword>
+
+    <keyword>Internet-Draft</keyword>
+
+    <keyword>Application-Layer Traffic Optimization, HTTP/2, SSE, Message Queue</keyword>
+
+    <abstract>
+      <t>The ALTO base protocol [RFC7285] is based on HTTP/1.x and hence includes the limitations of HTTP/1.x. ALTO/SSE [RFC8895] addresses some of the limitations, but is still based on HTTP/1.x. This document introduces ALTO new protocol, which provides the transport functions of ALTO/SSE on top of HTTP/2 [RFC7540], for a more efficient distribution system for ALTO information resources.</t>
+
+    </abstract>
+
+    <note title="Requirements Language">
+        <t>
+          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+          "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY",
+          and "OPTIONAL" in this document are to be interpreted as described
+          in BCP 14 <xref target="RFC2119"/><xref target="RFC8174"/> when,
+          and only when, they appear in all capitals, as shown here.
+        </t>
+    </note>
+
+  </front>
+
+  <middle>
+    <section anchor="intro" title="Introduction">
+      <t>Application-Layer Traffic Optimization (ALTO) provides a means for network applications 
+      to obtain network information. The ALTO base protocol <xref target="RFC7285"/> is based on HTTP/1.1 <xref target="RFC7230"/> to send network information to applications; hence, in the base protocol, an ALTO client is limited to the HTTP/1.1 request-response model: in the same HTTP connection, the client can send initial requests to obtain initial information resources; the requests will be served by the server one-by-one, in the order that the requests are sent to the server; the client need to pull the server to obtain changes to the resources, increasing delay and overhead.</t>
+
+      <t>To address the use cases where an ALTO client may need to efficiently, concurrently 
+      monitor changes to a set of network information resources, the ALTO Working Group introduces ALTO/SSE (ALTO Incremental Update based on Server-Sent-Event) 
+      <xref target="RFC8895"/>, so that an ALTO client can manage (i.e., add and remove) a set of 
+      requests maintained at an ALTO server, and the server can continuously, concurrently, and 
+      incrementally push updates whenever a monitored network information resource changes. 
+      Figure 1 shows the architecture and message flow of ALTO/SSE, which can be considered as a more general transport protocol than the ALTO base transport protocol.  Although ALTO/SSE allows the concurrent transport of multiple ALTO information resources, it has complexities and limitations. For example, it requires that the server provide a separate control URI, leading to complexity in management; the incremental update messages, even if for different information resources, cannot interleave.
+      </t>
+
+          <figure title="ALTO SSE Architecture and Message Flow." anchor="FigOverview">
+    <artwork>
+    <![CDATA[
+ ------------------------------------------------------------------
+|                                                                  |
+|          +-------+         +-------+ 1. init request  +------+   |
+|          |       |         |       | <-------------   |      |   |
+|          |       |         |       | ------------->   |      |   |
+| 3.add/   |       |         |       | 1'. control uri  |      |   |
+| remove   |       |         |       |                  |      |   |
+| resource |Stream |         |Update |                  |      |   |
+  -------->|Control| private |Stream | 2a. data update  |Client| --
+           |Server |<------->|Server | messages         |      |
+  -------- |       |         |       | -------------->  |      | <-
+| response |       |         |       | -------------->  |      |   |
+|          |       |         |       | 2b.control update|      |   |
+|          +-------+         +-------+ messages         +------+   |
+|                                                                  |
+ ------------------------------------------------------------------
+    ]]>
+    </artwork>
+    </figure>
+
+    <t>This document specifies ALTO new protocol, which realizes ALTO/SSE but takes advantage of new HTTP/2 <xref target="RFC7540"/>  capabilities. At a high level, the ALTO new protocol fully realizes the ALTO base protocol and the functions of ALTO/SSE shown in Figure 1, and uses a single HTTP/2 connection.</t>
+
+    </section>    
+
+    <section anchor="altoh2req" title="ALTO New Protocol Design Requirements">
+      <t>The new protocol is designed to satisfy a set of requirements, considering ALTO/SSE and ALTO deployment considerations <xref target="RFC7971"/>.</t>
+
+      <t>First, it should satisfy the following requirements to realize the functions 
+        of ALTO/SSE:</t>
+
+      <t><list style="symbols">
+        <t>R0: Client can request any resource using the connection, just as using ALTO base protocol or ALTO/SSE using HTTP/1.x;</t>
+
+        <t>R1: The client can request the addition (start) of incremental updates to a resource;</t>
+        <t>R2: The client can request the deletion (stop) of incremental updates to a resource;</t>
+        <t>R3: The server can signal to the client the start or stop of incremental updates to a resource;</t>
+        <t>R4: The server can choose the type of each incremental update encoding, as long as the type is indicated to be acceptable by the client.</t>
+      </list></t>
+
+      <t>Following the ALTO framework, the new transport protocol should still be HTTP based:</t>
+      <t><list style="symbols">
+        <t>R5: The design follows the basic principle of HTTP---Representational State Transfer 
+          [Fielding] and
+          hence can use only HTTP verbs (GET, POST, PUT, DELETE, HEAD);</t>
+        <t>R6: The design takes advantage of HTTP/2 design features such as parallel transfer 
+           and respects HTTP/2 semantics such as the semantics of PUSH_PROMISE.</t>
+      </list></t>
+
+      <t>To allow flexible deployment, the new transport protocol should be flexible:</t>
+      <t><list style="symbols">
+        <t>R7: The design should support capability negotiation.</t>
+      </list></t>
+
+
+    </section>
+
+    <section anchor="altoh2tis" title="ALTO New Transport Information Structure">
+      <t>The new ALTO transport protocol distinguishes between information about ALTO resources and information about ALTO transport. It introduces the following transport information structures to distribute ALTO information resources:</t>
+      <t><list style="symbols">
+        <t>The transport state from the ALTO server to an ALTO client (or a set of clients) for
+          an ALTO information resource is conceptually through a transport 
+          queue. A static ALTO information resource (e.g., Cost Map, Network Map) has a single transport queue, and a dynamic ALTO information resource (e.g., Filtered Cost Map) may create a queue for each unique filter request.</t>
+        <t>Each transport queue maintains two states: (1) the incremental updates queue 
+          TQ-BASE-URI/uq, 
+          and (2) the recipients set TQ-BASE-URI/rs, where TQ-BASE-URI is the base URI pointing to the transport queue, TQ-BASE-URI/uq is the list of update messages in the updates queue, and TQ-BASE-URI/uq/seq-no is a specific update. A transport queue can be created by a POST URI; a client can delete a transport queue by sending DELETE the TQ-BASE-URI. A client with an interest to receive incremental updates should be in TQ-BASE-URI/rs.</t>
+        <t>The transport queue state is exposed to clients through views; that is, a client can see only a virtual view of the server state.</t>
+      </list></t>
+
+      <section anchor="altoh2tistq" title="Transport Queue">
+        <t>An ALTO client creates a transport queue using ALTO SSE AddUpdateReq 
+          ([RFC 8895] Sec. 6.5). Consistent with [RFC 8895], the default value of 
+          "incremental-changes" MUST be true; that is, the "incremental-changes" field of 
+          a request is true, if the "incremental-changes" field is not included or is 
+          included with value true.  
+        </t>
+        <figure>
+          <artwork><![CDATA[
+    object {
+        ResourceID   resource-id;
+        [JSONString  tag;]
+        [Boolean     incremental-changes;]
+        [Object      input;]
+     } AddUpdateReq;
+
+          ]]></artwork>
+        </figure>
+
+
+        <t>If a request has "incremental-changes" being true, 
+          the client is added to TQ-BASE-URI/r. Whenever a disconnection happens between the client and the server, the server will remove the client from the receiver set of the transport queue; that is, the receiver state is session local and ephemeral. A client can also remove itself by deleting itself from the receiver set, by using the DELETE method.</t>
+
+        <t>A request with "incremental-changes" being false is equivalent to a standard pull request, and the server MUST return the same response for the request as the server will respond using the ALTO base protocol [RFC7285].</t>
+
+        <t>A request with "incremental-changes" being true starts the incremental push process from the server to the client, and the process is specified next.</t>
+      </section>
+
+
+      <section anchor="altoh2tismessages" title="Incremental Updates Queue">
+        <t>When a client joins a transport queue and specifies incremental push updates, the first update pushed from the server to the client MUST be the last independent update in the incremental updates queue, unless the client specifies a matching tag. The server MUST keep track of the state which indicates the most recent update pushed to each client in the receiver set. </t>
+
+        <t>Each update to the client is sent by PUSH_PROMISE.</t>
+
+      </section>
+
+      <section anchor="altoh2tisext" title="Examples">
+
+        <t>The first example is client receiving cost map and its updates.</t>
+
+        <figure>
+          <artwork><![CDATA[
+
+          ]]></artwork>
+        </figure>
+
+        <figure>
+          <artwork><![CDATA[
+   POST /tqs HTTP/2
+   Host: alto.example.com
+   Accept: application/alto-error+json,
+            application/alto-transport+json
+   Content-Type: application/alto-transport+json
+   Content-Length: TBD
+
+   {
+       "resource-id": "my-routingcost-map"
+   }
+
+   HTTP/2 200 OK
+   Content-Type: application/alto-transport+json
+
+   {"tq": “/tqs/2718281828459”}
+
+          ]]></artwork>
+        </figure>
+    
+        <t>Note that the example above uses HTTP/1.x notation, and it is straightforward to change to
+          use HTTP/2 notation. We use the short notation for now and will update to the HTTP/2 notation in later revisions.</t>
+        <figure>
+          <artwork><![CDATA[
+   Client -> server request
+
+   HEADERS
+     - END_STREAM
+     + END_HEADERS
+       :method = POST
+       :scheme = https
+       :path = /tqs
+       host = alto.example.com
+       accept = application/alto-error+json,
+                    application/alto-transport+json
+       content-type = application/alto-transport+json
+       content-length = TBD
+
+   DATA
+    - END_STREAM
+    {
+       "resource-id": "my-routingcost-map"
+    }
+
+   Server -> client response:
+
+   HEADERS
+     - END_STREAM
+     + END_HEADERS
+       :status = 200
+       content-type = application/alto-transport+json
+       content-length = TBD
+   
+   DATA
+     - END_STREAM
+      {"tq": “/tqs/2718281828459”}
+
+          ]]></artwork>
+        </figure>
+
+
+        <t>The client can check the status of the transport queue from the same connection:</t>
+        <figure>
+          <artwork><![CDATA[
+   GET /tqs/2718281828459 HTTP/2
+   Accept: application/alto-error+json,
+             application/alto-transport+json
+
+
+   HTTP/2 200 OK
+   Content-Type: application/alto-transport+json
+
+   { "uq":
+       [ 
+         {“seq”:        101, 
+          "media-type": "application/alto-costmap+json",
+          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" }, 
+         {“seq”:        102, 
+          "media-type": "application/merge-patch+json",
+          “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
+         {“seq”:        103, 
+          "media-type": "application/merge-patch+json",
+          “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+          "link":  "/updates/streams/2718281828459/m/aliase1"} 
+ 
+       ],
+     "rs": ["self"]
+  }
+          ]]></artwork>
+        </figure>
+
+        <figure>
+          <artwork><![CDATA[
+   Client -> server request
+
+   HEADERS
+     - END_STREAM
+     + END_HEADERS
+       :method = GET
+       :scheme = https
+       :path = /tqs/2718281828459
+       host = alto.example.com
+       accept = application/alto-error+json,
+                    application/alto-transport+json
+
+   Server -> client response:
+
+   HEADERS
+     - END_STREAM
+     + END_HEADERS
+       :status = 200
+       content-type = application/alto-transport+json
+       content-length = TBD
+   
+   DATA
+     - END_STREAM
+    { "uq":
+       [ 
+         {“seq”:        101, 
+          "media-type": "application/alto-costmap+json",
+          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" }, 
+         {“seq”:        102, 
+          "media-type": "application/merge-patch+json",
+          “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
+         {“seq”:        103, 
+          "media-type": "application/merge-patch+json",
+          “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+          "link":       "/tqs/2718281828459/snapshot/2e3f"} 
+ 
+       ],
+     "rs": ["self"]
+    }
+
+          ]]></artwork>
+        </figure>
+
+        <t>The client can check the status of the incremental updates queue of a transport queue from the same connection:</t>
+        <figure>
+          <artwork><![CDATA[
+   GET /tqs/2718281828459/uq HTTP/2
+   Accept: application/alto-error+json,
+             application/alto-transport+json
+
+
+   HTTP/2 200 OK
+   Content-Type: application/alto-transport+json
+
+   { 
+       [ 
+         {“seq”:        101, 
+          "media-type": "application/alto-costmap+json",
+          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" }, 
+         {“seq”:        102, 
+          "media-type": "application/merge-patch+json",
+          “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
+         {“seq”:        103, 
+          "media-type": "application/merge-patch+json",
+          “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+          "link":       "/tqs/2718281828459/snapshot/2e3f"} 
+ 
+       ],
+     
+  }
+          ]]></artwork>
+        </figure>
+
+        <figure>
+          <artwork><![CDATA[
+   Client -> server request
+
+   HEADERS
+     - END_STREAM
+     + END_HEADERS
+       :method = GET
+       :scheme = https
+       :path = /tqs/2718281828459/uq
+       host = alto.example.com
+       accept = application/alto-error+json,
+                    application/alto-transport+json
+
+   Server -> client response:
+
+   HEADERS
+     - END_STREAM
+     + END_HEADERS
+       :status = 200
+       content-type = application/alto-transport+json
+       content-length = TBD
+   
+   DATA
+     - END_STREAM
+    { 
+       [ 
+         {“seq”:        101, 
+          "media-type": "application/alto-costmap+json",
+          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" }, 
+         {“seq”:        102, 
+          "media-type": "application/merge-patch+json",
+          “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
+         {“seq”:        103, 
+          "media-type": "application/merge-patch+json",
+          “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+          "link":       "/tqs/2718281828459/snapshot/2e3f"} 
+ 
+       ],
+     
+    }
+
+          ]]></artwork>
+        </figure>
+
+        <t>The client can directly request each individual element in the incremental updates queue of a transport queue. Such a request SHOULD be sent in a new stream. </t>
+        <figure>
+          <artwork><![CDATA[
+   GET /tqs/2718281828459/uq/101 HTTP/2
+   Accept: application/application/alto-costmap+json
+
+
+   HTTP/2 200 OK
+   Content-Type: application/alto-error+json,
+          application/alto-costmap+json
+
+   {
+      "meta" : {
+         "dependent-vtags" : [{
+            "resource-id": "my-network-map",
+            "tag": "da65eca2eb7a10ce8b059740b0b2e3f8eb1d4785"
+          }],
+         "cost-type" : {
+           "cost-mode"  : "numerical",
+           "cost-metric": "routingcost"
+         },
+         "vtag": {
+           "resource-id" : "my-routingcost-map",
+           "tag" : "3ee2cb7e8d63d9fab71b9b34cbf764436315542e"
+         }
+      },
+      "cost-map" : {
+        "PID1": { "PID1": 1,  "PID2": 5,  "PID3": 10 },
+        "PID2": { "PID1": 5,  "PID2": 1,  "PID3": 15 },
+        "PID3": { "PID1": 20, "PID2": 15  }
+      }
+   }
+          ]]></artwork>
+        </figure>
+
+        <figure>
+          <artwork><![CDATA[
+   Client -> server request
+
+   HEADERS
+     + END_STREAM
+     + END_HEADERS
+       :method = GET
+       :scheme = https
+       :path = /tqs/2718281828459/uq/101
+       host = alto.example.com
+       accept = application/alto-error+json,
+                    application/alto-costmap+json
+
+   Server -> client response:
+
+   HEADERS
+     - END_STREAM
+     + END_HEADERS
+       :status = 200
+       content-type = application/alto-costmap+json
+       content-length = TBD
+   
+   DATA
+     + END_STREAM
+    {
+      "meta" : {
+         "dependent-vtags" : [{
+            "resource-id": "my-network-map",
+            "tag": "da65eca2eb7a10ce8b059740b0b2e3f8eb1d4785"
+          }],
+         "cost-type" : {
+           "cost-mode"  : "numerical",
+           "cost-metric": "routingcost"
+         },
+         "vtag": {
+           "resource-id" : "my-routingcost-map",
+           "tag" : "3ee2cb7e8d63d9fab71b9b34cbf764436315542e"
+         }
+      },
+      "cost-map" : {
+        "PID1": { "PID1": 1,  "PID2": 5,  "PID3": 10 },
+        "PID2": { "PID1": 5,  "PID2": 1,  "PID3": 15 },
+        "PID3": { "PID1": 20, "PID2": 15  }
+      }
+   }
+
+          ]]></artwork>
+        </figure>
+        <t>Note from the transport queue state that the 103 message has an OPTIONAL link to a complete snapshot, which a client can request.</t>
+
+        <t>Instead of directly requesting, the client can wait for the server for
+          incremental push, where the server first sends PUSH_PROMISE with the GET URI 
+          as above.</t>
+
+        <figure>
+          <artwork><![CDATA[
+   Server -> client PUSH_PROMISE in current stream
+
+   PUSH_PROMISE     
+     - END_STREAM
+       Promised Stream 4
+       HEADER BLOCK
+       :method = GET
+       :scheme = https
+       :path = /tqs/2718281828459/uq/101
+       host = alto.example.com
+       accept = application/alto-error+json,
+                    application/alto-costmap+json
+
+   Server -> client content Stream 4
+
+   HEADERS
+     + END_STREAM
+     + END_HEADERS
+       :status = 200
+       content-type = application/alto-costmap+json
+       content-length = TBD
+   
+   DATA
+     + END_STREAM
+    {
+      "meta" : {
+         "dependent-vtags" : [{
+            "resource-id": "my-network-map",
+            "tag": "da65eca2eb7a10ce8b059740b0b2e3f8eb1d4785"
+          }],
+         "cost-type" : {
+           "cost-mode"  : "numerical",
+           "cost-metric": "routingcost"
+         },
+         "vtag": {
+           "resource-id" : "my-routingcost-map",
+           "tag" : "3ee2cb7e8d63d9fab71b9b34cbf764436315542e"
+         }
+      },
+      "cost-map" : {
+        "PID1": { "PID1": 1,  "PID2": 5,  "PID3": 10 },
+        "PID2": { "PID1": 5,  "PID2": 1,  "PID3": 15 },
+        "PID3": { "PID1": 20, "PID2": 15  }
+      }
+   }
+
+   Server -> client PUSH_PROMISE in current stream
+
+   PUSH_PROMISE     
+     - END_STREAM
+       Promised Stream 6
+       HEADER BLOCK
+       :method = GET
+       :scheme = https
+       :path = /tqs/2718281828459/uq/102
+       host = alto.example.com
+       accept = application/alto-error+json,
+                    application/merge-patch+json
+
+   Server -> client content Stream 6
+
+   HEADERS
+     + END_STREAM
+     + END_HEADERS
+       :status = 200
+       content-type = application/merge-patch+json
+       content-length = TBD
+   
+   DATA
+     + END_STREAM
+    { ...}
+
+          ]]></artwork>
+        </figure>
+
+        <t>A client can stop incremental push updates by sending the request:</t>
+        <figure>
+          <artwork><![CDATA[
+   DELETE /tqs/2718281828459/rs/self HTTP/2
+   Accept: application/alto-transport+json
+
+
+   HTTP/2 200 OK
+          ]]></artwork>
+        </figure>
+
+        <t>A second client can can request the creation for the same resource and the 
+          server can return the same transport queue.</t>
+
+        <t>A client can delete the transport queue from its view, and as long as there 
+          are other clients, the server will still maintain the transport queue.</t>
+        <figure>
+          <artwork><![CDATA[
+   DELETE /tqs/2718281828459 HTTP/2
+   Accept: application/alto-transport+json
+
+
+   HTTP/2 200 OK
+          ]]></artwork>
+        </figure>
+
+        <t>The transport queue is not limited to only GET resources. The client can also 
+          request a filtered ALTO resource, which is shown in the example below:</t>
+
+        <figure>
+          <artwork><![CDATA[
+   POST /tqs HTTP/2
+   Host: alto.example.com
+   Accept: application/alto-transport+json
+   Content-Type: application/alto-updatestreamparams+json
+   Content-Length: 382
+
+   {
+      "resource-id": "my-pv",
+      "input": {
+         "cost-type": {
+            "cost-mode": "array",
+            "cost-metric": "ane-path"
+         },
+         "endpoints": {
+           "srcs": [ "ipv4:192.0.2.2" ],
+           "dsts": [ "ipv4:192.0.2.89", "ipv4:203.0.113.45" ]
+         },
+         "ane-properties": [ "maxresbw", "persistent-entities" ]
+      }
+   }
+]]></artwork>
+        </figure>
+
+        <figure>
+          <artwork><![CDATA[
+   HTTP/2 200 OK
+   Content-Type: application/alto-transport+json
+
+   {"mq": “/updates/streams/2718281828459”}
+
+]]></artwork>
+        </figure>
+
+      </section>
+    </section>
+
+<!--
+    <section anchor="altoh2req" title="ALTO/H2 Design I">
+
+      <t>Satisfying R1 by allowing client to continuously send in addition requests, with each request being a new HTTP request whose parameters are specified as in ALTO/SSE. The server </t>
+
+      <t>Satisfying R3 by server indicating END_OF_STREAM of the original addition .</t>
+
+      <t>Satisfying R4 by using PUSH_PROMISE: whenever a new update becomes available, the server sends PUSH_PROMISE, in the stream of the original addition request (e.g., n as above), with the Header indicating the type of incremental updates.</t>
+
+      <t>Example: Assume an initial addition request from the client is sent and the request has stream ID n. The request header should indicate the accept, which includes incremental.The client uses ENABLE-PUSH = 0.  When the first incremental update becomes available at the server, the server sends PUSH_PROMISE with promised stream id m, in stream n; the following header HEADER frame has Exclusive, Stream_Dependency = n. When the next incremental update becomes available at the server, the server sends PUSH_PROMISE with promised stream id m', in stream n; with the following header frame has Exclusive, Stream_Dependency = m.
+
+    </section>
+-->
+
+    <section anchor="altoh2ird" title="ALTO/H2 Information Resource Directory (IRD)">
+
+      <t>Extending the IRD example in Section 8.1 of [RFC8895], Figure 2 is the IRD of an ALTO server supporting ALTO base protocol, ALTO/SSE, and ALTO/H2.</t>
+
+      <t>In particular, </t>
+
+
+      <figure>
+        <artwork><![CDATA[
+  "my-network-map": {
+    "uri": "https://alto.example.com/networkmap",
+    "media-type": "application/alto-networkmap+json",
+  },
+  "my-routingcost-map": {
+    "uri": "https://alto.example.com/costmap/routingcost",
+    "media-type": "application/alto-costmap+json",
+    "uses": ["my-networkmap"],
+    "capabilities": {
+      "cost-type-names": ["num-routingcost"]
+    }
+  },
+  "my-hopcount-map": {
+    "uri": "https://alto.example.com/costmap/hopcount",
+    "media-type": "application/alto-costmap+json",
+    "uses": ["my-networkmap"],
+    "capabilities": {
+      "cost-type-names": ["num-hopcount"]
+    }
+  },
+  "my-filtered-cost-map": {
+    "uri": "https://alto.example.com/costmap/filtered/constraints",
+    "media-type": "application/alto-costmap+json",
+    "accepts": "application/alto-costmapfilter+json",
+    "uses": ["my-networkmap"],
+    "capabilities": {
+      "cost-type-names": ["num-routingcost", "num-hopcount"],
+      "cost-constraints": true
+    }
+  },
+  "my-simple-filtered-cost-map": {
+    "uri": "https://alto.example.com/costmap/filtered/simple",
+    "media-type": "application/alto-costmap+json",
+    "accepts": "application/alto-costmapfilter+json",
+    "uses": ["my-networkmap"],
+    "capabilities": {
+      "cost-type-names": ["num-routingcost", "num-hopcount"],
+      "cost-constraints": false
+    }
+  },
+  "my-props": {
+    "uri": "https://alto.example.com/properties",
+    "media-type": "application/alto-endpointprops+json",
+    "accepts": "application/alto-endpointpropparams+json",
+    "capabilities": {
+      "prop-types": ["priv:ietf-bandwidth"]
+    }
+  },
+  "my-pv": {
+    "uri": "https://alto.example.com/endpointcost/pv",
+    "media-type": "multipart/related;
+                   type=application/alto-endpointcost+json",
+    "accepts": "application/alto-endpointcostparams+json",
+    "capabilities": {
+      "cost-type-names": [ "path-vector" ],
+      "ane-properties": [ "maxresbw", "persistent-entities" ]
+    }
+  },
+  "update-my-costs": {
+    "uri": "https://alto.example.com/updates/costs",
+    "media-type": "text/event-stream",
+    "accepts": "application/alto-updatestreamparams+json",
+    "uses": [
+       "my-network-map",
+       "my-routingcost-map",
+       "my-hopcount-map",
+       "my-simple-filtered-cost-map"
+    ],
+    "capabilities": {
+      "incremental-change-media-types": {
+        "my-network-map": "application/json-patch+json",
+        "my-routingcost-map": "application/merge-patch+json",
+        "my-hopcount-map": "application/merge-patch+json"
+      },
+      "support-stream-control": true
+    }
+  },
+  "update-my-costs-h2": {
+    "uri": "https://alto.example.com/updates-h2/costs",
+    "media-type": "application/alto-h2",
+    "accepts": "application/alto-updatestreamparams+json",
+    "uses": [
+       "my-network-map",
+       "my-routingcost-map",
+       "my-hopcount-map",
+       "my-simple-filtered-cost-map"
+    ],
+    "capabilities": {
+      "incremental-change-media-types": {
+        "my-network-map": "application/json-patch+json",
+        "my-routingcost-map": "application/merge-patch+json",
+        "my-hopcount-map": "application/merge-patch+json"
+      },
+      "support-stream-control": true
+    }
+  },
+
+  "update-my-props": {
+    "uri": "https://alto.example.com/updates/properties",
+    "media-type": "text/event-stream",
+    "uses": [ "my-props" ],
+    "accepts": "application/alto-updatestreamparams+json",
+    "capabilities": {
+      "incremental-change-media-types": {
+        "my-props": "application/merge-patch+json"
+      },
+      "support-stream-control": true
+    }
+  },
+  "update-my-pv": {
+    "uri": "https://alto.example.com/updates/pv",
+    "media-type": "text/event-stream",
+    "uses": [ "my-pv" ],
+    "accepts": "application/alto-updatestreamparams+json",
+    "capabilities": {
+      "incremental-change-media-types": {
+        "my-pv": "application/merge-patch+json"
+      },
+      "support-stream-control": true
+    }
+  }
+  ]]></artwork>
+      </figure>
+
+    <t>Note that it is straightforward for an ALTO sever to run HTTP/2 and support concurrent retrieval of multiple resources such as "my-network-map" and "my-routingcost-map" using multiple HTTP/2 streams with the need to introducing ALTO/H2.</t>
+
+    <t>The resource "update-my-costs-h2" provides an ALTO/H2 based connection, and this is indicated by the media-type "application/alto-h2". For an ALTO/H2 connection, the client can send in a sequence of control requests using media type application/alto-updatestreamparams+json. The server creates HTTP/2 streams and pushes updates to the client.</t>
+
+    </section>
+
+    <section anchor="secconsider" title="Security Considerations">
+      <t>The properties defined in this document present no security
+      considerations beyond those in Section 15 of the base ALTO specification
+      [RFC7285].</t>
+    </section>
+
+    <section anchor="ianaconsider" title="IANA Considerations">
+      <t>IANA will need to register the alto-h2 media type under ALTO registry as defined in 
+        [RFC7285].</t>
+    </section>
+
+    <section title="Acknowledgments">
+      <t>The authors of this document would also like to thank many
+      for the reviews and comments.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+    <?rfc include="reference.RFC.2119.xml"?>  <!-- requirements words -->
+    <?rfc include="reference.RFC.7230.xml"?>  <!-- HTTP/1.1 -->        
+    <?rfc include="reference.RFC.7285.xml"?>  <!-- alto base -->   
+    <?rfc include="reference.RFC.7540.xml"?>  <!-- HTTP/2 -->     
+    <?rfc include="reference.RFC.8174.xml"?>  <!-- requirements words -->    
+    <?rfc include="reference.RFC.8895.xml"?>  <!-- ALTO SSE -->
+    </references>
+
+    <references title="Informative References">            
+
+      <?rfc include="reference.RFC.7971.xml"?>  <!-- requirements -->
+
+    </references>
+  </back>
+</rfc>
