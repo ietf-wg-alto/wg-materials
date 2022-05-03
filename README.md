@@ -1,2 +1,3 @@
-# wg-materials
-WG materials such as presentations slides, Hackathon Demo material, Code base. 
+# IETF ALTO Working Group Materials
+
+This repository holds agendas, minutes, presentations and other materials for the IETF ALTO Working Group.
