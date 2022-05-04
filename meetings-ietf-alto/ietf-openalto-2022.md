@@ -1,3 +1,9 @@
+**Meetings held on:** Mon 9am, Wed 9am and Thu 10am EST.
+
+**Location:** https://yale.zoom.us/my/yryang
+
+----
+
 **IETF OpenALTO Meeting: May 2, 2022**
 
 **Agenda:**
