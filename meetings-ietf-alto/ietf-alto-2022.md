@@ -1,7 +1,7 @@
 ----
 **Logistics:**
 
-- **Meetings time:** Tue 9:00 to 9:30am EST
+- **Meeting times:** Tue 9:00 to 9:30am EST
 
 - **Location:** https://ietf.webex.com/ietf/j.php?MTID=ma0e97cc97c4cd71bb59cf1a094682686
 
