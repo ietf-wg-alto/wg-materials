@@ -1,3 +1,9 @@
+- **Minute takers:** Jensen, Jordi, Kai, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine.
+
+- **Current minute taker:** Jensen
+
+----
+
 **IETF ALTO Meeting: May 3, 2022**
 
 **Agenda:**
