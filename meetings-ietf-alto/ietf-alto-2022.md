@@ -11,6 +11,21 @@
 
 ----
 
+**IETF ALTO Meeting: May 10, 2022**
+
+**Agenda:**
+
+- Reminder that using Github scrum is not a substitute for using ALTO mailing list. 
+  Good practice: use ALTO mailing list with pointers to Github tickets.
+  
+- WIP / Add here more agenda items
+
+**Minutes:**
+
+WIP
+
+----
+
 **IETF ALTO Meeting: May 3, 2022**
 
 **Agenda:**
