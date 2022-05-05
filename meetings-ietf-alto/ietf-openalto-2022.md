@@ -1,6 +1,14 @@
-**Meetings held on:** Mon 9am, Wed 9am and Thu 10am EST.
+----
 
-**Location:** https://yale.zoom.us/my/yryang
+**Logistics:**
+
+- **Meeting times:** Mon 9:00 to 10:00am EST, Wed 9:00 to 9:30am EST, Thu 10:00 to 10:30am EST
+
+- **Location:** https://yale.zoom.us/my/yryang
+
+- **Minute takers:** Alex, Jacobs, Jensen, Jordi, Kai, Mahdi, Richard.
+
+- **Current minute taker:** Alex
 
 ----
 
