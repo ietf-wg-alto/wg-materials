@@ -25,7 +25,46 @@
 
 **Minutes:**
 
-Notes taker: XXX
+Notes taker: Jacob
+
+* Administration: meeting minutes at ietf-wg-alto/wg-materials
+* Pull requests review:
+	* openalto/alto #5 (separate parser logic from server logic) getting close to completion -- only two outstanding conversations
+		* small change in comments language
+		* change name of algorithm from "JENSEN" to "NUM"
+	* openalto/alto #8 -- CI/unit-test pull request
+		* just merged! Now completed
+	* openalto/ietf-hackathon #44: documentation
+		* mostly just typos
+	* also discussion of PR on the Rucio repo; Jensen waiting for response on Slack
+* Quick around-the-table update
+	* Jensen:
+		* analyzed how FTS scheduler and optimizer works; see issue on GitHub
+		* issue to discuss later about control framework
+	* Richard:
+		* IPFS:
+			* opportunity: think about, for example, ALTO integration with IPFS
+			* IPFS highly relevant; part of movement to make web distributed again
+			* thus, recommend: *read about IPFS*
+			* interesting goal: work with IPFS to integrate ALTO for peer selection -- perfectly able to be integrated, and complements ALTO-Rucio integration
+			* we should invite the IPFS developers to work with us
+			* in addition, recruit a student or two to work on this
+* Discussion re: integrating ALTO with Rucio replica selection step and transfer scheduling step
+	* Jensen: need to have an interface between Rucio and FTS in order to better understand how to select replicas
+	* see Jensen's issue on GitHub -- nondeterminism in FTS scheduling means harder to predict replication rule TTC 
+	* Jensen explained on how FTS works: #36 on openalto/ietf-hackathon
+		* basic FTS concepts:
+			* link: ordered pair (source set, destination set)
+			* VO: virtual organization, that represents a science organization
+			* VO shares: each VO gets some number of slots for a given link
+			* weighted fairness determines how many shares each VO gets -- centralized controller
+		* FTS decides which transfers should start first (transfer scheduler)
+			* this invovles randomness in order to avoid starvation -- but makes it harder to predict rule TTC
+			* then, after weighted fairness determines how many shares per VO, FIFO is used to maximize bandwidth
+		* optimizer
+			* tuning after the transfers have started
+* Richard notes two fundamental new challenges: **multi-domain** and **multi-experiments**
+* For Wednesday, focus on architecture/algorithm
 
 ----
 
