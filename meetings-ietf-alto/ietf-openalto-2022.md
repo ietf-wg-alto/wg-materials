@@ -12,6 +12,23 @@
 
 ----
 
+**IETF OpenALTO Meeting: May 9, 2022**
+
+**Agenda:**
+
+- Review of pull requests
+- Quick around the table status update
+- Architecture
+- Rucio / FTS 114 Hackathon story
+- SIGCOMM'22 NAI submission
+- Wrap up and next tasks
+
+**Minutes:**
+
+Notes taker: XXX
+
+----
+
 **IETF OpenALTO Meeting: May 2, 2022**
 
 **Agenda:**
@@ -23,6 +40,8 @@
 - Wrap up and next tasks
 
 **Minutes:**
+
+Notes taker: Jordi
 
 - Jacob, Jensen and Mahdi provide an update on the three outstanding pull requests.
 - Everyone provides an update on what they are working on.
