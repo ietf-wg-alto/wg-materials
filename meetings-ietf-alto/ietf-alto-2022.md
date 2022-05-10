@@ -18,7 +18,7 @@
 - Reminder that using Github scrum is not a substitute for using ALTO mailing list. 
   Good practice: use ALTO mailing list with pointers to Github tickets.
   
-- WIP / Add here more agenda items
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 
 **Minutes:**
 
