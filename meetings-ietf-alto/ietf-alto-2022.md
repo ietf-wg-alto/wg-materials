@@ -18,6 +18,8 @@
 - Reminder that using Github scrum is not a substitute for using ALTO mailing list. 
   Good practice: use ALTO mailing list with pointers to Github tickets.
   
+- Confirm the NAI deadline
+  
 - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 
 **Minutes:**
