@@ -10,6 +10,21 @@
 - **Current minute taker:** Jensen
 
 ----
+**Next Meeting: IETF ALTO Meeting: May 17, 2022**
+
+**Agenda:**
+
+- John Graham update
+- To add
+- 
+----
+**Future Meeting (Planning): IETF ALTO Meeting: May 24, 2022**
+
+**Agenda:**
+
+- Tentative: Wireless physcical layer exposure + ALTO
+
+----
 
 **IETF ALTO Meeting: May 10, 2022**
 
