@@ -16,13 +16,28 @@
 
 - John Graham update
 - To add
-- 
+ 
 ----
 **Future Meeting (Planning): IETF ALTO Meeting: May 24, 2022**
 
 **Agenda:**
 
 - Tentative: Wireless physcical layer exposure + ALTO
+
+----
+**Future Meeting (Planning): IETF ALTO Meeting: May 31, 2022**
+
+**Agenda:**
+
+- Tentative: Modeling progress (Discrete event simulation, continuous simulation, packet simulation) + ALTO
+
+----
+
+**Future Meeting (Planning): IETF ALTO Meeting: June 7, 2022**
+
+**Agenda:**
+
+- Tentative: Application-driven in-network measurements + ALTO
 
 ----
 
