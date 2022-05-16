@@ -41,6 +41,10 @@
 - John Graham 5G Project in PRP: IETF ALTO, SRv6, Bottleneck Structure Graphs
 - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 
+**Minutes:**
+
+WIP
+
 ----
 
 **IETF ALTO Meeting: May 10, 2022**
