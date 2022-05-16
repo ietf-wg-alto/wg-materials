@@ -9,13 +9,7 @@
 
 - **Current minute taker:** Jensen
 
-----
-**Next Meeting: IETF ALTO Meeting: May 17, 2022**
 
-**Agenda:**
-
-- John Graham update
-- To add
  
 ----
 **Future Meeting (Planning): IETF ALTO Meeting: May 24, 2022**
@@ -40,6 +34,14 @@
 - Tentative: Application-driven in-network measurements + ALTO
 
 ----
+**IETF ALTO Meeting: May 17, 2022**
+
+**Agenda:**
+
+- John Graham 5G Project in PRP: IETF ALTO, SRv6, Bottleneck Structure Graphs
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+
+----
 
 **IETF ALTO Meeting: May 10, 2022**
 
@@ -54,7 +56,26 @@
 
 **Minutes:**
 
-WIP
+- ANE name: https://github.com/ietf-wg-alto/draft-ietf-alto-unified-props-new/issues/1  
+- Will take simple action 
+- Requested 2-hour slot for IETF 114 
+- Invite people to present first in our weekly meeting, then to the IETF  
+- Major trend in community how to understand how a network works
+- ALTO is modeling tool 
+- Combination of 3: visibility, intelligence, controllability 
+- Discrete simulation is superslow 
+- Modeling: accuracy issue 
+- Continuous discrete differential equation simulation, could be good for ALTO 
+- ALTO just focuses on query interface, you need to build the database 
+- For long we care a lot about northbound, we need to care more about southbound 
+- We have ALTO OAM 
+- Invite key people to discuss this to build the model 
+- MIT / digital twin 
+- Use ALTO / MOWIE for gaming 
+- Solve lack of interaction with 3GPP 
+- Flow level continuous simulator 
+- We also want to cover compute-aware networking, network as a service. We need to balance. 
+- A third direction: Application specifies needs using a language and compile it down to the network 
 
 ----
 
