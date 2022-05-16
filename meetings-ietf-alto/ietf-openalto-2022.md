@@ -8,7 +8,7 @@
 
 - **Minute takers:** Alex, Jacobs, Jensen, Jordi, Kai, Mahdi, Richard.
 
-- **Current minute taker:** Mahdi
+- **Current minute taker:** Kai
 
 ----
 
