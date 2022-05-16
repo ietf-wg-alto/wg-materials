@@ -23,7 +23,7 @@
 Notes taker: Kai
 
 * The team discussed the problem formulation for the positioning paper to be submitted to NAI'22.
-* Jocab updated the progress on downloading use cases (which replica to choose to download to minimize the downloading time)
+* Jacob updated the progress on downloading use cases (which replica to choose to download to minimize the downloading time)
 * Richard suggested to look into multi-level queue in OS and the estimation method of Hedera
 
 ----
