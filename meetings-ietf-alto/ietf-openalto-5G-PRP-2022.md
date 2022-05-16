@@ -55,7 +55,6 @@ Controllability:
     
 Network:
     - SONIC
-        - REST service control to communicate with OpenNSA
     - freeRouter 
     - Calico VPP
     - BStruct-Mininet (dev environment)
