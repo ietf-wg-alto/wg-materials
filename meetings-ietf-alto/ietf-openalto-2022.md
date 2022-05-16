@@ -8,7 +8,18 @@
 
 - **Minute takers:** Alex, Jacobs, Jensen, Jordi, Kai, Mahdi, Richard.
 
-- **Current minute taker:** Alex
+- **Current minute taker:** Mahdi
+
+----
+
+**IETF OpenALTO Meeting: May 16, 2022**
+
+**Agenda:**
+
+- SIGCOMM'22 NAI submission
+
+**Minutes:**
+
 
 ----
 
