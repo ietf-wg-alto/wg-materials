@@ -7,9 +7,7 @@
 
 - **Minute takers:** Jensen, Jordi, Kai, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine.
 
-- **Current minute taker:** Jensen
-
-
+- **Current minute taker:** Kai
  
 ----
 **Future Meeting (Planning): IETF ALTO Meeting: May 24, 2022**
@@ -34,6 +32,7 @@
 - Tentative: Application-driven in-network measurements + ALTO
 
 ----
+
 **IETF ALTO Meeting: May 17, 2022**
 
 **Agenda:**
@@ -59,6 +58,8 @@ WIP
 - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 
 **Minutes:**
+
+Note Taker: Jordi Ros-Giralt
 
 - ANE name: https://github.com/ietf-wg-alto/draft-ietf-alto-unified-props-new/issues/1  
 - Will take simple action 
