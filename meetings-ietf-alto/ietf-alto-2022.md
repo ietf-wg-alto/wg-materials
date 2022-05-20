@@ -41,6 +41,62 @@
 - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 
 **Minutes:**
+John gave a wonderful talk on "5G End to End OTA PRP/NRP O-RAN testbed". The talk was mainly on the PRP/NRP platform. Designed to provide a composable and end-to-end programmable 5G platform, the platform is built with programmable switches and FPGAs to provide complete data plane programmability and Kubernetes to provide service orchestration. Some highlights include
+
+- The platform now has 3 sites and 8 subnetworks
+- Xilinx and Open-AIR put up a demo that FPGA acceleration achieves 10x speed-up in 5G streaming
+- The 5G core is based on O-RAN but can potentially be compatible with other technologies. The platform also provides a field to test the interoperability of different 5G technologies
+- The platform is running on top of a multi-domain network with multiple controllers but provides end-to-end SRv6 programmability through the SENSE/AutoGole fabric. There is also an ongoing effort to reprogram BGP for performance-aware flow steering
+- The platform is used by NSF award-winning projects such as SAGE. Showcases include fire detection based on LoRA, multi-view camera stitching, and high frame-rate thermal dynamics
+
+Questions and discussions (briefs):
+
+- Jordi: What applications are running on the GPUs
+- John: Pretty much any workload
+- Jordi: How do you envision how ALTO/openALTO can be used in this architecture?
+- John: ALTO can be used by the orchestrator for POD placement: create latency heatmap, split into 6 zones of service pools, and have k8s place the pods where they perform best. The clusters will have awareness to the network. The other application is when Rucio finds that a job cannot be delivered in time, reprogram BGP to get a different priority path. Have ALTO to help figure out the best paths to deliver among multiple channels
+- Harvey: When the progress is insufficient, how does the job get accelerated? When you have an L2 overlay, what you do is to moderate the flow rate? Which tools we are going to use to accelerate the rate? 
+- John: Creating multiple SENSE paths. Each one with a different QoS setting. You can tell BGP to transit the flow from one path to another.
+- Harvey: We can use FireQoS (?) to moderate the rate
+- John: This is one way to solve the problem. There are other options, e.g., using P4 switches.
+- Jordi: We think of this as a really great platform to deploy the job in the WG. What John and his team is building is a highly controllable and programmable network. Some of the use cases are related to the drafts that we are writing, e.g., how to optimize applications running in the edge clouds. John mentioned the notion of visibility, intelligence, and control. Use ALTO to build a latency heatmap for POD placement. We look at this as a way to deploy the ALTO/openALTO work.
+- Luis: How is SRv6 used in the platform? 
+- John: We want to have SRv6 end-to-end. Calico VPP is the overlay network used in K8s. 
+- Luis: Tuning the BGP, do you consider this with traffic engineering?
+- John: What functions are missing in Calico VPP is another question. VPN is already there, some form of segment routing works but what actually works needs to be understood. 
+- Luis: We are also working on O-ran. An ongoing work is to expose topology to help the O-RAN management.
+- Richard: Potential architecture of overall network. Two types: private network, and public network (Internet). Do you envision this is a specific architecture or it can be generic? 
+- John: We are providing a garden of architectures. We have a good commitment of latest accelerators and embrace constant changes by adding the new capabilities.
+- Richard: ALTO path vector is a generalization of the BGP protocol. It's great that we have generic architecture.
+- John: What we are looking into is to make k8s a network-aware orchestrator based on the ALTO protocol. We use namespace and federated through namespace.
+- Harvey: To start imagine composable infra where different subsystems need to work under different contexts/use cases. Tools like the path vector which has the abstract concept of cost which allows stateful decisions. There is no single architecture. Success of SENSE is to engage many different regions of the world and deploy things. Get common things by doing. Start pursuing composable architecture.
+- Richard: K8s is using predicates + ranking architecture. 
+- Harvey: John mentioned few things. If you have an approaching deadline, it's not just a point decision, it's a lifecycle management system.
+- John: We've already extended the k8s scheduler. Give priorities to different namespaces, different nodes. Inform the state of the workflow, with daemons integrated into nautilus. We have instrumented everything to discover what the cluster is telling us. Instead of having application to figure out what is best, we can have dedicated containers to do that.
+- Richard: Do you consider the state sharing in etcd?
+- John: Shared state is federated through the etcd
+- Jordi: We track the [meeting minutes](https://github.com/ietf-wg-alto/wg-materials/blob/main/meetings-ietf-alto/ietf-openalto-5G-PRP-NRP-ORAN-2022.md) for the meeting on Monday. Putting the demo about the integration in SC'22.
+
+The WG also provides updates on the board items.
+
+Cost Mode: 
+- Kai: cost mode is now in IEST evaluation
+
+ANE name format:
+- Sabine: follow option 1 on the ANE name format issue 
+
+New transport:
+- Richard: a new version will be uploaded
+- Qin: once the new version is uploaded, it should be sent to HTTP2 WG for review
+
+OAM:
+- Jensen: dig into solving the configuration part
+- Qin: if there is any open issue, discuss on the mailing list
+
+NAI:
+- Luis: already have 5 submissions, advertised again. The deadline is officially May 25
+
+John mentioned that he and his team will continue to work on the Jupyter lab + ALTO integration, which will make PRP/NRP as a platform for future ALTO development/testing/hackathons.
 
 WIP
 
