@@ -12,6 +12,20 @@
 
 ----
 
+**IETF OpenALTO Meeting: May 23, 2022**
+
+**Agenda:**
+
+- SIGCOMM'22 NAI submission
+
+**Minutes:**
+
+Notes taker: Mahdi
+
+- WIP
+
+----
+
 **IETF OpenALTO Meeting: May 16, 2022**
 
 **Agenda:**
