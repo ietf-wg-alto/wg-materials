@@ -8,28 +8,21 @@
 - **Minute takers:** Jensen, Jordi, Kai, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine.
 
 - **Current minute taker:** Kai
- 
-----
-**Future Meeting (Planning): IETF ALTO Meeting: May 24, 2022**
-
-**Agenda:**
-
-- Tentative: Wireless physcical layer exposure + ALTO
-
-----
-**Future Meeting (Planning): IETF ALTO Meeting: May 31, 2022**
-
-**Agenda:**
-
-- Tentative: Modeling progress (Discrete event simulation, continuous simulation, packet simulation) + ALTO
 
 ----
 
-**Future Meeting (Planning): IETF ALTO Meeting: June 7, 2022**
+**IETF ALTO Meeting: May 24, 2022**
 
 **Agenda:**
 
-- Tentative: Application-driven in-network measurements + ALTO
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- Chair request: Focus/prioritize ALTO Transport and ALTO OAM.  
+
+**Minutes:**
+
+Note Taker: Luis
+
+- WIP
 
 ----
 
@@ -41,6 +34,9 @@
 - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 
 **Minutes:**
+
+Note Taker: Kai
+
 John gave a wonderful talk on "5G End to End OTA PRP/NRP O-RAN testbed". The talk was mainly on the PRP/NRP platform. Designed to provide a composable and end-to-end programmable 5G platform, the platform is built with programmable switches and FPGAs to provide complete data plane programmability and Kubernetes to provide service orchestration. Some highlights include
 
 - The platform now has 3 sites and 8 subnetworks
