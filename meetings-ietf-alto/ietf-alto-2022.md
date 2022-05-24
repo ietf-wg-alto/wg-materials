@@ -17,13 +17,23 @@
 
 - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 - Chair request: Focus/prioritize ALTO Transport and ALTO OAM.  
+- SIGCOMM NAI workshop
 
 **Minutes:**
 
 Note Taker: Luis
 
-- WIP
-
+- ALTO Transport (Roland / Richard): update behind schedule. To be recovered during next weeks. Updates include description of transport queue information, communication flows, appendix on ALTO and http/3, etc.
+- ALTO OAM (Jensen): working on open issues raised during last IETF meeting (data model for client side, config server level management). Checking related work (e.g., NETCONF) to improve the model. More disucssions needed.
+- ALTO cost mode (Kai): still waiting for further feedbacks. Now 8 YES, No objections so far.
+- ALTO tutorial: to be consider for the NAI workshop, depending on the number of submitted papers.
+- SIGCOMM NAI workshop (Luis / all): deadline on MAy 25th, 6 papers submitted by now, around 6 more known to be submitted. To take decisions once we have clear the final status in terms of number of submissions. Consider ALTO tutotial, invited papers (one now identified), etc. 
+- ALTO article for Internet Protocol journal
+- Guest speakers (Richard): 
+   * Talk from Princeton team scheduled for next week. Considering also participation/talks from Alibaba and Tencent. Discussions can help to profile topics for rechartering, specifically in this case leverage on ALTO for visualization of physical information. Target date: May 31th.
+   * Additional talk from Microsoft. Target date: June 7th. 
+- Rucio infor in ALTO format (Jordi / Richard): pursuing unified single model.
+-  
 ----
 
 **IETF ALTO Meeting: May 17, 2022**
