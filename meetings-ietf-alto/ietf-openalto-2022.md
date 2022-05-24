@@ -22,7 +22,22 @@
 
 Notes taker: Mahdi
 
-- WIP
+Current ongoing work for submission to NAI has three tracks: 
+
+1. **Manual Workflow Scheduling** Based on Jacob's LP proposal for which first formulation and protocol proposals can be found [here](https://docs.google.com/document/d/1ia8S0DzDdFNwuB9hCwCeoc3IAVvVRLB6qpBYKS-t3QU/edit) and [here](https://docs.google.com/document/d/1QlNsh2pNn0WzMP43okY37ODvnEuQrPxrF9aOJqUMVuo/edit).
+	* 	**Current state** Needs checks of algorithm and clear write-up - followed by simulation experiments and analytical evaluations - Richard will impose a story - **Final step** To merge with Rucio downloader. 
+2. **Automatic Workflow** Based on Jensen's formulation [here](https://www.overleaf.com/project/626fc17f4e3e279ce4df8949).
+	* This divides the automatic workflow into two subproblems of destination selection and replication schedules. The second part is identical to work track #1. However, it differs from two perspectives. 
+		1. The scale is higher (millions of flows) 
+		2. In 1 we have assumed that the flows are primarily bottlenecked at the edge. (**Kai's comment:** Given L2 tunneling in Rucio transfers the edge bottleneck assumption also remains legitimate for this case.)  			
+3. **Flow Scheduling** Alex's work is based on a three-level formulation of the flow optimization problem. 
+	* **Current state:** Formulation is concrete and complete, but needs evaluations. Most likely to be submitted. 		
+
+	
+### Decisions
+1. 	To temporarily abandon track 1, and focus on finalizing the manual workflow case. 
+	* **Steps:** 	1- To clear the write-up of the algorithm and protocol. (check the linearity conditions.) 2- To do evaluations based on simulation. (Jensen). 3-To finish writes up given an imposed story which will be devised by Richard in the upcoming days. 
+
 
 ----
 
