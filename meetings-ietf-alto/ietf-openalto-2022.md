@@ -6,7 +6,7 @@
 
 - **Location:** https://yale.zoom.us/my/yryang
 
-- **Minute takers:** Alex, Jacobs, Jensen, Jordi, Kai, Mahdi, Richard.
+- **Minute takers:** Alex, Jacobs, Jensen, Jordi, Kai, Mahdi, Shenshen, Richard.
 
 - **Current minute taker:** Kai
 
