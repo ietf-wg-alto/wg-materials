@@ -209,6 +209,7 @@
 
       <t>Figure 2 shows an example illustrating the aforementioned information. Each ALTO client 
         (Client 1, Client 2, Client 3) maintains a single HTTP/2 connection with the ALTO server.
+        [TODO: Add more elaboration.]
       </t>
           
       <figure title="ALTO New Transport Information Structure." anchor="FigInfoStruct">
@@ -274,7 +275,8 @@ sq/rs = receiver set
       Client requests transport queue status of tq
       Client requests an element in the incremental update queue
 
-      Client becomes a receiver
+      Client becomes a receiver [TODO: clear the 
+            concurrency, or initial is possible]
       Client receives incremental push updates
     Client closes the transport queue tq
     Client closes the connection
@@ -289,10 +291,10 @@ sq/rs = receiver set
       <section anchor="altoh2tqops" title="Transport Queue Operations">
 
         <t>A transport queue supports three basic operations (CRD): create, read 
-        (get status), and delete.
+        (get status), and delete. [TODO: fix or not]
         </t>
 
-        <t>Create a transport queue: An ALTO client creates a transport queue using the HTTP POST method with ALTO SSE AddUpdateReq 
+        <t>Create a transport queue: [TODO: What is the structure] An ALTO client creates a transport queue using the HTTP POST method with ALTO SSE AddUpdateReq 
         ([RFC 8895] Sec. 6.5) as the parameter: 
         </t>
 
@@ -312,7 +314,7 @@ sq/rs = receiver set
 
         <t>A successful POST request MUST return the URI for the transport queue. Unless the request has incremental-changes to be false, the client is added to receiver set as well, indicating that the client will receive automatic, incremental push updates. </t>
 
-        <t>Read a transport queue: A client reads the status of a transport queue by issuing a GET request to the transport queue URI returned from the POST method. </t>
+        <t>Read a transport queue: A client reads the status of a transport queue by issuing a GET request to the transport queue URI returned from the POST method. [TODO: alto-transport structure; meta or not]</t>
 
         <t>Delete a transport queue: a transport queue exposed to a client can be closed (deleted) either explicitly or implicitly.</t>
 
@@ -325,7 +327,7 @@ sq/rs = receiver set
           </t>
         </list></t>
 
-        <t>Error codes: ALTO/H2 uses HTTP error codes.</t>
+        <t>Error codes: ALTO/H2 uses HTTP error codes. [High level guidance of error code; JSON error code guidance]</t>
 
       </section> <!-- transport queue section operation -->
 
@@ -344,7 +346,8 @@ sq/rs = receiver set
        host = alto.example.com
        accept = application/alto-error+json,
                     application/alto-transport+json
-       content-type = application/alto-transport+json
+       content-type = application/alto-transport+json 
+                        [TODO: SSE stream control type]
        content-length = TBD
 
    DATA
@@ -441,10 +444,10 @@ sq/rs = receiver set
           update, with three required fields and one optional field:</t>
 
         <t><list style="symbols">
-          <t>"seq": a required JSON integer indicating the sequence number of the incremental update; As JSON allows a large integer space, when the server reaches the largest integer, the server SHOULD close the incremental update queue; </t>
+          <t>"seq": a required JSON integer indicating the sequence number of the incremental update; As JSON allows a large integer space, when the server reaches the largest integer, the server SHOULD close the incremental update queue; [TODO: check the spec on integer; tradition is to treat the space as a ring, but here is an interval and hence cannot wrap around]</t>
           <t>"media-type", a required JSON string giving the type of the incremental update  (see ALTO/SSE);</t>
           <t>"tag": a required JSON string giving a unique tag (see [RFC7285]; </t>
-          <t>"link": an optional JSON string giving an optional link for a client to directly request a resource as a complete snapshot (not through incremental updates).</t>
+          <t>"link": an optional JSON string giving an optional link for a client to directly request a resource as a complete snapshot (not through incremental updates). [TODO: relative or can be absolute]</t>
         </list></t>
 
         <t>Note that the server determines the state (window of history and type of each update) 
@@ -482,6 +485,9 @@ sq/rs = receiver set
    DATA
      - END_STREAM
     { 
+      "meta": {...}, // TODO: notification of incremental 
+                        updates queue closed
+      "queue":
        [ 
          {“seq”:        101, 
           "media-type": "application/alto-costmap+json",
@@ -492,8 +498,17 @@ sq/rs = receiver set
          {“seq”:        103, 
           "media-type": "application/merge-patch+json",
           “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
-          "link":       "/tqs/2718281828459/snapshot/2e3f"} 
- 
+          "link":       "/tqs/2718281828459/snapshot/2e3f"},
+          // design 1 -- end of stream record
+          {“seq”:        -1, // FFFFF}
+           // design 2: add an attribute to each entry
+          {“seq”:        101, // seq will be binded to uint; 
+                               but now w/ -1, int
+           "queue-status": closed,  // json binding always 
+                                       need a queue-status field
+          "media-type": "application/alto-costmap+json",
+          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" }, 
+
        ],
      
     }
@@ -518,7 +533,7 @@ sq/rs = receiver set
         <t><list style="symbols">
           <t>Initialization: the first update pushed from the server to the client MUST be the 
             later of the following two: (1) the last independent update in the incremental updates queue; and (2) the following entry of the entry that matches the tag when the client creates the transport queue. The client MUST set SETTINGS_ENABLE_PUSH to be 
-            consistent.</t>
+            consistent. [TODO: HTTP/2 specific; make it generic, if so what macro/constant?]</t>
           <t>Push state: the server MUST maintain the last entry pushed to the client (and hence per client, per connection state) and schedule next update push accordingly.</t>
           <t>Push management: The client MUST NOT cancel (RST_STREAM) a PUSH_PROMISE to avoid complex server state management.</t>
         </list></t>
@@ -707,7 +722,7 @@ sq/rs = receiver set
     <section anchor="altoh2streams" title="ALTO/H2 Stream Management">
        <section anchor="altoh2streamsobj" title="Objectives">
 
-          <t>A main benefit of using HTTP/2 for ALTO is to take advantage of HTTP/2 streams. In particular, the objectives of ALTO/H2 include: </t>
+          <t>A main benefit of using HTTP/2 for ALTO is to take advantage of HTTP/2 streams. In particular, the objectives of ALTO/H2 include: [TODO: more elaboration]</t>
 
           <t><list style="symbols">
             <t>Allow stream concurrency to reduce latency</t>
@@ -915,7 +930,7 @@ sq/rs = receiver set
     </section>
 
     <section anchor="ianaconsider" title="IANA Considerations">
-      <t>IANA will need to register the alto-h2 media type under ALTO registry as defined in 
+      <t>IANA will need to register a new media type application/alto-transport+json under ALTO registry as defined in 
         [RFC7285].</t>
     </section>
 

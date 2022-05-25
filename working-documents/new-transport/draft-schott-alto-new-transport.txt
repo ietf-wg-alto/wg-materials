@@ -85,7 +85,7 @@ Table of Contents
      5.1.  Incremental Updates Queue Operations  . . . . . . . . . .  10
      5.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  11
    6.  Individual Updates  . . . . . . . . . . . . . . . . . . . . .  12
-     6.1.  Individual Updates Operations . . . . . . . . . . . . . .  12
+     6.1.  Individual Updates Operations . . . . . . . . . . . . . .  13
      6.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  13
    7.  Receiver Set  . . . . . . . . . . . . . . . . . . . . . . . .  16
      7.1.  Receiver Set Operations . . . . . . . . . . . . . . . . .  16
@@ -244,8 +244,8 @@ Internet-Draft                   ALTO/H2                        May 2022
 
    Figure 2 shows an example illustrating the aforementioned
    information.  Each ALTO client (Client 1, Client 2, Client 3)
-   maintains a single HTTP/2 connection with the ALTO server.
-
+   maintains a single HTTP/2 connection with the ALTO server.  [TODO:
+   Add more elaboration.]
 
 
 
@@ -348,7 +348,8 @@ Internet-Draft                   ALTO/H2                        May 2022
          Client requests transport queue status of tq
          Client requests an element in the incremental update queue
 
-         Client becomes a receiver
+         Client becomes a receiver [TODO: clear the
+               concurrency, or initial is possible]
          Client receives incremental push updates
        Client closes the transport queue tq
        Client closes the connection
@@ -361,11 +362,11 @@ Internet-Draft                   ALTO/H2                        May 2022
 4.1.  Transport Queue Operations
 
    A transport queue supports three basic operations (CRD): create, read
-   (get status), and delete.
+   (get status), and delete.  [TODO: fix or not]
 
-   Create a transport queue: An ALTO client creates a transport queue
-   using the HTTP POST method with ALTO SSE AddUpdateReq ([RFC 8895]
-   Sec. 6.5) as the parameter:
+   Create a transport queue: [TODO: What is the structure] An ALTO
+   client creates a transport queue using the HTTP POST method with ALTO
+   SSE AddUpdateReq ([RFC 8895] Sec. 6.5) as the parameter:
 
 
        object {
@@ -384,8 +385,7 @@ Internet-Draft                   ALTO/H2                        May 2022
 
    Read a transport queue: A client reads the status of a transport
    queue by issuing a GET request to the transport queue URI returned
-   from the POST method.
-
+   from the POST method.  [TODO: alto-transport structure; meta or not]
 
 
 
@@ -409,7 +409,8 @@ Internet-Draft                   ALTO/H2                        May 2022
       client reconnects, the client MUST NOT assume that the transport
       queue is still valid.
 
-   Error codes: ALTO/H2 uses HTTP error codes.
+   Error codes: ALTO/H2 uses HTTP error codes.  [High level guidance of
+   error code; JSON error code guidance]
 
 4.2.  Examples
 
@@ -427,6 +428,7 @@ Internet-Draft                   ALTO/H2                        May 2022
           accept = application/alto-error+json,
                        application/alto-transport+json
           content-type = application/alto-transport+json
+                           [TODO: SSE stream control type]
           content-length = TBD
 
       DATA
@@ -434,8 +436,6 @@ Internet-Draft                   ALTO/H2                        May 2022
        {
           "resource-id": "my-routingcost-map"
        }
-
-
 
 
 
@@ -578,7 +578,9 @@ Internet-Draft                   ALTO/H2                        May 2022
    o  "seq": a required JSON integer indicating the sequence number of
       the incremental update; As JSON allows a large integer space, when
       the server reaches the largest integer, the server SHOULD close
-      the incremental update queue;
+      the incremental update queue; [TODO: check the spec on integer;
+      tradition is to treat the space as a ring, but here is an interval
+      and hence cannot wrap around]
 
    o  "media-type", a required JSON string giving the type of the
       incremental update (see ALTO/SSE);
@@ -587,7 +589,7 @@ Internet-Draft                   ALTO/H2                        May 2022
 
    o  "link": an optional JSON string giving an optional link for a
       client to directly request a resource as a complete snapshot (not
-      through incremental updates).
+      through incremental updates).  [TODO: relative or can be absolute]
 
    Note that the server determines the state (window of history and type
    of each update) in the incremental updates queue, as specified by
@@ -599,25 +601,6 @@ Internet-Draft                   ALTO/H2                        May 2022
    check the status of the incremental updates queue of a transport
    queue from the same connection:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Schott, et al.          Expires November 24, 2022              [Page 11]
-
-Internet-Draft                   ALTO/H2                        May 2022
-
-
       Client -> server request:
 
       HEADERS
@@ -627,6 +610,14 @@ Internet-Draft                   ALTO/H2                        May 2022
           :scheme = https
           :path = /tqs/2718281828459/uq
           host = alto.example.com
+
+
+
+Schott, et al.          Expires November 24, 2022              [Page 11]
+
+Internet-Draft                   ALTO/H2                        May 2022
+
+
           accept = application/alto-error+json,
                        application/alto-transport+json
 
@@ -642,6 +633,9 @@ Internet-Draft                   ALTO/H2                        May 2022
       DATA
         - END_STREAM
        {
+         "meta": {...}, // TODO: notification of incremental
+                           updates queue closed
+         "queue":
           [
             {"seq":        101,
              "media-type": "application/alto-costmap+json",
@@ -652,7 +646,16 @@ Internet-Draft                   ALTO/H2                        May 2022
             {"seq":        103,
              "media-type": "application/merge-patch+json",
              "tag":        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
-             "link":       "/tqs/2718281828459/snapshot/2e3f"}
+             "link":       "/tqs/2718281828459/snapshot/2e3f"},
+             // design 1 -- end of stream record
+             {"seq":        -1, // FFFFF}
+              // design 2: add an attribute to each entry
+             {"seq":        101, // seq will be binded to uint;
+                                  but now w/ -1, int
+              "queue-status": closed,  // json binding always
+                                          need a queue-status field
+             "media-type": "application/alto-costmap+json",
+             "tag":        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
 
           ],
 
@@ -660,11 +663,8 @@ Internet-Draft                   ALTO/H2                        May 2022
 
 6.  Individual Updates
 
-6.1.  Individual Updates Operations
 
-   A client can only read an individual update.  The read can be either
-   pull read issued by the client or a push from the server to the
-   client.
+
 
 
 
@@ -673,6 +673,12 @@ Schott, et al.          Expires November 24, 2022              [Page 12]
 
 Internet-Draft                   ALTO/H2                        May 2022
 
+
+6.1.  Individual Updates Operations
+
+   A client can only read an individual update.  The read can be either
+   pull read issued by the client or a push from the server to the
+   client.
 
    Client pull read: A client uses HTTP GET method on the incremental
    updates queue concatenated by the "seq" to pull an individual update.
@@ -689,7 +695,8 @@ Internet-Draft                   ALTO/H2                        May 2022
       independent update in the incremental updates queue; and (2) the
       following entry of the entry that matches the tag when the client
       creates the transport queue.  The client MUST set
-      SETTINGS_ENABLE_PUSH to be consistent.
+      SETTINGS_ENABLE_PUSH to be consistent.  [TODO: HTTP/2 specific;
+      make it generic, if so what macro/constant?]
 
    o  Push state: the server MUST maintain the last entry pushed to the
       client (and hence per client, per connection state) and schedule
@@ -702,13 +709,6 @@ Internet-Draft                   ALTO/H2                        May 2022
 
    The first example is a client pull example, in which the client
    directly requests an individual update.
-
-
-
-
-
-
-
 
 
 
@@ -921,6 +921,7 @@ Internet-Draft                   ALTO/H2                        May 2022
 
    A main benefit of using HTTP/2 for ALTO is to take advantage of
    HTTP/2 streams.  In particular, the objectives of ALTO/H2 include:
+   [TODO: more elaboration]
 
    o  Allow stream concurrency to reduce latency
 
@@ -945,7 +946,6 @@ Internet-Draft                   ALTO/H2                        May 2022
       resource, the other transport queue if the dependency is known.
 
    o  Invariant: Stream keeps open until close or error.
-
 
 
 
@@ -1186,8 +1186,8 @@ Internet-Draft                   ALTO/H2                        May 2022
 
 11.  IANA Considerations
 
-   IANA will need to register the alto-h2 media type under ALTO registry
-   as defined in [RFC7285].
+   IANA will need to register a new media type application/alto-
+   transport+json under ALTO registry as defined in [RFC7285].
 
 12.  Acknowledgments
 
