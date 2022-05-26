@@ -32,8 +32,8 @@ Note Taker: Luis
 - Guest speakers (Richard): 
    * Talk from Princeton team scheduled for next week. Considering also participation/talks from Alibaba and Tencent. Discussions can help to profile topics for rechartering, specifically in this case leverage on ALTO for visualization of physical information. Target date: May 31th.
    * Additional talk from Microsoft. Target date: June 7th. 
-- Rucio infor in ALTO format (Jordi / Richard): pursuing unified single model.
--  
+- Rucio info in ALTO format (Jordi / Richard): pursuing unified single model.
+
 ----
 
 **IETF ALTO Meeting: May 17, 2022**
