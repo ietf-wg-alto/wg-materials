@@ -8,7 +8,17 @@
 
 - **Minute takers:** Alex, Jacobs, Jensen, Jordi, Kai, Mahdi, Shenshen, Richard.
 
-- **Current minute taker:** Kai
+- **Current minute taker:** Shenshen
+
+----
+
+**IETF OpenALTO Meeting: May 30, 2022**
+
+**Agenda:**
+
+- SIGCOMM'22 NAI submission
+
+**Minutes:**
 
 ----
 
