@@ -20,6 +20,14 @@
 
 **Minutes:**
 
+Notes taker: Shenshen
+
+* Mahdi reported the progress on studying [a servey]("A Survey on Resource Scheduling for Data Transfers in Inter-Datacenter WANs") and suggested hierachy network-wide scheduling. 
+* Richard proposed Task 1-3 on Google doc (not sure if we can post the edit-link on this public repo) and discussed them with the team. Task 3 might be discussed in the next meeting.
+* The paper (due: July 1st) is a grand vision paper with concrete pieces (demo 1-3). Richard suggested getting the implementation starts early (by Monday next week latest).
+* Jensen will go over the progress on Task 2 (link posted on slack) on Wednesday. 
+
+
 ----
 
 **IETF OpenALTO Meeting: May 23, 2022**
