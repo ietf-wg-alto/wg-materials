@@ -7,7 +7,22 @@
 
 - **Minute takers:** Jensen, Jordi, Kai, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine.
 
-- **Current minute taker:** Kai
+- **Current minute taker:** Mahdi
+
+----
+
+**IETF ALTO Meeting: May 31, 2022**
+
+**Agenda:**
+
+- PBE-CC Team discussion
+- IETF ALTO discussion
+
+**Minutes:**
+
+Note taker: Mahdi
+
+- XXX
 
 ----
 
