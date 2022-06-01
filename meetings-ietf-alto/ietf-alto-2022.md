@@ -22,7 +22,58 @@
 
 Note taker: Mahdi
 
-- XXX
+**1. Discussions**
+
+- Professor Kyle Jamieson comment's on ALTO and NG-Scope: Two directions to implement [NG-Scope](https://arxiv.org/pdf/2201.05281.pdf) to do the telemetry and send the information on the client-side. 
+
+1. At the UE (client-side) (Needs firmware design and changes to quickly capture the dynamics and react.)
+2. Separated from the RAN infrastructures - Sits near the client and provides telemetry. 
+
+- Dr. Yaxiong Xie comments on NG-Scope: Cellular networks are centrally controlled, where BSs do resource allocation, bit-rate adaptation, etc., so the idea of NG-Scope is to extract information from control messages. One way to integrate with ALTO is to feed the collected data into the ALTO server and retrieve it back. But the main question is where to collect information and where to deploy it?
+
+- An example that aggregates the data at the receiver and provides information for fair CC at the client side is given [here](https://dl.acm.org/doi/pdf/10.1145/3387514.3405880).
+
+- Two fundamental questions are raised here: 
+
+1. What information to collect? 
+2. The scheme should be flexible and support "Carrier-aggregation" (Professor Jamieson's comment as a proper pathway for the integration of ALTO and NG-Scope). 
+
+- As a multitude of CC algorithms are used by multiple vendors on a wide variety of application 
+
+- An appropriate API is quintessential to aggregating the information. (One possible focus subject for ALTO as proposed by professor Jamieson.)
+
+- Tencent has experience with radio information aggregation in two ways.  
+
+* From BS to applications (for both out-band and in-band paths)
+* RLI (Radio link information) to UEs. 
+
+- Zili Meng's description of the Shortest Control Loop paper tries to address two main issues: Conventional feedback loops may face long delays due to long Sending + Marking + Receiving chains' delays, and possible drastic drops in the sending rates (by a factor of 10). The idea is to avoid queuing delays and send feedback directly to the sender.
+
+**2. Directions**
+
+- Professor Yang proposal: To possibly write a draft on how the NG-Scope-related protocol would look like in terms of API and the protocol requirements. As IETF promotes modular schemes this specification can be divided into three submodels, namely CC (as the application), information signaling, and the messaging protocol. 
+
+- Chair's suggestions (Dr. Qin Wu): Before writing a draft we need to further elaborate on the discussions, and to perform a survey to summarize the work and analyze the requirements. WG should also seek feedback from 3GPP, and IESG transport and CC control groups (Tencent's group has the experience of working with 3GPP).
+
+- Dr. Sabine Randriamasy: Since the ALTO WG is currently chartered, WG can work on physical layer information exposure as a use case, for now, to pave the way.  As an ALTO extension, which supports the application in cellular networks this use case should cover the following area.
+
+1. Introduce the use case. 
+2. Perform the gap analysis. 
+3. Justify that ALTO is useful for this use case. 
+
+- In terms of network abstractions and exposure, we should know how to stitch that information to guarantee cohesion among multiple domains.
+
+**Links:**
+
+- [MoWIE paper](https://dl.acm.org/doi/10.1145/3405672.3409489): Adaptive network information exposure in mobile networks.
+
+- [NG-Scope paper](https://dl.acm.org/doi/10.1145/3405672.3409489): First-ever channel capacity telemetry tool in cellular networks
+
+- [NG-Scope codebase](https://github.com/YaxiongXiePrinceton/NG-Scope)
+
+- [RFC 8888](https://datatracker.ietf.org/doc/rfc8888/) Interactive real-time CC using RTP (messaging format)
+
+- [PBE-CC](https://dl.acm.org/doi/10.1145/3387514.3405880) CC in cellular networks using physical layer BW measurements
 
 ----
 
