@@ -8,7 +8,39 @@
 
 - **Minute takers:** Alex, Jacobs, Jensen, Jordi, Kai, Mahdi, Shenshen, Richard.
 
-- **Current minute taker:** Shenshen
+- **Current minute taker:** Jensen
+
+----
+
+**IETF OpenALTO Meeting: June 6, 2022**
+
+**Agenda:**
+
+- SIGCOMM'22 NAI submission
+
+**Minutes:**
+
+Notes taker: Jensen
+
+* Mahdi reported the progress on FTS global resource control design (https://github.com/openalto/ietf-hackathon/issues/47)
+* Jensen introduced how the FTS optimizer works. Some issues were discussed:
+
+  * From the latest released FTS source code (https://github.com/cern-fts/fts3/blob/v3.11.2/src/server/services/optimizer/OptimizerConnections.cpp#L127), we know the current FTS optimizer algorithm will adjust the decision (the number of connections) in a logical link based on the EMA of the throughput (if we avoid the success rate issue):
+    * If the EMA increases, the optimizer will increase the decision until reaching the upper bound;
+    * If the EMA decreases, it will check if the round log of the EMA decreases:
+      * If true, decrease the decision until reaching the lower bound;
+      * Otherwise, keep the value.
+  * But in an older version of the FTS optimizer (https://github.com/cern-fts/fts3/blob/3.5/src/server/services/optimizer/OptimizerConnections.cpp#L148), it does not compare the round log of the EMA.
+  * Consider a single logical link:
+    * When there are running connections, the decision will be increased until reaching the upper bound;
+    * TODO: look at the real impact of adding a new flow; the more flows, the more likely MD can cause under utilization
+  * Then consider multiple logical links sharing the same bottleneck:
+    * When new flows are added to a logical link, the decision of this logical link will be increased until reaching the upper bound;
+      * In the latest FTS version, other logical links will not decrease the decision because of the round log
+      * In the older version, other logical links will decrease the decision until one of the link reaches the bound (see the dashboard example: https://fts3-docs.web.cern.ch/fts3-docs/docs/optimizer/monitoring_view.png)
+    * TODO: understand how the optimizers of different logical links affect each others.
+    * TODO: understand when the decision will be decreased in the latest version.
+
 
 ----
 
