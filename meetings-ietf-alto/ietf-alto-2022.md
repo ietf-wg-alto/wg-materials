@@ -7,7 +7,7 @@
 
 - **Minute takers:** Jensen, Jordi, Kai, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine.
 
-- **Current minute taker:** Mahdi
+- **Current minute taker:** Qiao
 
 ----
 
