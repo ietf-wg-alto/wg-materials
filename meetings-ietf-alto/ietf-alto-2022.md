@@ -11,6 +11,20 @@
 
 ----
 
+**IETF ALTO Meeting: June 6, 2022**
+
+**Agenda:**
+
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- Chair request: Focus/prioritize ALTO Transport and ALTO OAM.  
+- SIGCOMM NAI workshop
+
+**Minutes:**
+
+Note taker: Qiao
+
+----
+
 **IETF ALTO Meeting: May 31, 2022**
 
 **Agenda:**
