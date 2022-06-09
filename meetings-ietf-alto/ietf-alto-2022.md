@@ -23,6 +23,29 @@
 
 Note taker: Qiao
 
+1. Richard to introduce Jordi to Princeton and Tencent team so they can work together on writing IETF drafts. (I missed the first 10-15 minutes of the meeting, so this point may not be precise.)
+2. Open ticket on Unified Property:
+   Sabine: in the base protocol, ANE has the same format of PID (i.e., no dots). So we need to fix the incorrect ANE names in the examples of the current UP draft, and propose a more flexible ANE name format as a small update (i.e., protocol maintenance) in the future charter. Similar things can be done for the cost-mode draft.
+   Kai and Richard have the same opinion as well.
+   Sabine to post this in the mailing list.
+3. ALTO cost mode, no objection, already pass IESG
+4. MIT Technology Review article: Richard to lead this effort. Jordi suggests doing the interview style, because the group may not have enough bandwidth. Qin suggests we focus more on other work such as ALTO article for the Internet protocol journal. Jordi is going through the admin process in his company to get clearance.
+5. NAI:
+   (1) Luis:NAI review assigned, 13 submissions, plan to accept ~6;
+   (2) Invited paper:
+       1 by Richard, Jordi about Rucio/FTS/CERN (waiting for Ruciao/CERN's response),
+       1 by Telefonica, Deutsche Telekom, Linux Foundation and Cisco, this is about consuming network capability through interfaces.
+       For the 3rd invited paper, Richard suggests two candidates:
+         candidate 1: Facebook on entitlement/contract between planning/ops/apps of network  
+         candidate 2: Harvey about the composable architecture of different experiments (e.g., CERN, SLAC and UCSD)
+       Richard will reach out to Facebook first
+   (3) Keynote speaker: Richard to approach Jon Crowcroft@Cambridge
+       Others: Richard to collect this year's accepted paper authors to decide.
+6. ALTO new transport:
+   Richard: mostly done by adoption, now it's about re-iteration. Qin: need people to review it and provide feedback
+7. Richard suggests inviting Nick Zhang's group to talk about their recently accepted SIGCOMM paper on deep queue (Q?) network
+8. Jensen talks about his progress in the data model/service model of the OAM draft. He will summarize it in a ticket. 
+
 ----
 
 **IETF ALTO Meeting: May 31, 2022**
