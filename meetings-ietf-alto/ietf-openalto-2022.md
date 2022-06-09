@@ -11,6 +11,46 @@
 - **Current minute taker:** Jensen
 
 ----
+**IETF OpenALTO Meeting: June 7, 2022**
+
+**Agenda:**
+
+- OpenALTO design and current development state (to identify the gaps for the hackathon 114). 
+
+**Minutes:**
+
+* **Open Daylight ALTO project** [link](https://wiki-archive.opendaylight.org/view/ALTO:Architecture) Is not being maintained anymore. Will be removed/ archived soon unless we provide test-cases and upgrades. 
+
+	* **Design quesiton:** Should the environment be controller independent, or inside a particular controller architecture? 
+	* 	**Decision:** OpenALTO should be independent, but have plugins to various controllers. 
+	* Reason: Have to support multi-domain (controller) networks. 
+	* Issue: Multiple controllers (ODL, ONOS, Wireless -ORAN-, G2-Mininet)
+
+For now, we will base the devs on Mininet, because we should have our own demo env besides PRP. 
+
+* **Practice:** [BENOCS paper](https://people.csail.mit.edu/gsmaragd/publications/CoNEXT2019/CoNEXT2019.pdf) -Page 7- A set of listeners submit changes to aggregator, that will update a reference DB. Previously we used ODL data store. This way we will be controler independent, besides a plugin to update the DB triggered by G2-Mininet  arch changes.)
+	* 	**Question:** Best DS to use? **Redis** suggested by Kai, mainly for high performance. *Rationale:* To be viable in 5G congestion control ([PBE-CC](https://dl.acm.org/doi/pdf/10.1145/3387514.3405880)). 
+
+**Current repositories:**
+
+1. **Sextant:** Is a fork of the ODL ALTO repository with some minor BGP related changes. (Sextant provides ALTO server funcionalities.)
+	* Sextant components: 
+		1. Basic: Basic services like Network and Cost Maps. 
+		2. Core
+		3. Karaf: creates executable Karaf containers.  
+		4. Release-features: Aggreagator for all the features.  
+2. **ALTO:** ALTO client API, parsers, and mock server functionalities for testing. 
+3. **Others:** Are ancilary ones created for specific demos (should be moved into the main repo, because they provide a single subtool. 
+
+**TODO**
+
+1. To integrate sextant and ALTO into a single OpenALTO repo (with northbound (APPs)/ Kernel/ southbound (Contollers)/ DB modules). [(Specified here)](https://docs.google.com/document/d/1p8u9I7RbI9yFTNnQEmdoZPslV3Wbnl0R_mkK-JHWGHA/edit). - Following best practice in design (Usecase driven multiple iterations)
+2. Create a landing README that describes the ARCH and different components of the env. 
+3. Move other repos to appropriate destinations. 
+
+**Major decision (to be made)** Class centric vs Data Driven design: Unifying interfaces with known schemas enable multiple programming languages, and because each controller may support different PLs. 
+
+---
 
 **IETF OpenALTO Meeting: June 6, 2022**
 
