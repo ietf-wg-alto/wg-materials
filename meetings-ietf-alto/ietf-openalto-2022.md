@@ -11,6 +11,26 @@
 - **Current minute taker:** Shenshen
 
 ----
+**IETF OpenALTO Meeting: June 13, 2022**
+
+**Agenda:**
+
+- Reporting last-meeting assignments and planning for the next step.
+
+**Minutes:**
+
+Notes taker: Shenshen
+
+* Jensen reported his experiments on FTS (the goal is to make sure we are not making up things). Setting: every 20 sec, sending files through 10M-limited links. 
+    * **Highlights in Discussion:** (1) success rate and nFailedLastHour [link](https://gitlab.cern.ch/fts/fts3/-/blob/develop/src/db/mysql/OptimizerDataSource.cpp#L325); (2) why the case "decision: 8, running: 4" appears? probably due to the constraints on src; (3) why FTS starts with maximum [link](https://github.com/cern-fts/fts3/blob/v3.11.2/src/server/services/optimizer/OptimizerConnections.cpp#L193)? a related corner case [link](https://github.com/cern-fts/fts3/blob/v3.11.2/src/server/services/optimizer/OptimizerConnections.cpp#L121).
+    * **Comments:** build a clear "physical" (not engineering) model and focus on stable states (rather than transient states).
+
+* Madhi reported issues (posted on slack channel).
+    * **Highlights in Discussion:** : (1) a conrner case [link](https://gitlab.cern.ch/fts/fts3/-/blob/develop/src/server/services/optimizer/OptimizerConnections.cpp#L315) related to the race condition; (2) FTS always maximizes the #connections (the knee point between the transfer bottleneck and storage/network bottleck).
+    * **Comments:** (1) remove conrner cases and come up with the main setting; (2) operators may want coarse-grained operations; (3) what is FTS's model and what is a proper model [link](https://gitlab.cern.ch/fts/fts3/-/blob/develop/src/db/mysql/OptimizerDataSource.cpp#L285).
+    * **TODO:** prove the convergence of maximum #connections.
+    
+----
 **IETF OpenALTO Meeting: June 7, 2022**
 
 **Agenda:**
