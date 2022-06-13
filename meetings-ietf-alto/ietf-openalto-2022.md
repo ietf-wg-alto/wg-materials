@@ -8,7 +8,7 @@
 
 - **Minute takers:** Alex, Jacobs, Jensen, Jordi, Kai, Mahdi, Shenshen, Richard.
 
-- **Current minute taker:** Jensen
+- **Current minute taker:** Shenshen
 
 ----
 **IETF OpenALTO Meeting: June 7, 2022**
