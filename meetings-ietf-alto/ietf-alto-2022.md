@@ -24,7 +24,30 @@
 
 **Minutes:**
 
-Note taker: (Next in the Minute taker list)
+1. Jensen will take care of CDNI and address two remaining discussion points from RFC Editors.
+
+2. Sabine will take care of Unified Property draft and provide feedback to RFC Editors in June 14.
+
+3. Jensen gave a quick update of ALTO OAM and will raise discussion on the list.
+
+4. Roland gave a quick update of ALTO transport progress and Richard and Kai needs to follow up with IPR call. Roland and Richard need to create a section to track the open issues and make update to the draft after the draft getted adopted.
+
+5. ART review will be requested after ALTO Transport draft gets adopted.
+
+6. Sabine will help review ALTO transport draft since she is believing it will be important topic related
+
+to MOWIE.
+
+7. CAN status update and the relation with ALTO has been discussed. It was agreed that ALTO can play an
+
+important role in Edge discovery which is related to Luis's draft.
+
+8. It was suggested to invite Danny and Rucio and CERN people to provide ALTO integration update which
+
+is targeted to commerical use.
+
+
+Note taker: Qin
 
 ----
 
