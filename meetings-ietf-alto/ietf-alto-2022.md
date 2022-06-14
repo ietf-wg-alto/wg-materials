@@ -11,6 +11,23 @@
 
 ----
 
+**IETF ALTO Meeting: June 14, 2022**
+
+**Agenda:**
+
+- Chartered documents
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- SIGCOMM NAI workshop
+- IETF 114
+- New I-Drafts
+- Others in the Scrum dashboard
+
+**Minutes:**
+
+Note taker: (Next in the Minute taker list)
+
+----
+
 **IETF ALTO Meeting: June 6, 2022**
 
 **Agenda:**
