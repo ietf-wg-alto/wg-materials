@@ -6,9 +6,9 @@
 
 - **Location:** https://yale.zoom.us/my/yryang
 
-- **Minute takers:** Alex, Jacobs, Jensen, Jordi, Kai, Mahdi, Shenshen, Richard.
+- **Minute takers:** Jensen, Alex, Jacobs, Jordi, Kai, Mahdi, Shenshen, Richard.
 
-- **Current minute taker:** Shenshen
+- **Current minute taker:** Jensen
 
 ----
 **IETF OpenALTO Meeting: June 13, 2022**
