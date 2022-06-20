@@ -18,6 +18,17 @@
 - Reporting last-meeting assignments and planning for the next step.
 
 **Minutes:**
+Notes taker: Jensen
+
+
+----
+**IETF OpenALTO Meeting: June 13, 2022**
+
+**Agenda:**
+
+- Reporting last-meeting assignments and planning for the next step.
+
+**Minutes:**
 
 Notes taker: Shenshen
 
