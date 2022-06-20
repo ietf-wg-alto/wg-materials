@@ -11,15 +11,28 @@
 - **Current minute taker:** Jensen
 
 ----
-**IETF OpenALTO Meeting: June 13, 2022**
+**IETF OpenALTO Meeting: June 20, 2022**
 
 **Agenda:**
 
-- Reporting last-meeting assignments and planning for the next step.
+- Preparing for meeting with FTS team
 
 **Minutes:**
 Notes taker: Jensen
 
+* Q: What is the major findings to talk to FTS?
+  * FTS makes the guarding of throughput decreasing (round log) so that
+    decreasing the decision is extremely harder
+  * FTS is based on gradient algorithms on each logical link individually
+    * Not efficient (pareto-optimal)
+    * Not control fairness at all
+* Design Proposal:
+  * We are going to introduce an aggregation function, then give gradient
+    algorithms to reach pareto-optimal
+  * Propose a mechanism for bandwidth control
+  * Integrate Rucio into the control loop
+  * Detailed discussion is on the slack channel (start from June 20 9:31 am ET)
+* Q: what to do if we can modify both FTS and Rucio
 
 ----
 **IETF OpenALTO Meeting: June 13, 2022**
