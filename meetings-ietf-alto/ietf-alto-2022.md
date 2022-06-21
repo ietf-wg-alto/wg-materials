@@ -24,6 +24,27 @@
 
 **Minutes:**
 
+Note taker: Richard
+
+
+
+----
+
+**IETF ALTO Meeting: June 14, 2022**
+
+**Agenda:**
+
+- Chartered documents
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- SIGCOMM NAI workshop
+- IETF 114
+- New I-Drafts
+- Others in the Scrum dashboard
+
+**Minutes:**
+
+Note taker: Qin
+
 1. Jensen will take care of CDNI and address two remaining discussion points from RFC Editors.
 
 2. Sabine will take care of Unified Property draft and provide feedback to RFC Editors in June 14.
@@ -45,9 +66,6 @@ important role in Edge discovery which is related to Luis's draft.
 8. It was suggested to invite Danny and Rucio and CERN people to provide ALTO integration update which
 
 is targeted to commerical use.
-
-
-Note taker: Qin
 
 ----
 
