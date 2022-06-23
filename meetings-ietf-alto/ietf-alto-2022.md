@@ -11,7 +11,7 @@
 
 ----
 
-**IETF ALTO Meeting: June 14, 2022**
+**IETF ALTO Meeting: June 21, 2022**
 
 **Agenda:**
 
@@ -26,6 +26,25 @@
 
 Note taker: Richard
 
+Cellular network information design team: Yuhang from Tencent; schedule a meeting w/ Alibaba and Tencent;
+
+An update of https://datatracker.ietf.org/doc/html/draft-li-alto-cellular-use-cases is posted, which is a second draft based on MOWIE. It has substantial work to move to standard. The authors invite people to look at the draft, which includes motivation, use cases, and each section highlights the need, which is available from 3GPP but not ALTO. Sabine encourages feedback and Qin (chair) encourages more collaboration from all members.
+
+Authors need to approve the items in the RFC editor queue items: CDNi (Jan and Jensen approved; others need to approve, remind Richard and Kevin Ma, Jo); Unified Property (need to remind all authors to approve, look at the last modification, in terms of the formatting such as those turned into tables).
+
+ALTO new transport adopted as WG document and need to update the new version -01 with new WG file name, collect all open issues in the appendix, discuss them on mailing list---each issue a separate thread, create github to track each issue.
+
+ANE name in the path vector could benefit from the relaxation in the format of the ANE names in the base protocol RFC7285. In particular, only modification on the PIDName. Need to take care of backward compatibility. Option 1 modifies base protocol; Option 2 introduces Bis. A suggestion is to look at the approach of cost mode. Post an errata first to get attention and feedback.
+
+A suggestion is to add the following best practice: add a link on the git to the email discussion.
+
+OAM draft authors check w/ the netmod mailing list and discuss. Jensen already asked questions by posting to yangd doctor mailinglist. Suggest to post to netmod.
+
+Update ALTO journal article based on Med's latest version and post by next weekly meeting.
+
+Please engage more with the CAN BoF discussion. CAN has more remaining issues to be closed. There can be both centralized (e.g., ALTO) and distributed (e.g., any) solutions. Discussion of on-path or off-path solutions. Need fast reaction.
+
+Discussion on how much WG need to focus on WG items (e.g., CAN and edge discovery).
 
 
 ----
