@@ -76,7 +76,7 @@ Note taker: Roland
    - How much do we as ALTO WG want to be integrated in the routing part?
 - FTS is the control plane regarding the maximum number of TCP sessions
 - Each source and destination maintain a amount of concurrent sessions and ALTO comes into the play for optimization of the routing matrix
-   - Adjustment or TCP sessions 
+   - Adjustment of TCP sessions 
 
 
 ----
