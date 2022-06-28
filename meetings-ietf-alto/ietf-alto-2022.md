@@ -26,7 +26,7 @@
 
 Note taker: Roland
 
-**TOP 1 Chartered Documents & ALTO Dashboard:**
+**Agenda Item 1 - Chartered Documents & ALTO Dashboard:**
 
 - Go through the dashboard and the documents
 - Info regarding RFC 9240 can be found on: https://www.rfc-editor.org/auth48/rfc9240
