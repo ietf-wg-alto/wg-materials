@@ -53,7 +53,6 @@ Note taker: Roland
 - Several VP levels speaker will take part of the conference
 - Potential keynote speaker: Werner Vogels (VP & CTO at Amazon)
   - Option for remote presentation 
--  
 
 **Agenda Item - IETF 114:**
 
@@ -66,6 +65,15 @@ Note taker: Roland
   - Connection to 3GPP required and coordination of the design teams
 - Discussion on MoWIE draft
   - 3GPP is offering APIs, suggestion to integrate these in the ALTO work
+ 
+ **Agenda Item - Others in the Scrum dashboard**
+ 
+ - Discussion regarding proposal FTS and global resource allocation
+ - Idea of TCP controller getting all information of the networks and how much bandwidth is used or available, respectively
+ - Discussion is related to RUCIO and SIGCOMM NAI
+ - Clarification together with San Diego Supercomputer Center
+ - Question regarding Rucio/FTS interoperation:
+    - How much do we as ALTO WG want to be integrated in the routing part?
  
 
 ----
