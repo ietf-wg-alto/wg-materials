@@ -26,6 +26,13 @@
 
 Note taker: Roland
 
+**TOP 1 Chartered Documents & ALTO Dashboard:**
+
+- Go through the dashboard and the documents
+- Info regarding RFC 9240 can be found on: https://www.rfc-editor.org/auth48/rfc9240
+- Info regarding RFC 9241 can be found on: https://www.rfc-editor.org/auth48/rfc9241
+- ALTO Transport draft was adopted by the WG: https://datatracker.ietf.org/doc/draft-ietf-alto-new-transport/
+- 
 
 
 ----
