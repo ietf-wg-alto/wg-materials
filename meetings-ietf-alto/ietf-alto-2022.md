@@ -56,8 +56,8 @@ Note taker: Roland
 
 **Agenda Item - IETF 114:**
 
-- Discussion, if the MoWIE work shall be presented in the ALTO WG meeting slot
-- Concerns that the time slots might be too small
+- Discussion, if the MoWIE work shall be presented in the ALTO WG IETF 114 meeting slot
+- Concerns that the time slot might be too small
 
 **Agenda Item - New I-Drafts:**
 
@@ -71,7 +71,7 @@ Note taker: Roland
  - Discussion regarding proposal FTS and global resource allocation
  - Idea of TCP controller getting all information of the networks and how much bandwidth is used or available, respectively
  - Discussion is related to RUCIO and SIGCOMM NAI
- - Clarification together with San Diego Supercomputer Center
+ - Clarification of cooperation with San Diego Supercomputer Center is intended
  - Question regarding Rucio/FTS interoperation:
     - How much do we as ALTO WG want to be integrated in the routing part?
  
