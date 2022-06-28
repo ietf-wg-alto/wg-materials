@@ -31,8 +31,8 @@ Note taker: Roland
 - Go through the dashboard and the documents
 - Info regarding RFC 9240 can be found on: https://www.rfc-editor.org/auth48/rfc9240
 - Info regarding RFC 9241 can be found on: https://www.rfc-editor.org/auth48/rfc9241
-- ALTO Transport draft was adopted by the WG: https://datatracker.ietf.org/doc/draft-ietf-alto-new-transport/
-  or on github: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport
+- ALTO Transport draft was adopted by the WG, see: https://datatracker.ietf.org/doc/draft-ietf-alto-new-transport/
+  or github: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport
 - 
 
 
