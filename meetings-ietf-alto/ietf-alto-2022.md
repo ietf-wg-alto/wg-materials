@@ -68,13 +68,16 @@ Note taker: Roland
  
  **Agenda Item - Others in the Scrum dashboard**
  
- - Discussion regarding proposal FTS and global resource allocation
- - Idea of TCP controller getting all information of the networks and how much bandwidth is used or available, respectively
- - Discussion is related to RUCIO and SIGCOMM NAI
- - Clarification of cooperation with San Diego Supercomputer Center is intended
- - Question regarding Rucio/FTS interoperation:
-    - How much do we as ALTO WG want to be integrated in the routing part?
- 
+- Discussion regarding proposal FTS and global resource allocation
+- Idea of TCP controller getting all information of the networks and how much bandwidth is used or available, respectively
+- Discussion is related to RUCIO and SIGCOMM NAI
+- Clarification of cooperation with San Diego Supercomputer Center is intended
+- Question regarding Rucio/FTS interoperation:
+   - How much do we as ALTO WG want to be integrated in the routing part?
+- FTS is the control plane regarding the maximum number of TCP sessions
+- Each source and destination maintain a amount of concurrent sessions and ALTO comes into the play for optimization of the routing matrix
+   - Adjustment or TCP sessions 
+
 
 ----
 
