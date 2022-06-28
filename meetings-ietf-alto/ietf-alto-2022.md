@@ -77,7 +77,7 @@ Note taker: Roland
 - FTS is the control plane regarding the maximum number of TCP sessions
 - Each source and destination maintain several concurrent sessions and ALTO comes into the play for optimization of the routing matrix
    - Adjustment of TCP sessions
-- Roland stated that the idea to bring this into the Hackathon of IETF 114 is a resonable place to show implementations. Scalability issues need to be taken into   account. In principle centralization is not a new idea.
+- Roland stated that the idea to bring this into the Hackathon of IETF 114 is a reasonable place to show implementations. Scalability issues need to be considered. In principle centralization is not a new idea.
 
 
 ----
