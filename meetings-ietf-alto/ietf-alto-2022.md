@@ -40,8 +40,8 @@ Note taker: Roland
     additional topics
   - Clarification regarding the contact persons is needed
 - ALTO article
-  -  Pulish ALTO article, work is going on
-  - Feedback form MED expected
+  - Pulish ALTO article, work is going on
+  - Feedback form Med (Mohamed Boucadair) expected
   - Update our ALTO Wiki 
 
 **Agenda Item - SIGCOMM NAI workshop**
@@ -52,6 +52,7 @@ Note taker: Roland
 - Try to get a VP level person from Meta
 - Serveral VP levels speaker will take part of the conference
 - Potential keynote speaker: Werner Vogels (VP & CTO at Amazon)
+  - Option for remote presentation 
 -  
 
 **Agenda Item - IETF 114:**
