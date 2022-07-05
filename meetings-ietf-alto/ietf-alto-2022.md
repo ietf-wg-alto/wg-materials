@@ -7,9 +7,27 @@
 
 - **Minute takers:** Jensen, Jordi, Kai, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine.
 
-- **Current minute taker:** Roland
+- **Current minute taker:** Sabine
 
-----
+------------------------------
+
+**IETF ALTO Meeting: July 5, 2022**
+
+**Agenda:**
+
+- Chartered documents
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- SIGCOMM NAI workshop
+- IETF 114
+- New I-Drafts
+- Others in the Scrum dashboard
+
+**Minutes:**
+
+Note taker: Sabine
+
+
+------------------------------
 
 **IETF ALTO Meeting: June 28, 2022**
 
