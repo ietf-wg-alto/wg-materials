@@ -5,7 +5,7 @@
 
 - **Location:** https://ietf.webex.com/ietf/j.php?MTID=ma0e97cc97c4cd71bb59cf1a094682686
 
-- **Minute takers:** Jensen, Jordi, Kai, Lei Yixxe, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang.
+- **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang.
 
 - **Current minute taker:** Sabine
 
