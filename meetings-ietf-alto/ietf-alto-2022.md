@@ -15,12 +15,11 @@
 
 **Agenda:**
 
+- IETF 114
 - Chartered documents
 - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 - SIGCOMM NAI workshop
-- IETF 114
 - New I-Drafts
-- Others in the Scrum dashboard
 
 **Minutes:**
 
