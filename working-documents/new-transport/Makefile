@@ -1,5 +1,5 @@
 XML2RFC := xml2rfc
-TARGET := draft-schott-alto-new-transport.xml
+TARGET := draft-ietf-alto-new-transport.xml
 OPEN := gnome-open
 all:
 	$(XML2RFC) $(TARGET)
