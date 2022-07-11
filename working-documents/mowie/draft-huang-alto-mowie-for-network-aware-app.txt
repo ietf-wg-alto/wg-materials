@@ -5,40 +5,40 @@
 ALTO                                                              Y. Jia
 Internet-Draft                                                  Y. Zhang
 Intended status: Standards Track                                 Tencent
-Expires: January 12, 2022                                        Y. Yang
+Expires: January 12, 2023                                        Y. Yang
                                                          Yale University
                                                                    G. Li
                                                             China Mobile
                                                                   Y. Lei
                                                                   Y. Han
                                                                  Tencent
-                                                     Sabine. Randriamasy
+                                                          S. Randriamasy
                                                                    Nokia
-                                                           July 11, 2021
+                                                           July 11, 2022
 
 
-                  MoWIE for Network Aware Application
+                  MoWIE for Network Aware Applications
             draft-huang-alto-mowie-for-network-aware-app-04
 
 Abstract
 
    With the quick deployment of 5G networks in the world, cloud-based
-   interactive services such as cloud gaming have gained substantial
-   attention and are regarded as potential killer applications.  To
-   ensure users' quality of experience (QoE), a cloud interactive
-   service may require not only high bandwidth (e.g., high-resolution
-   media transmission) but also low delay (e.g., low latency and low
-   lagging).  However, the bandwidth and delay experienced by a mobile
-   and wireless user can be dynamic, as a function of many factors, and
-   unhandled changes can substantially compromise the user's QoE.  In
-   this document, we investigate network-aware applications (NAA), which
-   realize cloud based interactive services with improved QoE, by
-   efficient utilization of a solution named Mobile and Wireless
-   Information Exposure (MoWIE).  In particular, this document
-   demonstrates, through realistic evaluations, that mobile network
-   information such as MCS (Modulation and Coding Scheme) can
-   effectively expose the dynamicity of the underlying network and can
-   be made available to applications through MoWIE; using such
+   interactive applications (services) such as cloud gaming have gained
+   substantial attention and are regarded as potential killer
+   applications.  To ensure users' quality of experience (QoE), a cloud
+   interactive service may require not only high bandwidth (e.g., high-
+   resolution media transmission) but also low delay (e.g., low latency
+   and low lagging).  However, the bandwidth and delay experienced by a
+   mobile and wireless user can be dynamic, as a function of many
+   factors, and unhandled changes can substantially compromise the
+   user's QoE.  In this document, we investigate network-aware
+   applications (NAA), which realize cloud based interactive services
+   with improved QoE, by efficient utilization of a solution named
+   Mobile and Wireless Information Exposure (MoWIE).  In particular,
+   this document demonstrates, through realistic evaluations, that
+   mobile network information such as MCS (Modulation and Coding Scheme)
+   can effectively expose the dynamicity of the underlying network and
+   can be made available to applications through MoWIE; using such
    information, the applications can then adapt key control knobs such
    as media codec scheme, encapsulation, and application layer
    processing to minimize QoE deduction.  Based on the evaluations, we
@@ -53,9 +53,9 @@ Abstract
 
 
 
-Jia, et al.             Expires January 12, 2022                [Page 1]
+Jia, et al.             Expires January 12, 2023                [Page 1]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
 Status of This Memo
@@ -73,11 +73,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 12, 2022.
+   This Internet-Draft will expire on January 12, 2023.
 
 Copyright Notice
 
-   Copyright (c) 2021 IETF Trust and the persons identified as the
+   Copyright (c) 2022 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Jia, et al.             Expires January 12, 2022                [Page 2]
+Jia, et al.             Expires January 12, 2023                [Page 2]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
      4.5.  Adaptive Bitrate with Network Capability Exposure . . . .  15
@@ -165,9 +165,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022                [Page 3]
+Jia, et al.             Expires January 12, 2023                [Page 3]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    resources the user will get and how many users are competing with it.
@@ -221,9 +221,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022                [Page 4]
+Jia, et al.             Expires January 12, 2023                [Page 4]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    cover the whole end-to-end network.  How to enable the application to
@@ -277,9 +277,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022                [Page 5]
+Jia, et al.             Expires January 12, 2023                [Page 5]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    playing game interaction between the anchor and the audience.  A
@@ -333,9 +333,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022                [Page 6]
+Jia, et al.             Expires January 12, 2023                [Page 6]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
 3.  Current (Indirect) Technologies on NAA
@@ -389,9 +389,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022                [Page 7]
+Jia, et al.             Expires January 12, 2023                [Page 7]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
 3.2.  AI-based Adaptive Bitrate
@@ -445,9 +445,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022                [Page 8]
+Jia, et al.             Expires January 12, 2023                [Page 8]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    wireless network scenarios, which results in long reaction delay or
@@ -501,9 +501,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022                [Page 9]
+Jia, et al.             Expires January 12, 2023                [Page 9]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    *  MCS: The index of Modulation and Coding Scheme (MCS);
@@ -557,9 +557,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 10]
+Jia, et al.             Expires January 12, 2023               [Page 10]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
                +------------------------------------+---------------+
@@ -613,9 +613,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 11]
+Jia, et al.             Expires January 12, 2023               [Page 11]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    low latency in wireless and cellular networks.  The increasing
@@ -669,9 +669,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 12]
+Jia, et al.             Expires January 12, 2023               [Page 12]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    3) A relative accuracy saliency detection method.  In general, if an
@@ -725,9 +725,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 13]
+Jia, et al.             Expires January 12, 2023               [Page 13]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    calculate the new QoE and the saved bandwidth.  The results are shown
@@ -781,9 +781,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 14]
+Jia, et al.             Expires January 12, 2023               [Page 14]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
 4.5.  Adaptive Bitrate with Network Capability Exposure
@@ -837,9 +837,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 15]
+Jia, et al.             Expires January 12, 2023               [Page 15]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    shows the modulation (e.g.  QPSK, 16QAM,...) and the coding rate used
@@ -893,9 +893,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 16]
+Jia, et al.             Expires January 12, 2023               [Page 16]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    Without MoWIE, the application cannot get the lower layer network
@@ -949,9 +949,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 17]
+Jia, et al.             Expires January 12, 2023               [Page 17]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
 5.  Standardization Considerations of MoWIE as an Extension to ALTO
@@ -1005,9 +1005,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 18]
+Jia, et al.             Expires January 12, 2023               [Page 18]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    Extending ALTO with MoWIE, therefore, may allow ALTO to expose lower
@@ -1061,9 +1061,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 19]
+Jia, et al.             Expires January 12, 2023               [Page 19]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    *  Compact network information encoding consideration: One benefit of
@@ -1117,9 +1117,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 20]
+Jia, et al.             Expires January 12, 2023               [Page 20]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    Also, the network needs to authenticate the information exposure
@@ -1173,9 +1173,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 21]
+Jia, et al.             Expires January 12, 2023               [Page 21]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    [ETSI_MEC]
@@ -1229,9 +1229,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 22]
+Jia, et al.             Expires January 12, 2023               [Page 22]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    [Saliency]
@@ -1285,9 +1285,9 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 23]
+Jia, et al.             Expires January 12, 2023               [Page 23]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    [TS38.323]
@@ -1341,9 +1341,9 @@ Authors' Addresses
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 24]
+Jia, et al.             Expires January 12, 2023               [Page 24]
 
-Internet-Draft     MoWIE for Network Aware Application         July 2021
+Internet-Draft    MoWIE for Network Aware Applications         July 2022
 
 
    Gang Li
@@ -1376,11 +1376,11 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
    Email: yunbohan@tencent.com
 
 
-   S. Randriamasy
+   Sabine Randriamasy
    Nokia
    Nokia Bell Labs
    Nozay
-   United States of America
+   France
 
    Email: sabine.randriamasy@nokia-bell-labs.com
 
@@ -1397,4 +1397,4 @@ Internet-Draft     MoWIE for Network Aware Application         July 2021
 
 
 
-Jia, et al.             Expires January 12, 2022               [Page 25]
+Jia, et al.             Expires January 12, 2023               [Page 25]

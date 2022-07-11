@@ -13,7 +13,7 @@
 	<?rfc text-list-symbols="*o+-"?>
 	<?rfc toc="yes"?>
 	<front>
-	<title>MoWIE for Network Aware Application</title>
+	<title>MoWIE for Network Aware Applications</title>
 	<author initials="Y." surname="Jia" fullname="Yuhang Jia">
 	<organization>Tencent</organization>
 	<address><postal><street>Flat 9, No. 10 West Building, Xi Bei Wang East Road</street>
@@ -79,21 +79,21 @@
 	</address>
 	</author>
 
-   <author initials="Sabine" surname="Randriamasy" fullname="S. Randriamasy">
+   <author initials="S." surname="Randriamasy" fullname="Sabine Randriamasy">
 	<organization>Nokia</organization>
 	<address><postal><street>Nokia Bell Labs</street>
 	<street>Nozay</street>
-	<street>United States of America</street>
+	<street>France</street>
 	</postal>
 	<email>sabine.randriamasy@nokia-bell-labs.com</email>
 	</address>
 	</author>
 
-	<date year="2021" month="July" day="11"/>
+	<date year="2022" month="July" day="11"/>
 	<workgroup>ALTO</workgroup>
 	<abstract><t>
    With the quick deployment of 5G networks in the world, cloud-based
-   interactive services such as cloud gaming have gained substantial
+   interactive applications (services) such as cloud gaming have gained substantial
    attention and are regarded as potential killer applications.  To
    ensure users' quality of experience (QoE), a cloud interactive
    service may require not only high bandwidth (e.g., high-resolution
