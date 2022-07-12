@@ -11,7 +11,7 @@
 
 ------------------------------
 
-**IETF ALTO Meeting: July 5, 2022**
+**IETF ALTO Meeting: July 12, 2022**
 
 **Agenda:**
 
