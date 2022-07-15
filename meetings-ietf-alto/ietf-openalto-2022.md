@@ -10,7 +10,28 @@
 
 - **Current minute taker:** Jordi
 
-----
+---------------------
+
+**IETF OpenALTO Meeting: June 20, 2022**
+
+**Agenda:**
+
+- Preparing for meeting with FTS team
+
+**Minutes:**
+
+Notes taker: Jordi
+
+- Use cases for demo
+
+    Use case 1: FTS global resource control using ALTO
+
+    Use case 2: Rucio automatic replica workflow using ALTO
+
+Actual notes were taken in this doc: https://docs.google.com/document/d/1xNSxM5WWWBW5BjFqoncXMcs9HtjzA_LGFUcp4NU3nzk/edit
+
+---------------------
+
 **IETF OpenALTO Meeting: June 20, 2022**
 
 **Agenda:**
