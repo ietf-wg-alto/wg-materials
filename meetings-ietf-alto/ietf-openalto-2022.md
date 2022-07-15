@@ -16,7 +16,7 @@
 
 **Agenda:**
 
-- Preparing for meeting with FTS team
+- Preps for IETF 114 ALTO Hackathon
 
 **Minutes:**
 
