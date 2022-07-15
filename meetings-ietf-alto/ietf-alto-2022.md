@@ -25,7 +25,25 @@
 
 Note taker: Yuhang
 
+1. Richard gave a quick presentation of two demos on FTS.
 
+2. Qin thinks the first demo that we can say PHASE I is already done in IETF 113 and we focus on new functionalities in IETF 114.
+
+3. Sabine/Richard/Yixue: Discussed the MoWIE draft regarding Princeton's work and Zili's work. The updated drafts have reflected the work about the PBE-CC e.g. which can be exposed and carried out for cellular network.
+
+4. Yixue asks if the updated MoWIE draft can be presented in IETF 114.  Richard will check with Qin about whether/how in the summary part.
+
+5. Disscussons on Alto new transport:
+Richard needs to address the comments and other open issues before IETF 114 meeting.
+It is suggested that Richard or Roland should get all people on the discussion to synchronize the comments
+
+6. Jensen should summarize the current open issues as to the main list.
+
+7. Richard will discuss and address some feedback from the ALTO O&M data model draft update.
+
+8. SIGCOMM NAI: Richard and Luis invited people from Google and Microsoft to join the conversation with offline discussion.
+
+9. Regarding to the Wiki or Internet-Draft about ALTO deployments and challenges, it is recommended to further check what is a real deployment and what is not a real deployment.
 
 ------------------------------
 
