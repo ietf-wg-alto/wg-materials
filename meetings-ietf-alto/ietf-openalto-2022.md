@@ -12,7 +12,7 @@
 
 ---------------------
 
-**IETF OpenALTO Meeting: June 20, 2022**
+**IETF OpenALTO Meeting: July 15, 2022**
 
 **Agenda:**
 
