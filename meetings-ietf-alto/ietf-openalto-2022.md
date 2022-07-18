@@ -12,7 +12,38 @@
 
 ---------------------
 
-**IETF OpenALTO Meeting: July 15, 2022**
+**IETF OpenALTO Meeting: July 18, 2022**
+
+**Agenda:**
+
+- Preps for IETF 114 ALTO Hackathon
+- IETF 114 ALTO Hackathon dashboard: https://github.com/orgs/openalto/projects/1/views/2
+
+**Minutes:**
+
+Notes taker: Jordi
+
+* Message that we can/want to send:
+    * <= unit (e.g., 100 Mbps): resource control
+    * \>= unit (e.g., 100 Mbps): integrated service (admission contrl)
+
+* <= unit; No weight, no guarantte
+
+    * resource control beyond bw, e.g., mem buffer size use ("imple a shell, query the socket buffer size and report to the control)
+    * mem_size <= 1 GB  => unit / socket buffer size query (CAN) 
+
+* In the controller, there is a simple resource mapping logic:
+    * pipe -> resource list (alto) => resource mapping logical
+        * vector n (the number of connections for each pipe, indexed by pipe): n
+        * bw pipe -> resource list: matrix
+            * network resource (pipe -> network entities)
+                * pipe -> [0, 1, 0, ...]   // this pipe uses those links with entry 1
+                * pipe: tput of this pipe
+* mem resource (pipe -> mem of each RSE)
+
+---------------------
+
+**IETF OpenALTO Meeting: July 11, 2022**
 
 **Agenda:**
 
