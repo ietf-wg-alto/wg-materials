@@ -21,7 +21,7 @@
 
 **Minutes:**
 
-Notes taker: Jordi
+Notes taker: Kai / Jordi
 
 * Message that we can/want to send:
     * <= unit (e.g., 100 Mbps): resource control
@@ -40,6 +40,8 @@ Notes taker: Jordi
                 * pipe -> [0, 1, 0, ...]   // this pipe uses those links with entry 1
                 * pipe: tput of this pipe
 * mem resource (pipe -> mem of each RSE)
+
+(Kai you can continue adding your notes here)
 
 ---------------------
 
