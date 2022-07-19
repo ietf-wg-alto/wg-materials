@@ -7,8 +7,6 @@
 
 - **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang.
 
-- **Current minute taker:** Sabine
-
 ------------------------------
 
 **IETF ALTO Meeting: July 19, 2022**
