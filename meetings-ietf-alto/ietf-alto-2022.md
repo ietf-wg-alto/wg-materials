@@ -11,6 +11,24 @@
 
 ------------------------------
 
+**IETF ALTO Meeting: July 19, 2022**
+
+**Agenda:**
+
+- IETF 114
+- Chartered documents
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- SIGCOMM NAI workshop
+- New I-Drafts
+
+**Minutes:**
+
+Note taker: Jensen
+
+TBD
+
+------------------------------
+
 **IETF ALTO Meeting: July 12, 2022**
 
 **Agenda:**
