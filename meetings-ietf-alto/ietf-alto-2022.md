@@ -21,7 +21,7 @@
 
 **Minutes:**
 
-Note taker: Jensen
+Notes taker: Jensen
 
 TBD
 
