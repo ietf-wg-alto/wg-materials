@@ -8,7 +8,7 @@
 
 - **Minute takers:** Jensen, Alex, Jacobs, Jordi, Kai, Mahdi, Shenshen, Richard.
 
-- **Current minute taker:** Jordi
+- **Current minute taker:** Kai
 
 ---------------------
 
@@ -41,7 +41,39 @@ Notes taker: Kai / Jordi
                 * pipe: tput of this pipe
 * mem resource (pipe -> mem of each RSE)
 
-(Kai you can continue adding your notes here)
+Main topics of the meeting: setting goals for the Hackathon (basic & stretch)
+
+- Resource model:
+
+  1. Enable options in the configuration file
+  2. Show in the demo that the target resource control can be achieved
+
+  Mahdi mentioned absolute value is necessary when some links are not controlled by TCN.
+
+  **Decision: use the resource control model (<= XXX unit, using absolute value)**
+
+- Resource types:
+  
+  1. Collect information (bandwidth, TCP buffer size) for each link
+  2. Enable query of the information 
+
+  **Decision: supporting multiple resource types is a stretch goal**
+
+- ALTO messaging format:
+
+  **Decision: path vector with modification to support multiple (src, dst) pairs instead of cross-product**
+
+- Zero-order protocol:
+
+  1. Concern is raised about the robustness of the control algorithm
+
+  **Decision: implement a two state-based control protocol (estimate state and running state)**
+
+  Implementing a continuous control protocol is set as a stretch goal.
+
+
+
+
 
 ---------------------
 
