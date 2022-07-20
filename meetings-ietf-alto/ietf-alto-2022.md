@@ -23,7 +23,13 @@
 
 Notes taker: Jensen
 
-TBD
+
+1. Richard and Roland will answer to the artart early reviews for new-transport document.
+2. Jensen reported discussions about O&M document on the mailing list. Jensen will send the summary email to the mailing list as soon.
+3. Jordi / Luis / Ziyang / Jensen will coordinate the ALTO deployment report.
+4. Qin required that all the IETF 114 presenters should send the first version of the slides before this Sunday.
+5. Qin mentioned another potential option where to publish the ALTO article: APNIC blog (https://blog.apnic.net/)
+6. Richard / Sabine/ Yixue will start the conversion about the cellular use cases and the MoWIE work on the mailing list.
 
 ------------------------------
 
