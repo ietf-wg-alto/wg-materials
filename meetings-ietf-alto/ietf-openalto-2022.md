@@ -8,9 +8,95 @@
 
 - **Minute takers:** Jensen, Alex, Jacobs, Jordi, Kai, Mahdi, Shenshen, Richard.
 
-- **Current minute taker:** Jordi
+- **Current minute taker:** Kai
 
-----
+---------------------
+
+**IETF OpenALTO Meeting: July 18, 2022**
+
+**Agenda:**
+
+- Preps for IETF 114 ALTO Hackathon
+- IETF 114 ALTO Hackathon dashboard: https://github.com/orgs/openalto/projects/1/views/2
+
+**Minutes:**
+
+Notes taker: Kai / Jordi
+
+* Message that we can/want to send:
+    * <= unit (e.g., 100 Mbps): resource control
+    * \>= unit (e.g., 100 Mbps): integrated service (admission contrl)
+
+* <= unit; No weight, no guarantte
+
+    * resource control beyond bw, e.g., mem buffer size use ("imple a shell, query the socket buffer size and report to the control)
+    * mem_size <= 1 GB  => unit / socket buffer size query (CAN) 
+
+* In the controller, there is a simple resource mapping logic:
+    * pipe -> resource list (alto) => resource mapping logical
+        * vector n (the number of connections for each pipe, indexed by pipe): n
+        * bw pipe -> resource list: matrix
+            * network resource (pipe -> network entities)
+                * pipe -> [0, 1, 0, ...]   // this pipe uses those links with entry 1
+                * pipe: tput of this pipe
+* mem resource (pipe -> mem of each RSE)
+
+Main topics of the meeting: setting goals for the Hackathon (basic & stretch)
+
+- Resource model:
+
+  1. Enable options in the configuration file
+  2. Show in the demo that the target resource control can be achieved
+
+  Mahdi mentioned absolute value is necessary when some links are not controlled by TCN.
+
+  **Decision: use the resource control model (<= XXX unit, using absolute value)**
+
+- Resource types:
+  
+  1. Collect information (bandwidth, TCP buffer size) for each link
+  2. Enable query of the information 
+
+  **Decision: supporting multiple resource types is a stretch goal**
+
+- ALTO messaging format:
+
+  **Decision: path vector with modification to support multiple (src, dst) pairs instead of cross-product**
+
+- Zero-order protocol:
+
+  1. Concern is raised about the robustness of the control algorithm
+
+  **Decision: implement a two state-based control protocol (estimate state and running state)**
+
+  Implementing a continuous control protocol is set as a stretch goal.
+
+
+
+
+
+---------------------
+
+**IETF OpenALTO Meeting: July 11, 2022**
+
+**Agenda:**
+
+- Preps for IETF 114 ALTO Hackathon
+
+**Minutes:**
+
+Notes taker: Jordi
+
+- Use cases for demo
+
+    Use case 1: FTS global resource control using ALTO
+
+    Use case 2: Rucio automatic replica workflow using ALTO
+
+Actual notes were taken in this doc: https://docs.google.com/document/d/1xNSxM5WWWBW5BjFqoncXMcs9HtjzA_LGFUcp4NU3nzk/edit
+
+---------------------
+
 **IETF OpenALTO Meeting: June 20, 2022**
 
 **Agenda:**

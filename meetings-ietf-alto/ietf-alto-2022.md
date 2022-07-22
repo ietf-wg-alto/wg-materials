@@ -7,7 +7,65 @@
 
 - **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang.
 
-- **Current minute taker:** Sabine
+------------------------------
+
+**IETF ALTO Meeting: July 19, 2022**
+
+**Agenda:**
+
+- Chartered documents: 
+    - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- IETF 114
+- SIGCOMM NAI workshop
+- New I-Drafts
+
+**Minutes:**
+
+Notes taker: Jensen
+
+
+1. Richard and Roland will answer to the artart early reviews for new-transport document.
+2. Jensen reported discussions about O&M document on the mailing list. Jensen will send the summary email to the mailing list as soon.
+3. Jordi / Luis / Ziyang / Jensen will coordinate the ALTO deployment report.
+4. Qin required that all the IETF 114 presenters should send the first version of the slides before this Sunday.
+5. Qin mentioned another potential option where to publish the ALTO article: APNIC blog (https://blog.apnic.net/)
+6. Richard / Sabine/ Yixue will start the conversion about the cellular use cases and the MoWIE work on the mailing list.
+
+------------------------------
+
+**IETF ALTO Meeting: July 12, 2022**
+
+**Agenda:**
+
+- IETF 114
+- Chartered documents
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- SIGCOMM NAI workshop
+- New I-Drafts
+
+**Minutes:**
+
+Note taker: Yuhang
+
+1. Richard gave a quick presentation of two demos on FTS.
+
+2. Qin thinks the first demo that we can say PHASE I is already done in IETF 113 and we focus on new functionalities in IETF 114.
+
+3. Sabine/Richard/Yixue: Discussed the MoWIE draft regarding Princeton's work and Zili's work. The updated drafts have reflected the work about the PBE-CC e.g. which can be exposed and carried out for cellular network.
+
+4. Yixue asks if the updated MoWIE draft can be presented in IETF 114.  Richard will check with Qin about whether/how in the summary part.
+
+5. Disscussons on Alto new transport:
+Richard needs to address the comments and other open issues before IETF 114 meeting.
+It is suggested that Richard or Roland should get all people on the discussion to synchronize the comments
+
+6. Jensen should summarize the current open issues as to the main list.
+
+7. Richard will discuss and address some feedback from the ALTO O&M data model draft update.
+
+8. SIGCOMM NAI: Richard and Luis invited people from Google and Microsoft to join the conversation with offline discussion.
+
+9. Regarding to the Wiki or Internet-Draft about ALTO deployments and challenges, it is recommended to further check what is a real deployment and what is not a real deployment.
 
 ------------------------------
 
@@ -25,6 +83,87 @@
 
 Note taker: Sabine
 
+ABBREV:
+- aos 	ALTO Server
+- aoc	ALTO Client
+- pip	people
+- ry: 	Richard
+- jz	Jensen
+- tc	Tencent
+WG	working group
+
+GITHUB
+https://github.com/ietf-wg-alto/wg-materials/blob/main/meetings-ietf-alto/ietf-alto-2022.md
+
+- min taker : sabine
+people:  jordi, richard, jensen,  Lei Yixue, luis, mahdi, qiao, yale ryan yang, Yuhang, roland, sabine
+
+- charter items
+Qin wants see updates on open issues. 
+
+TICKETS
+- ALTO cost mode: T18. moved to RFC queue. Milestone done
+
+- T32 CDNI related registry. sec 6 
+CDNI adds new footprint type:
+link to cdni doc: https://www.rfc-editor.org/authors/rfc9241.html#name-query-footprint-properties-
+
+Question to cdni ml. 
+eml link: TBC
+New cdni footprint type: question should we register to ALTO EDT (entity domain type) registry? 
+option: write doc later on that defines this ALTO EDT associated with footprint type  
+
+T29 - UP => 9240
+all authors approved publication as RFC
+
+ALTO O&M
+Jensen gives updates. 
+added new server grouping to handle server set-up. 
++ new metrics
+
+ry: what if want deploy AOS in multiple domains to work together?
+jz: this doc is for a single AOS. no decided if multiple docs. 
+qin: should add to open issues + discuss on list. section 5.5 server to server communication
+ry: how config AOC. new feature rucio download. how to config params.?
+AOS uri, how specify? 
+qin: seems relate to access ctrl. see alto base protoc, maybe already specified.
+jz: aoc also needs params 
+rucio doc: 
+how define simple and consistent commands 
+automation by config aoc. command line or browser, 
+qin:  see ZTP zero touch protocol => open issue
+sabine: whether in/out scope, we should see what happens with more complex commands (eg w constraints, filtering)
+aoc is ancillary to an apps. 
+
+T19 transport
+ry & roland will post new tread on http3. Roland ok needs feedback from WG. 
+will post update and open discussion. 
+who sould we reach out to besides alto wg? 
+qin: will ping Med to engage more http3 folks
+
+alto docs
+ry: jordi on bttleneck structs? maybe no time until next monday
+
+MOWIE 
+- Tencent authors need do some updates: 3gpp, cost metrics. maybe finish tomorrow or later. 
+July 11 is tough deadline. will see how far can go. 
+qin: concerned. need better sync-up, organize discussion framework, wants hear more voices. Zhili suggests maybe ALTO115. qin: people must converge. Sabine did another draft. need show and do join effort.
+sab & gang li have a draft. alibaba team, princeton team
+
+ry: do we want them to present at IETF114?
+qin: go to list, have discussion. off line not efficient. get all pip on same page
+tc sent e-mail to princteon no asw. same princeton and alibaba. 
+qin : pb indeed. 
+tc: sab and li gang already invilved in mowi thread. 
+qin: want see how this fits in alto. 
+
+tcLei: next step? 
+qin: go to list and share your draft and issues. get pip interested. 
+ry: first send to me. 
+qin: need make disc happen naturally. not only presentations. need new blood
+tcLei: discuss w sab and cmcc. contribs already 
+
+ry needs approve CDNI doc. 
 
 ------------------------------
 
