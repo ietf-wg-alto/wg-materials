@@ -9,6 +9,40 @@
 
 ------------------------------
 
+**IETF ALTO Meeting: August 2, 2022**
+
+**Agenda:**
+
+- Chartered documents: 
+    - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+    - Transport 
+    - OAM
+- Cellular case
+
+**Minutes:**
+
+Notes taker: Jordi
+
+- Summary of ALTO meeting on July 26 in Philadelphia:
+    - Need to be:
+        - Focused
+        - Be pragmatic 
+        - Deliver 
+    - Approach:
+        - Chartered milestones 
+        - Deployments
+        - Evangelize
+    - Improve workflow:
+        - Need traffic in the mailing list 
+        - Outcome of decisions in the mailing list and request if any comments
+
+
+
+
+
+
+------------------------------
+
 **IETF ALTO Meeting: July 19, 2022**
 
 **Agenda:**
