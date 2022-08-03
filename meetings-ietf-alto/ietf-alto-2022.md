@@ -36,10 +36,22 @@ Notes taker: Jordi
         - Need traffic in the mailing list 
         - Outcome of decisions in the mailing list and request if any comments
 
-
-
-
-
+- Transport Draft :
+    - Feedback from IETF: restructuring 
+    - Incremental push updates from SSE
+    - 7285 client pull protocol. Two issues: latency and overhead (blocked transmission)
+    - 8895 To solve the issue introduced SSE server push
+    - Reviewers feedback: Why don't you use server put. 
+    - Question 1: should we split transport doc into two docs?
+        - What are the two docs:
+            - Data model / URI.
+            - Transport that is independent of HTTP version.    
+        - Approach: take current doc and take data model schema into a new doc and create a separate doc with a server-put centric design
+    - Question 2: Design that is independent of the transport version (works for all).
+        - Kai: I think we should keep it separate. Server put
+        - Put is overwrite. Information resource we all (client and server) know exists. Put overwrites the state. So put is idempotent.
+        - Post is additional. Incremental, not idempotent.
+        - If state is overwritten, serialization is needed.
 
 ------------------------------
 
