@@ -12,6 +12,40 @@
 
 ---------------------
 
+**Meeting minutes (ALTO-IETF hackathon meeting) Monday Aug 1, 2022**
+
+**Minutes:**
+
+* Two issues of ALTO WG emphasized by the AD: 
+
+	1. 	We are slow in terms of devising and deployment.
+	2. We are not actively engaged in the discussions. (empty discussion queue.) 
+
+* Deployment tracks toward IETF 114: 
+
+	1. Telefonica CDN use case (Louis's team works). Internal team will not focus on this track (relatively closed code sources + already in good hands/shape.)
+	2. FTS/TCN track. 
+	3. MPQUIC/MPTCP track (We may also want to focus on this track, since it is a promising branch, ALTO might as well be used as a mean to provide information in cellular handovers. -inherently multi-path tunneling-). 
+
+* Tracks to follow for TCN: 
+
+	1. **Analytical:** FTS analysis (Richard mentioned) + Zero order subtleties + Convergence proofs (I have added to the list of TODOs). 
+	2. **Deployment track:** Technical content, system model/architecture/ results. 
+
+* Technical issues of TCN: (brought up by Richard) 
+	
+	1. How to coordinate with ESnet/ SDSC team and integrate TCN with their efforts. (Richard's comment: Frequent path changes may become futile when new transfers are being submitted every minute. - My comment: Also, frequent routing changes may nullify zero-order state adaptations.)
+	2. Limited controllability: Selected control knob (no TCP connections) significantly limit the feasible regions, thus throttles the controllability criterion we were rooting for. 
+	
+		**Solutions:** A. To only support relative throughput weights as input conditions (currently deployed) **Sematincs:** Scheduling scheme should be work-conserving. B.  To request bounded aggregated BW from data path. C. To use time-devision mutliplexing to achieve more fine-grained control. 
+	
+	  
+
+**Decisions:**
+
+1. To participate in SDSC/ESNet meeting/ speed should be aligned with internal deployment's progress so we can actively get engaged. (Kai's suggestions.)
+
+
 **IETF OpenALTO Meeting: July 18, 2022**
 
 **Agenda:**
