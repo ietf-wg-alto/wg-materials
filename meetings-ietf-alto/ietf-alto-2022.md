@@ -52,6 +52,7 @@ Notes taker: Jordi
         - Put is overwrite. Information resource we all (client and server) know exists. Put overwrites the state. So put is idempotent.
         - Post is additional. Incremental, not idempotent.
         - If state is overwritten, serialization is needed.
+- Let's take  these conversations to the mailing list.
 
 ------------------------------
 
