@@ -6,9 +6,19 @@
 
 - **Location:** https://yale.zoom.us/my/yryang
 
-- **Minute takers:** Jensen, Alex, Jacobs, Jordi, Kai, Mahdi, Shenshen, Richard.
+- **Minute takers:** Jensen, Alex, Jacobs, Jordi, Kai, Mahdi, Ryan, Shenshen, Richard.
 
-- **Current minute taker:** Kai
+- **Current minute taker:** Ryan
+
+---------------------
+
+**Meeting minutes (ALTO-IETF hackathon meeting) Monday Aug 8, 2022**
+
+**Minutes:**
+
+Notes taker: Ryan
+
+XXX
 
 ---------------------
 
