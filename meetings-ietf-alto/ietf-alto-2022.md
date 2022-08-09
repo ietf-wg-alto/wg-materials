@@ -5,7 +5,7 @@
 
 - **Location:** https://ietf.webex.com/ietf/j.php?MTID=ma0e97cc97c4cd71bb59cf1a094682686
 
-- **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang.
+- **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing.
 
 ------------------------------
 
@@ -23,7 +23,7 @@
 
 Notes taker: Jordi
 
-- HTTP:
+- HTTP (Richard and Roland):
     - Using put to implement incremental push update
     - We don't want to include a new container. 
     - So the only way is to do put.
@@ -35,9 +35,15 @@ Notes taker: Jordi
     - What if the system gets out of sync
     - Need to provide mechanism to provide full snapshot from time to time
     - Bring this to the mailing list
-OAM:
-    - Since there is no server-to-server protocol defined for ALTO yet, one option is to not standardized server-to-server OAM.
-    - Bring this to the mailing list
+OAM (Jensen):
+    - Q5. Since there is no server-to-server protocol defined for ALTO yet, one option is to not standardized server-to-server OAM.
+    - Q6. Do we need a data broker for ALTO server
+    - Jensen to bring this question to the mailing list
+MPQUIC (Ziyang):
+    - Consider putting another demo for 115.
+    - Provide updates to the ALTO WG
+    - WG will seek ways to integrate Ziyang's demo into some of the deployments that are going on.
+
 
 ------------------------------
 
