@@ -15,6 +15,23 @@
 
 - Chartered documents: 
     - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+    - HTTP Transport 
+    - OAM
+- Cellular case
+
+**Minutes:**
+
+Notes taker: Lei
+
+
+------------------------------
+
+**IETF ALTO Meeting: August 2, 2022**
+
+**Agenda:**
+
+- Chartered documents: 
+    - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
     - Transport 
     - OAM
 - Cellular case
