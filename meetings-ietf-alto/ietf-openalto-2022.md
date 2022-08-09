@@ -18,7 +18,32 @@
 
 Notes taker: Ryan
 
-XXX
+* Implementability. Possible Solutions:
+	1. Network rate limit control knob. 
+	2. Multiple controllers
+* Logistics
+	1. Meeting Louis
+* Proposal (Jordi): using 2013v4 with TC
+* Direction
+	1. Big breakthroughs come from either supporting new workloads or using new hardware. Our workload is big data sciences.
+* Big Science Big Data
+	1. Supply side/resource environment: multidomain networks
+		a. Controllability is limited due to multiple controllers.
+	2. Demand: workload
+		a. Largest IoT on Earth (within the experimental data)
+		b. BSBD has larger and more predictable workload ()
+	3. Further discussion of differences between DC, TCN, and FTS in TCN project notes.
+* Goals 
+	1. deploy ALTO
+	2. Meeting with Mario: Thursday, 10:00am ET = 16:00 CET.
+	3. Integrate with routing control plane
+		a. Develop Route Plugin for SENSE and for PCE (Integrate w/ routing control plane)
+		b. Intelligence: computing mesh
+			i. Current models: traditional PCE, Sincronia, FB Entitlement, BS
+		c. Rate and Route are complementary control variables.
+		d. Related, Soon-To-Be-Publisehd Work: Cebinae (Sigcomm)
+	
+	goals: deploy ALTO + zero order, minimize disruption to FTS, capacity planning, bandwidth enforcement.
 
 ---------------------
 
