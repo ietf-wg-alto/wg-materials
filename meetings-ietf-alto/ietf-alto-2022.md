@@ -9,7 +9,7 @@
 
 ------------------------------
 
-**IETF ALTO Meeting: August 2, 2022**
+**IETF ALTO Meeting: August 9, 2022**
 
 **Agenda:**
 
@@ -21,8 +21,23 @@
 
 **Minutes:**
 
-Notes taker: Lei
+Notes taker: Jordi
 
+- HTTP:
+    - Using put to implement incremental push update
+    - We don't want to include a new container. 
+    - So the only way is to do put.
+    - PUT URI - PUT URI - PUT URI
+    - How does the client know what's the URI for each push
+    - Client must have a way to agree on URI with server
+    - We follow semantics of HTTP (no exploiting of protocol ambiguity)
+    - Server sending state to the client. Put is idempotent.
+    - What if the system gets out of sync
+    - Need to provide mechanism to provide full snapshot from time to time
+    - Bring this to the mailing list
+OAM:
+    - Since there is no server-to-server protocol defined for ALTO yet, one option is to not standardized server-to-server OAM.
+    - Bring this to the mailing list
 
 ------------------------------
 
