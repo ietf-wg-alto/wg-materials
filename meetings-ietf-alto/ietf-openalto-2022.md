@@ -23,7 +23,7 @@ Notes taker: Ryan
 	2. Multiple controllers
 * Logistics
 	1. Meeting Louis
-* Proposal (Jordi): using 2013v4 with TC
+* Proposal (Jordi): using 2013B4 with TC
 * Direction
 	1. Big breakthroughs come from either supporting new workloads or using new hardware. Our workload is big data sciences.
 * Big Science Big Data
