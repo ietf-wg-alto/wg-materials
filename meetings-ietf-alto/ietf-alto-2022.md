@@ -35,10 +35,13 @@ Notes taker: Jordi
     - What if the system gets out of sync
     - Need to provide mechanism to provide full snapshot from time to time
     - Bring this to the mailing list
+
+
 OAM (Jensen):
     - Q5. Since there is no server-to-server protocol defined for ALTO yet, one option is to not standardized server-to-server OAM.
     - Q6. Do we need a data broker for ALTO server
     - Jensen to bring this question to the mailing list
+
 MPQUIC (Ziyang):
     - Consider putting another demo for 115.
     - Provide updates to the ALTO WG
