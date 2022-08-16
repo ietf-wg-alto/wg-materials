@@ -37,12 +37,12 @@ Notes taker: Jordi
     - Bring this to the mailing list
 
 
-OAM (Jensen):
+- OAM (Jensen):
     - Q5. Since there is no server-to-server protocol defined for ALTO yet, one option is to not standardized server-to-server OAM.
     - Q6. Do we need a data broker for ALTO server
     - Jensen to bring this question to the mailing list
 
-MPQUIC (Ziyang):
+- MPQUIC (Ziyang):
     - Consider putting another demo for 115.
     - Provide updates to the ALTO WG
     - WG will seek ways to integrate Ziyang's demo into some of the deployments that are going on.
