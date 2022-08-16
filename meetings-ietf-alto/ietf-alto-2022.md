@@ -8,6 +8,51 @@
 - **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing.
 
 ------------------------------
+**IETF ALTO Meeting: August 16, 2022**
+
+**Agenda**:
+
+- New transport
+- OAM
+- Deployment (integration with Rucio/FTS)
+
+Note taker: Kai
+
+**Minutes**:
+
+- New transport
+  - The decision is to not focus on the push-update. A summary email will be sent to the mailing list.
+  - In the first version, the updates will be sent to the client using HTTP PUT: A client sends a POST to subscribe and the server sends PUT message(s) with different media types to update the data on the client side.
+  - No need for HTTP/2 and beyond
+
+  - Question: Enable ALTO clients to write to ALTO server (e.g., using PUT command)?
+  - What need to be done: URL naming convention between ALTO client/server
+
+  - Question: How to organize the documents for new transport?
+  - Two options:
+    - 3 document: base (namespace), push promise, server put
+    - 2 document: base, server put
+  - Chair suggests bringing the options to the mailing list
+  - Mention the new capability of client PUT 
+- OAM
+  - The opeartor need to configure the algorithm and the data model
+  - Two approaches:
+    1. Read directly (e.g., from a YANG model)
+    2. Use a data broker (as a uniform data model) for multiple sources
+  - Introduce a new configuration item called "data-store"
+    - The "data-id" and "data-type" are read-only and set by the implementation
+  - Question: Does this document define standards or investigate the design space?
+  - Concerns were raised that the current specification may be too detailed and implementation specific
+  - Suggestion: Put the optional configurations into the appendix and keep only the base in the main text
+- Integration with Rucio/FTS
+  - Planned for IETF 115 and 116 (development and hackathon)
+  - Effort to collect statistics and prepare A/B test
+  - First milestone: single virtual organization (VO), fixed routing, multiple networks
+  - Question: How to handle multi-domain deployment (globally for a single experiment, or uniform deployment), e.g., ATLAS v.s. CMS?
+  - Protocols invovled: base protocol, performance metrics, unified properties, path vector and some non-standard extensions (e.g., flow cost service and multi-domain ALTO)
+  - The planning will be shared to the mailing list (with involved teams)
+
+------------------------------
 
 **IETF ALTO Meeting: August 9, 2022**
 
