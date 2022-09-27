@@ -18,7 +18,7 @@
 - OAM
 - Deployment (integration with Rucio/FTS)
 
-Note taker: Kai
+Note taker: Mahdi
 
 **Minutes**:
 
