@@ -5,6 +5,31 @@
 
 - **Location:** https://ietf.webex.com/ietf/j.php?MTID=ma0e97cc97c4cd71bb59cf1a094682686
 
+- **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
+
+------------------------------
+**IETF ALTO Meeting: September 27, 2022**
+
+**Agenda**:
+
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- Path vector RFC
+- New transport
+- OAM
+- Deployment (integration with Rucio/FTS)
+
+Note taker: Kai
+
+**Minutes**:
+
+
+----
+**Logistics:**
+
+- **Meeting times:** Tue 9:00 to 10:00am EST
+
+- **Location:** https://ietf.webex.com/ietf/j.php?MTID=ma0e97cc97c4cd71bb59cf1a094682686
+
 - **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing.
 
 ------------------------------
