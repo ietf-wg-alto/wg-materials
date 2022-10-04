@@ -8,6 +8,43 @@
 - **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
 
 ------------------------------
+**IETF ALTO Meeting: October 4, 2022**
+
+**Agenda**:
+
+- Deployment
+- OAM
+- IETF 115 planning
+
+Note taker: Kai
+
+**Minutes**:
+
+- Deployment
+  - The goal is to deploy ALTO in CERN, ESNet and potentially PRP as well. There are two types of information that is provided for the path from a source to a destination
+    1. controlled assets (selective exposure): whether the path uses links from a given set
+    2. end-to-end metrics (aggregated): e.g., number of hops, fiber wavelength
+  - Question from Luis: What is the current process?
+    - For the CERN deployment, the mapping from traffic to controlled assets (e.g., inter-domain links) are obtained from LookingGlass servers. Information for next hops is obtained from IRR (e.g., using `whois`).
+    - For ESNet, the information is a static topology file. The server needs to search the attachment points first and then compute the shortest paths.
+  - Comment from Luis: BGP-LS is not deployed in some infrastructure and the ALTO server needs information from static views.
+  - Comment from Luis: Some logically separated networks may go through the same infrastructure
+- OAM
+  - Update: A new field is added to support cross-domain server discovery. The configuration specifies a list of endpoint addresses (e.g., IPv4 prefixes) that should be mapped to the server.
+  - Question from Richard: What does the endpoint in the field mean? Does the mapping refer to, for example, the information from the CRIC database?
+    - Yes. The information is to allow building DNS entries for cross-domain discovery.
+  - Question from Richard: Can we use IRR to discover the servers?
+    - It is possible. But xdom-disc is already an ALTO standard.
+  - Further questions would be exchanged on the mailing list
+- IETF 115 Planning:
+  - ALTO transport has the highest priority. Need to discuss with AD on how to split the document, and show that each document is useful.
+  - ALTO OAM: The agreement is to keep the generic parts and move specific options to the appendix. Updates on the github should be made more transparent to the WG.
+  - ALTO deployment discussion: CERN & telefonica will be the focus
+  - Recharter discussion: Probably not the time to discuss recharter. Delivering ALTO transport is important as a foundation to start recharter discussion.
+  - Missing piece: how to provide better security and confidentiality for ALTo servers
+
+
+------------------------------
 **IETF ALTO Meeting: September 27, 2022**
 
 **Agenda**:
