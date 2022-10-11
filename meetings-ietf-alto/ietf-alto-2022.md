@@ -8,6 +8,22 @@
 - **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
 
 ------------------------------
+
+**IETF ALTO Meeting: October 11, 2022**
+
+**Agenda:**
+
+Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+Path vector RFC
+New transport
+OAM
+Deployment (integration with Rucio/FTS)
+Note taker: 
+
+Minutes:
+
+------------------------------
+
 **IETF ALTO Meeting: October 4, 2022**
 
 **Agenda**:
