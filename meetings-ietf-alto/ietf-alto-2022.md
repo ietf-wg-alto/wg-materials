@@ -19,9 +19,53 @@
 - OAM
 - Deployment (integration with Rucio/FTS, Telefonica, NRP)
 
-Note taker: 
+Note taker: Jordi
 
-Minutes:
+Minutes: 
+
+Internet
+
+Telefonica ALTO deployment:
+- Launch date towards end of October
+- Hope we can report developments in IETF 115
+
+OAM:
+- Summarize existing work status
+- IANA registry
+- IRR (Internet Routing Register)
+- Our proposal is to add a new field called server discovery and behind it specify different methods that the client can discover the server
+- How to connect the algorithms that constructs the ALTO services. Algorithms should have their own configurations that can be extended. Specify the fields that are required from other ALTO servers. 
+- Do you think we should put the example in the main text or move to the appendix?
+    - Qin: suggest moving to the Appendix
+
+Transport:
+- Feedback from Martin: wants to tweak charter to focus  on version independent mechanims
+- Two solutions: with and without put
+- Kai and team can focus on without put case
+- I hope this can be another work item for the recharter
+- If you can deliver no put option and make it complete.
+- Goal of 115 is to introduce this new recharter.
+
+Path Vector:
+- RFC already published
+- Let's remove it from the dashboard
+
+Currently ongoing deployments:
+- Telefonica
+- CERN/LHCONE
+- NRP/Qualcomm
+
+Recharter:
+- Approach: drive conversations starting from what we learn from the deployments to identify gaps/needs.
+- HTTP transport put case
+- Multidomain settings, security is a big issue
+    - Telefonica is working on some ideas about security based on deployment experience.
+- Bottleneck structures
+
+IETF hackathon
+- CERN / LHCONE: Looking glass parser for ALTO
+- National Researc Platform / Bottleneck structure
+
 
 ------------------------------
 
