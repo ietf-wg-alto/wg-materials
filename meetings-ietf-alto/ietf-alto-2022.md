@@ -17,7 +17,7 @@
 - Path vector RFC
 - New transport
 - OAM
-- Deployment (integration with Rucio/FTS)
+- Deployment (integration with Rucio/FTS, Telefonica, NRP)
 
 Note taker: 
 
