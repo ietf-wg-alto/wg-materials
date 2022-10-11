@@ -13,11 +13,12 @@
 
 **Agenda:**
 
-Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
-Path vector RFC
-New transport
-OAM
-Deployment (integration with Rucio/FTS)
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- Path vector RFC
+- New transport
+- OAM
+- Deployment (integration with Rucio/FTS)
+
 Note taker: 
 
 Minutes:
