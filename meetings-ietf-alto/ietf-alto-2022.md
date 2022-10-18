@@ -18,8 +18,9 @@
 - New transport
 - OAM
 - Deployment (integration with Rucio/FTS, Telefonica, NRP)
+- IETF 115
 
-Note taker: 
+Note taker: Lauren
 
 Minutes: 
 
