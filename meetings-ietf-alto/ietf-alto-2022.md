@@ -5,7 +5,7 @@
 
 - **Location:** https://ietf.webex.com/ietf/j.php?MTID=ma0e97cc97c4cd71bb59cf1a094682686
 
-- **Minute takers:** Jensen, Jordi, Kai, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
+- **Minute takers:** Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
 
 ------------------------------
 
@@ -22,7 +22,41 @@
 
 Note taker: Lauren
 
-Minutes: 
+Minutes:
+
+IETF 115
+- The top priority for IETF 115 should be transport.
+- Will we have documents ready by the submission deadline?
+  - Richard: Yes
+
+OAM
+- Jensen shared a summary of progress.
+- The main purpose is to define how the model can be extended to accommodate new data sources.
+
+Deployment Update
+
+General:
+- Getting as many deployments as possible is important because we need concrete implementations to show during rechartering conversations.
+- Concrete implementations will illustrate operational issues that can lay the foundation for the recharter.
+- Richard: The early days of ALTO focused too much on the interface and not enough on the mechanisms for collecting information. BGP-LS could still be an important tool.
+- Centralized openalto.org for DNS resolution can be used to direct to the correct ALTO server for each domain if there is an individual ALTO server running inside of each network. We already own this domain name.
+- openalto servers in each domain act a structured looking glass output.
+
+Rucio:
+- Use openalto as frontend to supply source and destination information that guides Rucio path selection.
+- Rucio can also use geo-distance.
+
+Ongoing Deployments:
+- Telefonica: There probably will not be enough time before IETF 115 to accomplish deployment here. There are concerns about what sort of information is revealed through ALTO.
+- CERN (AS 513): This deployment is driven by looking glass data.The ALTO API can supply information about the AS path, next hop and hopcount. A demo was given by Jensen of the ALTO server to be set up inside of CERN.
+- NRP (previously PRP): The G2 REST API can be queried by ALTO for capacity, latency, etc
+
+Wiki Revision
+- We should restructure how we keep track of deployments to include documentation about how information is collected in each case.
+- The [current wiki](https://trac.ietf.org/trac/alto/wiki/Impl) is hard to read.
+- A [new wiki](https://wiki.ietf.org/e/en/group/ALTO/deployment) was created.
+- Someone needs to port the information to the new wiki. This could possibly be done during the IETF 115 hackathon.
+
 
 ------------------------------
 
