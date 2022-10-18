@@ -9,6 +9,22 @@
 
 ------------------------------
 
+**IETF ALTO Meeting: October 18, 2022**
+
+**Agenda:**
+
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- Path vector RFC
+- New transport
+- OAM
+- Deployment (integration with Rucio/FTS, Telefonica, NRP)
+
+Note taker: 
+
+Minutes: 
+
+------------------------------
+
 **IETF ALTO Meeting: October 11, 2022**
 
 **Agenda:**
