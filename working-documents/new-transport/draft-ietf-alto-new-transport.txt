@@ -14,7 +14,7 @@ Expires: 24 April 2023                                   Yale University
 
 
        ALTO New Transport: ALTO Transport Information Structures
-                    draft-ietf-alto-new-transport-02
+                    draft-ietf-alto-new-transport-03
 
 Abstract
 
@@ -30,7 +30,7 @@ Abstract
    independent client (long) pull allowed by non-blocking, newer HTTP,
    and (2) HTTP/2 specific server push.  This document defines ALTO TIS
    and the first design.  A companion document
-   [draft-ietf-alto-new-transport-push] defines server-push ALTO
+   [draft-schott-alto-new-transport-push] defines server-push ALTO
    transport based on ALTO TIS.
 
 Requirements Language
@@ -266,7 +266,7 @@ Internet-Draft                   ALTO/H2                    October 2022
       includes a sequence of incremental update messages.  A particular
       transport design may extend the base design to include additional
       state.  For example, the server-push design
-      [draft-ietf-alto-new-transport-push] may include the additional
+      [draft-schott-alto-new-transport-push] may include the additional
       receiver set state, which includes the set of receivers receiving
       incremental push updates from the ALTO server.
 
@@ -1144,10 +1144,10 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 12.2.  Informative References
 
-   [draft-ietf-alto-new-transport-push]
+   [draft-schott-alto-new-transport-push]
               Schott, R. and Y. Yang, "ALTO New Transport: Server Push",
               Internet Draft ID, October 2022,
-              <https://datatracker.ietf.org/doc/draft-ietf-alto-new-
+              <https://datatracker.ietf.org/doc/draft-schott-alto-new-
               transport-push/>.
 
    [RFC7971]  Stiemerling, M., Kiesel, S., Scharf, M., Seidel, H., and

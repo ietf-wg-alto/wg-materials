@@ -72,7 +72,7 @@
     <keyword>Application-Layer Traffic Optimization, HTTP/2, SSE, Message Queue</keyword>
     <abstract>
       <t>The ALTO base protocol [RFC7285] defines both the ALTO information resources and their transport from the server to the client. Using HTTP/1.x as the transport protocol, the  ALTO transport in the base protocol includes the limitations of HTTP/1.x. ALTO/SSE [RFC8895] defines a new transport design addressing some of the limitations, but is still based on HTTP/1.x. This document introduces ALTO new transport, which introduces ALTO transport information structures (TIS) at an ALTO server. The introduction of ALTO TIS allows at least two types of efficient transport using HTTP: (1) HTTP/2/3 independent client (long) pull allowed by non-blocking, newer HTTP, and (2) HTTP/2 specific server push. This document defines ALTO TIS and the first design. A companion document 
-        <xref target="draft-ietf-alto-new-transport-push" format="default"/> defines server-push ALTO transport based on ALTO TIS.
+        <xref target="draft-schott-alto-new-transport-push" format="default"/> defines server-push ALTO transport based on ALTO TIS.
       </t>
     </abstract>
     <note>
@@ -158,7 +158,7 @@
         an ALTO information resource is conceptually through a transport 
         queue. A static ALTO information resource (e.g., Cost Map, Network Map) has a single transport queue, and a dynamic ALTO information resource (e.g., Filtered Cost Map) may create a queue for each unique filter request.</li>
 
-        <li>The base transport queue defined in this document includes only a single element: the incremental update message queue, which includes a sequence of incremental update messages. A particular transport design may extend the base design to include additional state. For example, the server-push design <xref target="draft-ietf-alto-new-transport-push" format="default"/> may include the additional receiver set state, which includes the set of receivers receiving incremental push updates from the ALTO server. </li>
+        <li>The base transport queue defined in this document includes only a single element: the incremental update message queue, which includes a sequence of incremental update messages. A particular transport design may extend the base design to include additional state. For example, the server-push design <xref target="draft-schott-alto-new-transport-push" format="default"/> may include the additional receiver set state, which includes the set of receivers receiving incremental push updates from the ALTO server. </li>
 
         <li>The transport queue state is exposed to clients through views; that is, a client can see only a virtual view of the server state.</li>
       </ul>
@@ -832,7 +832,7 @@ tqi/rs = receiver set of transport queue i
       <references>
         <name>Informative References</name>
 
-          <reference anchor="draft-ietf-alto-new-transport-push" target="https://datatracker.ietf.org/doc/draft-ietf-alto-new-transport-push/">
+          <reference anchor="draft-schott-alto-new-transport-push" target="https://datatracker.ietf.org/doc/draft-schott-alto-new-transport-push/">
           <front>
             <title>ALTO New Transport: Server Push</title>
             <author initials="R." surname="Schott" fullname="R. Schott">
