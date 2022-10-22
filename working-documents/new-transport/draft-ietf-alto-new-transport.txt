@@ -27,9 +27,10 @@ Abstract
    transport, which introduces ALTO transport information structures
    (TIS) at an ALTO server.  The introduction of ALTO TIS allows at
    least two types of efficient transport using HTTP: (1) HTTP/2/3
-   independent client (long) poll allowed by non-blocking, newer HTTP,
+   independent client (long) pull allowed by non-blocking, newer HTTP,
    and (2) HTTP/2 specific server push.  This document defines ALTO TIS
-   and the first design.  A companion document defines server-push ALTO
+   and the first design.  A companion document
+   [draft-ietf-alto-new-transport-push] defines server-push ALTO
    transport based on ALTO TIS.
 
 Requirements Language
@@ -49,7 +50,6 @@ Status of This Memo
    Task Force (IETF).  Note that other groups may also distribute
    working documents as Internet-Drafts.  The list of current Internet-
    Drafts is at https://datatracker.ietf.org/drafts/current/.
-
 
 
 
@@ -84,28 +84,28 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  ALTO New Transport Design Requirements  . . . . . . . . . . .   4
    3.  ALTO New Transport Design Overview  . . . . . . . . . . . . .   5
-   4.  Transport Information: Transport Queue  . . . . . . . . . . .   7
-     4.1.  Transport Queue Operations  . . . . . . . . . . . . . . .   7
-     4.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .   8
-   5.  Transport Information: Incremental Updates Queue  . . . . . .  10
+   4.  Transport Information: Transport Queue  . . . . . . . . . . .   8
+     4.1.  Transport Queue Operations  . . . . . . . . . . . . . . .   8
+     4.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .   9
+   5.  Transport Information: Incremental Updates Queue  . . . . . .  11
      5.1.  Incremental Updates Queue Operations  . . . . . . . . . .  11
-     5.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  11
+     5.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  12
    6.  Information Resource Information: Client Pull Individual
-           Updates . . . . . . . . . . . . . . . . . . . . . . . . .  12
+           Updates . . . . . . . . . . . . . . . . . . . . . . . . .  13
      6.1.  Individual Updates Operations . . . . . . . . . . . . . .  13
-     6.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  13
-   7.  ALTO New Transport Stream Management  . . . . . . . . . . . .  15
-     7.1.  Objectives  . . . . . . . . . . . . . . . . . . . . . . .  15
-     7.2.  Client -> Server [Create Transport Queue] . . . . . . . .  15
-     7.3.  Client -> Server [Close Transport Queue]  . . . . . . . .  15
+     6.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  14
+   7.  ALTO New Transport Stream Management  . . . . . . . . . . . .  16
+     7.1.  Objectives  . . . . . . . . . . . . . . . . . . . . . . .  16
+     7.2.  Client -> Server [Create Transport Queue] . . . . . . . .  16
+     7.3.  Client -> Server [Close Transport Queue]  . . . . . . . .  16
      7.4.  Client -> Server [Request on Data of a Transport Queue on
-           Stream SID_tq]  . . . . . . . . . . . . . . . . . . . . .  16
-     7.5.  Concurrency Management  . . . . . . . . . . . . . . . . .  16
-   8.  ALTO New Transport Information Resource Directory (IRD) . . .  16
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  19
-   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
-   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  19
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
+           Stream SID_tq]  . . . . . . . . . . . . . . . . . . . . .  17
+     7.5.  Concurrency Management  . . . . . . . . . . . . . . . . .  17
+   8.  ALTO New Transport Information Resource Directory (IRD) . . .  17
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  20
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  20
+   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  20
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  20
 
 
 
@@ -114,10 +114,10 @@ Schott, et al.            Expires 24 April 2023                 [Page 2]
 Internet-Draft                   ALTO/H2                    October 2022
 
 
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  19
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  20
-   Appendix A.  Outlook to ALTO with HTTP/3  . . . . . . . . . . . .  20
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  21
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  20
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  21
+   Appendix A.  Outlook to ALTO with HTTP/3  . . . . . . . . . . . .  21
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
 
 1.  Introduction
 
@@ -261,23 +261,79 @@ Internet-Draft                   ALTO/H2                    October 2022
       dynamic ALTO information resource (e.g., Filtered Cost Map) may
       create a queue for each unique filter request.
 
-   *  Each transport queue MUST maintain the state of the incremental
-      update message queue, which includes a sequence of incremental
-      update messages.  A particular transport design MAY include
-      additional state.  For example, the server push design may include
-      the additional receiver set state, which includes the set of
-      receivers receiving incremental push updates from the ALTO server.
+   *  The base transport queue defined in this document includes only a
+      single element: the incremental update message queue, which
+      includes a sequence of incremental update messages.  A particular
+      transport design may extend the base design to include additional
+      state.  For example, the server-push design
+      [draft-ietf-alto-new-transport-push] may include the additional
+      receiver set state, which includes the set of receivers receiving
+      incremental push updates from the ALTO server.
 
    *  The transport queue state is exposed to clients through views;
       that is, a client can see only a virtual view of the server state.
 
-   Figure 2 shows an example illustrating the aforementioned
-   information.  Each ALTO client (Client 1, Client 2, or Client 3)
-   maintains a single HTTP/2 connection with the ALTO server.
+
 
 
 
 Schott, et al.            Expires 24 April 2023                 [Page 5]
+
+Internet-Draft                   ALTO/H2                    October 2022
+
+
+   Figure 2 shows an example illustrating the aforementioned
+   information.  It includes the additional receiver-set state, to
+   illustrate the possibility of extension.  Each ALTO client (Client 1,
+   Client 2, or Client 3) maintains a single HTTP connection with the
+   ALTO server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.            Expires 24 April 2023                 [Page 6]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -333,7 +389,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                 [Page 6]
+Schott, et al.            Expires 24 April 2023                 [Page 7]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -356,7 +412,7 @@ Internet-Draft                   ALTO/H2                    October 2022
        Client closes the connection
 
 
-       Figure 3: ALTO New Transport Transport Management Information.
+                   Figure 3: ALTO New Transport Workflow.
 
 4.  Transport Information: Transport Queue
 
@@ -379,17 +435,17 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
+   In the base design, the client should not include the incremental-
+   changes field.
+
    A successful POST request MUST return the URI for the transport
-   queue.  Unless the request has incremental-changes to be false, the
-   client is added to receiver set as well, indicating that the client
-   will receive automatic, incremental push updates.
+   queue.
 
 
 
 
 
-
-Schott, et al.            Expires 24 April 2023                 [Page 7]
+Schott, et al.            Expires 24 April 2023                 [Page 8]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -445,7 +501,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                 [Page 8]
+Schott, et al.            Expires 24 April 2023                 [Page 9]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -501,7 +557,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                 [Page 9]
+Schott, et al.            Expires 24 April 2023                [Page 10]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -542,25 +598,11 @@ Internet-Draft                   ALTO/H2                    October 2022
              “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
              "link":       "/tqs/2718281828459/snapshot/2e3f"}
 
-          ],
-        "rs": ["self"]
+          ]
        }
 
 
 5.  Transport Information: Incremental Updates Queue
-
-
-
-
-
-
-
-
-
-Schott, et al.            Expires 24 April 2023                [Page 10]
-
-Internet-Draft                   ALTO/H2                    October 2022
-
 
 5.1.  Incremental Updates Queue Operations
 
@@ -568,6 +610,13 @@ Internet-Draft                   ALTO/H2                    October 2022
    the read operation: a client cannot create, update, or delete
    incremental updates queue directly---it is read only, and associated
    with transport queue automatically.
+
+
+
+Schott, et al.            Expires 24 April 2023                [Page 11]
+
+Internet-Draft                   ALTO/H2                    October 2022
+
 
    Reads an incremental updates queue: A client reads the status of an
    incremental updates queue using the HTTP GET method: GET transport-
@@ -613,7 +662,14 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 11]
+
+
+
+
+
+
+
+Schott, et al.            Expires 24 April 2023                [Page 12]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -660,27 +716,19 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 6.  Information Resource Information: Client Pull Individual Updates
 
+6.1.  Individual Updates Operations
+
+   A client can only read an individual update: A client uses the HTTP
+   GET method on the incremental updates queue concatenated by a
+   sequence number to pull an individual update.The server push model,
+   however, depends on HTTP specific version.
 
 
 
-
-
-
-
-
-
-Schott, et al.            Expires 24 April 2023                [Page 12]
+Schott, et al.            Expires 24 April 2023                [Page 13]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
-
-6.1.  Individual Updates Operations
-
-   A client can only read an individual update: A client uses HTTP GET
-   method on the incremental updates queue concatenated by a sequence
-   number to pull an individual update.The server push model, however,
-   depends on HTTP specific version.  The companion document specifies
-   server push for HTTP/2.
 
 6.2.  Examples
 
@@ -725,7 +773,15 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 13]
+
+
+
+
+
+
+
+
+Schott, et al.            Expires 24 April 2023                [Page 14]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -781,14 +837,14 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 14]
+Schott, et al.            Expires 24 April 2023                [Page 15]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
 
    One important design is that the "seq" must be sequentially
    increasing.  Hence, by issuing a request on the next sequence number,
-   the client realizes long poll.
+   the client realizes long pull.
 
 7.  ALTO New Transport Stream Management
 
@@ -837,7 +893,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 15]
+Schott, et al.            Expires 24 April 2023                [Page 16]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -893,7 +949,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 16]
+Schott, et al.            Expires 24 April 2023                [Page 17]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -949,7 +1005,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 17]
+Schott, et al.            Expires 24 April 2023                [Page 18]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -1005,7 +1061,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 18]
+Schott, et al.            Expires 24 April 2023                [Page 19]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -1061,7 +1117,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 19]
+Schott, et al.            Expires 24 April 2023                [Page 20]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -1088,6 +1144,12 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 12.2.  Informative References
 
+   [draft-ietf-alto-new-transport-push]
+              Schott, R. and Y. Yang, "ALTO New Transport: Server Push",
+              Internet Draft ID, October 2022,
+              <https://datatracker.ietf.org/doc/draft-ietf-alto-new-
+              transport-push/>.
+
    [RFC7971]  Stiemerling, M., Kiesel, S., Scharf, M., Seidel, H., and
               S. Previdi, "Application-Layer Traffic Optimization (ALTO)
               Deployment Considerations", RFC 7971,
@@ -1108,19 +1170,20 @@ Appendix A.  Outlook to ALTO with HTTP/3
    QUIC has been developed by the IETF QUIC Working Group with the
    following goals:
 
+
+
+
+Schott, et al.            Expires 24 April 2023                [Page 21]
+
+Internet-Draft                   ALTO/H2                    October 2022
+
+
    *  Minimizing connection establishment and overall transport latency
       for applications, starting with HTTP/2
 
    *  Providing multiplexing without head-of-line blocking
 
    *  Requiring only changes to path endpoints to enable deployment
-
-
-
-Schott, et al.            Expires 24 April 2023                [Page 20]
-
-Internet-Draft                   ALTO/H2                    October 2022
-
 
    *  Enabling multipath and forward error correction extensions
 
@@ -1159,6 +1222,18 @@ Authors' Addresses
    Email: yry@cs.yale.edu
 
 
+
+
+
+
+
+
+
+Schott, et al.            Expires 24 April 2023                [Page 22]
+
+Internet-Draft                   ALTO/H2                    October 2022
+
+
    Kai Gao
    Sichuan University
    Chengdu
@@ -1170,14 +1245,6 @@ Authors' Addresses
    Jingxuan Jensen Zhang
    Tongji University
    4800 Cao'An Hwy
-
-
-
-Schott, et al.            Expires 24 April 2023                [Page 21]
-
-Internet-Draft                   ALTO/H2                    October 2022
-
-
    Shanghai
    201804
    China
@@ -1218,15 +1285,4 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-Schott, et al.            Expires 24 April 2023                [Page 22]
+Schott, et al.            Expires 24 April 2023                [Page 23]

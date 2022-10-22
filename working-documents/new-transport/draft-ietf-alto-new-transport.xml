@@ -7,7 +7,7 @@
 ]>
 <!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
      by Daniel M Kohn (private) -->
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-02" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-03" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3">
   <!-- xml2rfc v2v3 conversion 3.12.10 -->
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
@@ -71,7 +71,8 @@
     <keyword>Internet-Draft</keyword>
     <keyword>Application-Layer Traffic Optimization, HTTP/2, SSE, Message Queue</keyword>
     <abstract>
-      <t>The ALTO base protocol [RFC7285] defines both the ALTO information resources and their transport from the server to the client. Using HTTP/1.x as the transport protocol, the  ALTO transport in the base protocol includes the limitations of HTTP/1.x. ALTO/SSE [RFC8895] defines a new transport design addressing some of the limitations, but is still based on HTTP/1.x. This document introduces ALTO new transport, which introduces ALTO transport information structures (TIS) at an ALTO server. The introduction of ALTO TIS allows at least two types of efficient transport using HTTP: (1) HTTP/2/3 independent client (long) poll allowed by non-blocking, newer HTTP, and (2) HTTP/2 specific server push. This document defines ALTO TIS and the first design. A companion document defines server-push ALTO transport based on ALTO TIS.
+      <t>The ALTO base protocol [RFC7285] defines both the ALTO information resources and their transport from the server to the client. Using HTTP/1.x as the transport protocol, the  ALTO transport in the base protocol includes the limitations of HTTP/1.x. ALTO/SSE [RFC8895] defines a new transport design addressing some of the limitations, but is still based on HTTP/1.x. This document introduces ALTO new transport, which introduces ALTO transport information structures (TIS) at an ALTO server. The introduction of ALTO TIS allows at least two types of efficient transport using HTTP: (1) HTTP/2/3 independent client (long) pull allowed by non-blocking, newer HTTP, and (2) HTTP/2 specific server push. This document defines ALTO TIS and the first design. A companion document 
+        <xref target="draft-ietf-alto-new-transport-push" format="default"/> defines server-push ALTO transport based on ALTO TIS.
       </t>
     </abstract>
     <note>
@@ -157,11 +158,13 @@
         an ALTO information resource is conceptually through a transport 
         queue. A static ALTO information resource (e.g., Cost Map, Network Map) has a single transport queue, and a dynamic ALTO information resource (e.g., Filtered Cost Map) may create a queue for each unique filter request.</li>
 
-        <li>Each transport queue MUST maintain the state of the incremental update message queue, which includes a sequence of incremental update messages. A particular transport design MAY include additional state. For example, the server push design may include the additional receiver set state, which includes the set of receivers receiving incremental push updates from the ALTO server. </li>
+        <li>The base transport queue defined in this document includes only a single element: the incremental update message queue, which includes a sequence of incremental update messages. A particular transport design may extend the base design to include additional state. For example, the server-push design <xref target="draft-ietf-alto-new-transport-push" format="default"/> may include the additional receiver set state, which includes the set of receivers receiving incremental push updates from the ALTO server. </li>
+
         <li>The transport queue state is exposed to clients through views; that is, a client can see only a virtual view of the server state.</li>
       </ul>
-      <t>Figure 2 shows an example illustrating the aforementioned information. Each ALTO client 
-        (Client 1, Client 2, or Client 3) maintains a single HTTP/2 connection with the ALTO server.
+
+      <t>Figure 2 shows an example illustrating the aforementioned information. It includes the additional receiver-set state, to illustrate the possibility of extension. Each ALTO client 
+        (Client 1, Client 2, or Client 3) maintains a single HTTP connection with the ALTO server.
       </t>
       <figure anchor="FigInfoStruct">
         <name>ALTO New Transport Transport Management Information.</name>
@@ -215,9 +218,10 @@ tqi/rs = receiver set of transport queue i
     
       ]]></artwork>
       </figure>
+
       <t>The basic work flow of a client connecting to an ALTO server is the following:</t>
       <figure anchor="FigInfoWorkflow">
-        <name>ALTO New Transport Transport Management Information.</name>
+        <name>ALTO New Transport Workflow.</name>
         <artwork name="" type="" align="left" alt=""><![CDATA[
     
 
@@ -259,8 +263,11 @@ tqi/rs = receiver set of transport queue i
 
           
         ]]></artwork>
-        <t>A successful POST request MUST return the URI for the transport queue. Unless the request has incremental-changes to be false, the client is added to receiver set as well, indicating that the client will receive automatic, incremental push updates. </t>
+        <t>In the base design, the client should not include the incremental-changes field.</t>
+        <t>A successful POST request MUST return the URI for the transport queue. </t>
+
         <t>Read a transport queue: A client reads the status of a transport queue by issuing a GET request to the transport queue URI returned from the POST method. </t>
+
         <t>Delete a transport queue: a transport queue exposed to a client can be closed (deleted) either explicitly or implicitly.</t>
         <ul spacing="normal">
           <li>Explicit delete: A client uses the HTTP DELETE method to explicitly delete a transport 
@@ -354,8 +361,7 @@ tqi/rs = receiver set of transport queue i
           “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
           "link":       "/tqs/2718281828459/snapshot/2e3f"} 
  
-       ],
-     "rs": ["self"]
+       ]
     }
 
           ]]></artwork>
@@ -436,7 +442,7 @@ tqi/rs = receiver set of transport queue i
       <name>Information Resource Information: Client Pull Individual Updates</name>
       <section anchor="altoh2updatesops" numbered="true" toc="default">
         <name>Individual Updates Operations</name>
-        <t>A client can only read an individual update: A client uses HTTP GET method on the incremental updates queue concatenated by a sequence number to pull an individual update.The server push model, however,  depends on HTTP specific version. The companion document specifies server push for HTTP/2.</t>
+        <t>A client can only read an individual update: A client uses the HTTP GET method on the incremental updates queue concatenated by a sequence number to pull an individual update.The server push model, however,  depends on HTTP specific version.</t>
         
       </section>
       <section anchor="altoh2updatesexamples" numbered="true" toc="default">
@@ -492,7 +498,7 @@ tqi/rs = receiver set of transport queue i
           ]]></artwork>
         <t>Note from the transport queue state that the 103 message has an OPTIONAL link to a complete snapshot, which a client can request.</t>
 
-        <t>One important design is that the "seq" must be sequentially increasing. Hence, by issuing a request on the next sequence number, the client realizes long poll.</t>
+        <t>One important design is that the "seq" must be sequentially increasing. Hence, by issuing a request on the next sequence number, the client realizes long pull.</t>
 
       </section>
       <!-- individual example -->
@@ -825,6 +831,21 @@ tqi/rs = receiver set of transport queue i
     </references>
       <references>
         <name>Informative References</name>
+
+          <reference anchor="draft-ietf-alto-new-transport-push" target="https://datatracker.ietf.org/doc/draft-ietf-alto-new-transport-push/">
+          <front>
+            <title>ALTO New Transport: Server Push</title>
+            <author initials="R." surname="Schott" fullname="R. Schott">
+              <organization/>
+            </author>
+            <author initials="Y." surname="Yang" fullname="Y. Yang">
+              <organization/>
+            </author>
+            <date year="2022" month="October"/>
+          </front>
+          <seriesInfo name="Internet Draft" value="ID"/>
+        </reference>
+
         <reference anchor="RFC7971" target="https://www.rfc-editor.org/info/rfc7971" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7971.xml">
           <front>
             <title>Application-Layer Traffic Optimization (ALTO) Deployment Considerations</title>
