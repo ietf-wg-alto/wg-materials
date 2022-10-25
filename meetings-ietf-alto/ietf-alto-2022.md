@@ -19,7 +19,30 @@
 - Deployment (Telefonica, integration with Rucio/FTS/CERN, Geant, NRP, ESnet)
 - IETF 115
 
-Note taker: 
+Note taker: Jensen
+
+Minutes:
+
+IETF meeting agenda:
+- Qin briefly talked about the ALTO session agenda for IETF 115.
+- Jordi suggested that we present OpenALTO to IETF.
+- Deployment will be a major topic during the coming ALTO session.
+
+Richard reported updates on ALTO new transport draft:
+- By discussion with Martin, the original draft is splitted to 2 drafts.
+- Will fix some minor issues by next week.
+- Qin suggested more modular design (split to 4 drafts).
+
+Jensen reported OAM updates:
+- Qin and Richard agree that a specific deployment should be able to choose different server discovery approaches.
+- Will send a summary email talking about how the open issues are resolved.
+
+For ALTO deployment
+- Lauren has been running an ALTO server at CERN. Some access control issue may need to be fixed.
+- Kai and Jensen are working on NRP deployment.
+- Richard talked about a potential hierarchical deployment architecture, which leverage IRR to do server discovery.
+- Wiki page needs to be updated (Kai's students can help the initial wiki page migration).
+- Richard proposed suggestions on how to structure the deployment wiki page: current wiki page focus on northbound features; Should present more about southbound techniques and methodologies.
 
 
 ------------------------------
