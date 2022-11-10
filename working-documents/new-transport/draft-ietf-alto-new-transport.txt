@@ -89,23 +89,23 @@ Table of Contents
      4.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .   9
    5.  Transport Information: Incremental Updates Queue  . . . . . .  11
      5.1.  Incremental Updates Queue Operations  . . . . . . . . . .  11
-     5.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  12
+       5.1.1.  Media Type  . . . . . . . . . . . . . . . . . . . . .  12
+       5.1.2.  HTTP Method . . . . . . . . . . . . . . . . . . . . .  12
+       5.1.3.  Response  . . . . . . . . . . . . . . . . . . . . . .  12
+     5.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  13
    6.  Information Resource Information: Client Pull Individual
-           Updates . . . . . . . . . . . . . . . . . . . . . . . . .  13
-     6.1.  Individual Updates Operations . . . . . . . . . . . . . .  13
-     6.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  14
-   7.  ALTO New Transport Stream Management  . . . . . . . . . . . .  16
-     7.1.  Objectives  . . . . . . . . . . . . . . . . . . . . . . .  16
-     7.2.  Client -> Server [Create Transport Queue] . . . . . . . .  16
-     7.3.  Client -> Server [Close Transport Queue]  . . . . . . . .  16
+           Updates . . . . . . . . . . . . . . . . . . . . . . . . .  14
+     6.1.  Individual Updates Operations . . . . . . . . . . . . . .  14
+     6.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  15
+   7.  ALTO New Transport Stream Management  . . . . . . . . . . . .  17
+     7.1.  Objectives  . . . . . . . . . . . . . . . . . . . . . . .  17
+     7.2.  Client -> Server [Create Transport Queue] . . . . . . . .  17
+     7.3.  Client -> Server [Close Transport Queue]  . . . . . . . .  17
      7.4.  Client -> Server [Request on Data of a Transport Queue on
-           Stream SID_tq]  . . . . . . . . . . . . . . . . . . . . .  17
-     7.5.  Concurrency Management  . . . . . . . . . . . . . . . . .  17
-   8.  ALTO New Transport Information Resource Directory (IRD) . . .  17
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  20
-   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  20
-   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  20
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  20
+           Stream SID_tq]  . . . . . . . . . . . . . . . . . . . . .  18
+     7.5.  Concurrency Management  . . . . . . . . . . . . . . . . .  18
+   8.  ALTO New Transport Information Resource Directory (IRD) . . .  18
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  21
 
 
 
@@ -114,10 +114,13 @@ Schott, et al.            Expires 24 April 2023                 [Page 2]
 Internet-Draft                   ALTO/H2                    October 2022
 
 
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  20
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  21
-   Appendix A.  Outlook to ALTO with HTTP/3  . . . . . . . . . . . .  21
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  21
+   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  21
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  21
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  22
+   Appendix A.  Outlook to ALTO with HTTP/3  . . . . . . . . . . . .  22
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
 
 1.  Introduction
 
@@ -145,9 +148,6 @@ Internet-Draft                   ALTO/H2                    October 2022
    separate control URI, leading to complexity in management; it needs
    its own envelop protocol on top of HTTP encoding to indicate message
    types.
-
-
-
 
 
 
@@ -397,8 +397,6 @@ Internet-Draft                   ALTO/H2                    October 2022
    The basic work flow of a client connecting to an ALTO server is the
    following:
 
-
-
        Client opens a connection to the server
        Client opens/identifies a transport queue tq
          // pull mode
@@ -425,7 +423,6 @@ Internet-Draft                   ALTO/H2                    October 2022
    using the HTTP POST method with ALTO SSE AddUpdateReq ([RFC 8895]
    Sec. 6.5) as the parameter:
 
-
        object {
            ResourceID   resource-id;
            [JSONString  tag;]
@@ -438,9 +435,12 @@ Internet-Draft                   ALTO/H2                    October 2022
    In the base design, the client should not include the incremental-
    changes field.
 
-   A successful POST request MUST return the URI for the transport
-   queue.
+   A successful POST request MUST return a JSON object of type
+   ALTOTransportQueueData
 
+       object {
+           JSONString tq;
+       } ALTOTransportQueueData;
 
 
 
@@ -449,6 +449,10 @@ Schott, et al.            Expires 24 April 2023                 [Page 8]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
+
+   with field:
+
+   tq:  The relative URI to the incremental update queue resource.
 
    Read a transport queue: A client reads the status of a transport
    queue by issuing a GET request to the transport queue URI returned
@@ -475,6 +479,33 @@ Internet-Draft                   ALTO/H2                    October 2022
 
    The first example is a client creating a transport queue.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.            Expires 24 April 2023                 [Page 9]
+
+Internet-Draft                   ALTO/H2                    October 2022
+
+
       Client -> server request
 
       HEADERS
@@ -496,16 +527,6 @@ Internet-Draft                   ALTO/H2                    October 2022
        }
 
 
-
-
-
-
-
-Schott, et al.            Expires 24 April 2023                 [Page 9]
-
-Internet-Draft                   ALTO/H2                    October 2022
-
-
       Server -> client response:
 
       HEADERS
@@ -525,27 +546,6 @@ Internet-Draft                   ALTO/H2                    October 2022
    read operation (GET) in the same HTTP connection.  Below is an
    example (structure of incremental updates queue will be specified in
    the next section):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -623,24 +623,63 @@ Internet-Draft                   ALTO/H2                    October 2022
    queue-uri/uq, where the transport-queue-uri is the URI returned in
    the transport queue create method.
 
+5.1.1.  Media Type
+
+   The media type of the incremental update queue resource is
+   "application/alto-transportqueue+json".
+
+5.1.2.  HTTP Method
+
+   The incremental update queue resource is requested using the HTTP GET
+   method.
+
+5.1.3.  Response
+
    The response informs the client the backlog status, and potential
-   direct links.  Specifically, the response is a JSON array, with each
-   element being one incremental update, with three required fields and
-   one optional field:
+   direct links.  Specifically, the response is encoded as a JSON object
+   of type ALTOIncUpdateQueue
 
-   *  "seq": a required JSON integer indicating the sequence number of
-      the incremental update; As JSON allows a large integer space, when
+   object {
+     ALTOIncUpdate  uq<0..*>;
+   } ALTOIncUpdateQueue;
+
+   with field:
+
+   uq:  A queue of incremental updates.
+
+   Each incremental update is encoded as a JSON object of type
+   ALTOIncUpdate
+
+   object {
+       JSONNumber   seq;
+       JSONString   media-type;
+       JSONString   tag;
+       [JSONString  link;]
+   } ALTOIncUpdate;
+
+   with fields:
+
+   seq:  A required JSON integer indicating the sequence number of the
+      incremental update.  As JSON allows a large integer space, when
       the server reaches the largest integer, the server SHOULD close
-      the incremental update queue;
+      the incremental update queue.
 
-   *  "media-type", a required JSON string giving the type of the
-      incremental update (see ALTO/SSE);
+   media-type:  A required JSON string giving the type of the
+      incremental update (see ALTO/SSE).
 
-   *  "tag": a required JSON string giving a unique tag (see [RFC7285];
 
-   *  "link": an optional JSON string giving an optional link for a
-      client to directly request a resource as a complete snapshot (not
-      through incremental updates).
+
+Schott, et al.            Expires 24 April 2023                [Page 12]
+
+Internet-Draft                   ALTO/H2                    October 2022
+
+
+   tag:  A required JSON string which is defined the same way as the
+      "tag" field of VersionTag (see Section 10.3 of [RFC7285]).
+
+   link:  An optional JSON string giving an optional link for a client
+      to directly request a resource as a complete snapshot (not through
+      incremental updates).
 
    Note that the server determines the state (window of history and type
    of each update) in the incremental updates queue, as specified by
@@ -669,7 +708,24 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 12]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.            Expires 24 April 2023                [Page 13]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -684,7 +740,7 @@ Internet-Draft                   ALTO/H2                    October 2022
           :path = /tqs/2718281828459/uq
           host = alto.example.com
           accept = application/alto-error+json,
-                       application/alto-transport+json
+                       application/alto-transportqueue+json
 
       Server -> client response:
 
@@ -692,13 +748,13 @@ Internet-Draft                   ALTO/H2                    October 2022
         - END_STREAM
         + END_HEADERS
           :status = 200
-          content-type = application/alto-transport+json
+          content-type = application/alto-transportqueue+json
           content-length = TBD
 
       DATA
         - END_STREAM
        {
-          [
+          "uq": [
             {“seq”:        101,
              "media-type": "application/alto-costmap+json",
              “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
@@ -709,9 +765,7 @@ Internet-Draft                   ALTO/H2                    October 2022
              "media-type": "application/merge-patch+json",
              “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
              "link":       "/tqs/2718281828459/snapshot/2e3f"}
-
-          ],
-
+          ]
        }
 
 6.  Information Resource Information: Client Pull Individual Updates
@@ -725,7 +779,9 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 13]
+
+
+Schott, et al.            Expires 24 April 2023                [Page 14]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -781,7 +837,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 14]
+Schott, et al.            Expires 24 April 2023                [Page 15]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -837,7 +893,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 15]
+Schott, et al.            Expires 24 April 2023                [Page 16]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -893,7 +949,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 16]
+Schott, et al.            Expires 24 April 2023                [Page 17]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -949,7 +1005,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 17]
+Schott, et al.            Expires 24 April 2023                [Page 18]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -1005,7 +1061,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 18]
+Schott, et al.            Expires 24 April 2023                [Page 19]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -1061,7 +1117,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 19]
+Schott, et al.            Expires 24 April 2023                [Page 20]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -1117,7 +1173,7 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 20]
+Schott, et al.            Expires 24 April 2023                [Page 21]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -1173,7 +1229,7 @@ Appendix A.  Outlook to ALTO with HTTP/3
 
 
 
-Schott, et al.            Expires 24 April 2023                [Page 21]
+Schott, et al.            Expires 24 April 2023                [Page 22]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -1211,6 +1267,7 @@ Authors' Addresses
    Heinrich-Hertz-Strasse 3-7
    64295 Darmstadt
    Germany
+
    Email: Roland.Schott@telekom.de
 
 
@@ -1219,6 +1276,7 @@ Authors' Addresses
    51 Prospect St
    New Haven, CT 06520
    United States of America
+
    Email: yry@cs.yale.edu
 
 
@@ -1227,9 +1285,7 @@ Authors' Addresses
 
 
 
-
-
-Schott, et al.            Expires 24 April 2023                [Page 22]
+Schott, et al.            Expires 24 April 2023                [Page 23]
 
 Internet-Draft                   ALTO/H2                    October 2022
 
@@ -1239,6 +1295,7 @@ Internet-Draft                   ALTO/H2                    October 2022
    Chengdu
    201804
    China
+
    Email: kgao@scu.edu.cn
 
 
@@ -1248,6 +1305,7 @@ Internet-Draft                   ALTO/H2                    October 2022
    Shanghai
    201804
    China
+
    Email: jingxuan.n.zhang@gmail.com
 
 
@@ -1283,6 +1341,4 @@ Internet-Draft                   ALTO/H2                    October 2022
 
 
 
-
-
-Schott, et al.            Expires 24 April 2023                [Page 23]
+Schott, et al.            Expires 24 April 2023                [Page 24]

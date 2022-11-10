@@ -71,7 +71,7 @@
     <keyword>Internet-Draft</keyword>
     <keyword>Application-Layer Traffic Optimization, HTTP/2, SSE, Message Queue</keyword>
     <abstract>
-      <t>The ALTO base protocol [RFC7285] defines both the ALTO information resources and their transport from the server to the client. Using HTTP/1.x as the transport protocol, the  ALTO transport in the base protocol includes the limitations of HTTP/1.x. ALTO/SSE [RFC8895] defines a new transport design addressing some of the limitations, but is still based on HTTP/1.x. This document introduces ALTO new transport, which introduces ALTO transport information structures (TIS) at an ALTO server. The introduction of ALTO TIS allows at least two types of efficient transport using HTTP: (1) HTTP/2/3 independent client (long) pull allowed by non-blocking, newer HTTP, and (2) HTTP/2 specific server push. This document defines ALTO TIS and the first design. A companion document 
+      <t>The ALTO base protocol [RFC7285] defines both the ALTO information resources and their transport from the server to the client. Using HTTP/1.x as the transport protocol, the  ALTO transport in the base protocol includes the limitations of HTTP/1.x. ALTO/SSE [RFC8895] defines a new transport design addressing some of the limitations, but is still based on HTTP/1.x. This document introduces ALTO new transport, which introduces ALTO transport information structures (TIS) at an ALTO server. The introduction of ALTO TIS allows at least two types of efficient transport using HTTP: (1) HTTP/2/3 independent client (long) pull allowed by non-blocking, newer HTTP, and (2) HTTP/2 specific server push. This document defines ALTO TIS and the first design. A companion document
         <xref target="draft-schott-alto-new-transport-push" format="default"/> defines server-push ALTO transport based on ALTO TIS.
       </t>
     </abstract>
@@ -89,19 +89,19 @@
   <middle>
     <section anchor="intro" numbered="true" toc="default">
       <name>Introduction</name>
-      <t>Application-Layer Traffic Optimization (ALTO) provides a means for network applications 
+      <t>Application-Layer Traffic Optimization (ALTO) provides a means for network applications
       to obtain network status information. The ALTO base protocol <xref target="RFC7285" format="default"/> is based on the sequential request and response model of HTTP/1.1 <xref target="RFC7230" format="default"/>. Hence, the base protocol cannot support well the use cases where an ALTO client may need to efficiently monitor the changes to a set of network information resources. If the client opens a single HTTP connection, the request for one resource may block the request for the next resource. </t>
 
-      <t>To address the issue using a protocol that is still based on the HTTP/1.1 transport model, the ALTO Working Group introduces ALTO/SSE (ALTO Incremental Update based on Server-Sent-Event) 
-      <xref target="RFC8895" format="default"/>, so that an ALTO client can manage (i.e., add and remove) a set of 
-      requests maintained at an ALTO server, and the server can continuously, concurrently, and 
-      incrementally push updates whenever a monitored network information resource changes. 
+      <t>To address the issue using a protocol that is still based on the HTTP/1.1 transport model, the ALTO Working Group introduces ALTO/SSE (ALTO Incremental Update based on Server-Sent-Event)
+      <xref target="RFC8895" format="default"/>, so that an ALTO client can manage (i.e., add and remove) a set of
+      requests maintained at an ALTO server, and the server can continuously, concurrently, and
+      incrementally push updates whenever a monitored network information resource changes.
       Figure 1 shows the architecture and message flow of ALTO/SSE, which can be considered as a more general transport protocol than the ALTO base transport protocol.  Although ALTO/SSE allows the concurrent transport of multiple ALTO information resources, it has complexities and limitations. For example, it requires that the server provide a separate control URI, leading to complexity in management; it needs its own envelop protocol on top of HTTP encoding to indicate message types.
       </t>
       <figure anchor="FigOverview">
         <name>ALTO SSE Architecture and Message Flow.</name>
         <artwork name="" type="" align="left" alt=""><![CDATA[
-    
+
  ------------------------------------------------------------------
 |                                                                  |
 |          +-------+         +-------+ 1. init request  +------+   |
@@ -118,7 +118,7 @@
 |          +-------+         +-------+ messages         +------+   |
 |                                                                  |
  ------------------------------------------------------------------
-    
+
     ]]></artwork>
       </figure>
       <t>This document specifies ALTO New Transport, which realizes ALTO/SSE functions but takes advantage of newer versions of HTTP (e.g., HTTP/2 <xref target="RFC7540" format="default"/>) that support concurrent, non-blocking transport of multiple streams in the same HTTP connection.</t>
@@ -141,7 +141,7 @@
       </ul>
 
       <t>ALTO New Transport should be designed to take advantage of newer HTTP design features, in particular, parallel transfers, but be as transparent to versions (HTTP/2, HTTP/3) as possible. If a design is based on a particular HTTP version, it should respect its semantics:</t>
-      <ul spacing="normal">      
+      <ul spacing="normal">
         <li>R6: The design respects specific HTTP semantics such as the semantics of PUSH_PROMISE, if the feature is used.</li>
       </ul>
 
@@ -155,7 +155,7 @@
       <t>A key design of ALTO New Transport is to distinguish between information about ALTO resources and information about ALTO transport. The latter information is called transport management information, which provides meta information about the transport of ALTO information resources:</t>
       <ul spacing="normal">
         <li>The transport state from the ALTO server to an ALTO client (or a set of clients) for
-        an ALTO information resource is conceptually through a transport 
+        an ALTO information resource is conceptually through a transport
         queue. A static ALTO information resource (e.g., Cost Map, Network Map) has a single transport queue, and a dynamic ALTO information resource (e.g., Filtered Cost Map) may create a queue for each unique filter request.</li>
 
         <li>The base transport queue defined in this document includes only a single element: the incremental update message queue, which includes a sequence of incremental update messages. A particular transport design may extend the base design to include additional state. For example, the server-push design <xref target="draft-schott-alto-new-transport-push" format="default"/> may include the additional receiver set state, which includes the set of receivers receiving incremental push updates from the ALTO server. </li>
@@ -163,13 +163,13 @@
         <li>The transport queue state is exposed to clients through views; that is, a client can see only a virtual view of the server state.</li>
       </ul>
 
-      <t>Figure 2 shows an example illustrating the aforementioned information. It includes the additional receiver-set state, to illustrate the possibility of extension. Each ALTO client 
+      <t>Figure 2 shows an example illustrating the aforementioned information. It includes the additional receiver-set state, to illustrate the possibility of extension. Each ALTO client
         (Client 1, Client 2, or Client 3) maintains a single HTTP connection with the ALTO server.
       </t>
       <figure anchor="FigInfoStruct">
         <name>ALTO New Transport Transport Management Information.</name>
         <artwork name="" type="" align="left" alt=""><![CDATA[
-    
+
 Information Resource:
 
 a) Static resource (#1) such as NetworkMap
@@ -185,12 +185,12 @@ b) Filterable resource (#3) such as FilteredCostMap
 ---------|------------------|-----------------|---------|------------
          |                  |                 |         | Information
          |                  |                 |         | Resource
-+-------------+   +-------------+   +-------------+   +-------------+ 
-| Information |   | Information |   | Information |   | Information | 
-| Resource #1 |   | Resource #2 |   | Resource #3 |   | Resource #4 | 
-+-------------+   +-------------+   +-------------+   +-------------+ 
++-------------+   +-------------+   +-------------+   +-------------+
+| Information |   | Information |   | Information |   | Information |
+| Resource #1 |   | Resource #2 |   | Resource #3 |   | Resource #4 |
++-------------+   +-------------+   +-------------+   +-------------+
        |                              /    \
--------|-----------------------------/------\------------------------ 
+-------|-----------------------------/------\------------------------
        |                            /        \            Transport
        |                      +----/          \------+    Queues
        |                      |                      |
@@ -215,7 +215,7 @@ b) Filterable resource (#3) such as FilteredCostMap
 tqi    = transport queue i
 tqi/uq = incremental updates queue of transport queue i
 tqi/rs = receiver set of transport queue i
-    
+
       ]]></artwork>
       </figure>
 
@@ -223,7 +223,7 @@ tqi/rs = receiver set of transport queue i
       <figure anchor="FigInfoWorkflow">
         <name>ALTO New Transport Workflow.</name>
         <artwork name="" type="" align="left" alt=""><![CDATA[
-    
+
 
     Client opens a connection to the server
     Client opens/identifies a transport queue tq
@@ -236,7 +236,7 @@ tqi/rs = receiver set of transport queue i
       Client receives incremental push updates
     Client closes the transport queue tq
     Client closes the connection
-    
+
       ]]></artwork>
       </figure>
     </section>
@@ -246,14 +246,14 @@ tqi/rs = receiver set of transport queue i
       <name>Transport Information: Transport Queue</name>
       <section anchor="altoh2tqops" numbered="true" toc="default">
         <name>Transport Queue Operations</name>
-        <t>A transport queue supports three basic operations (CRD): create, read 
+        <t>A transport queue supports three basic operations (CRD): create, read
         (get status), and delete.
         </t>
-        <t>Create a transport queue: An ALTO client creates a transport queue using the HTTP POST method with ALTO SSE AddUpdateReq 
-        ([RFC 8895] Sec. 6.5) as the parameter: 
+        <t>Create a transport queue: An ALTO client creates a transport queue using the HTTP POST method with ALTO SSE AddUpdateReq
+        ([RFC 8895] Sec. 6.5) as the parameter:
         </t>
         <artwork name="" type="" align="left" alt=""><![CDATA[
-      
+
     object {
         ResourceID   resource-id;
         [JSONString  tag;]
@@ -261,16 +261,29 @@ tqi/rs = receiver set of transport queue i
         [Object      input;]
      } AddUpdateReq;
 
-          
+
         ]]></artwork>
         <t>In the base design, the client should not include the incremental-changes field.</t>
-        <t>A successful POST request MUST return the URI for the transport queue. </t>
+        <t>A successful POST request MUST return a JSON object of type ALTOTransportQueueData </t>
+
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+
+    object {
+        JSONString tq;
+    } ALTOTransportQueueData;
+
+        ]]></artwork>
+        <t>with field:</t>
+        <dl>
+          <dt>tq:</dt>
+          <dd><t>The relative URI to the incremental update queue resource.</t></dd>
+        </dl>
 
         <t>Read a transport queue: A client reads the status of a transport queue by issuing a GET request to the transport queue URI returned from the POST method. </t>
 
         <t>Delete a transport queue: a transport queue exposed to a client can be closed (deleted) either explicitly or implicitly.</t>
         <ul spacing="normal">
-          <li>Explicit delete: A client uses the HTTP DELETE method to explicitly delete a transport 
+          <li>Explicit delete: A client uses the HTTP DELETE method to explicitly delete a transport
           queue. If successful, the transport queue is deleted from the local view of the client, although the server may still maintain the transport queue for other client connections.
           </li>
           <li>Implicit delete: Transport queue for a client is ephemeral: the close of the HTTP connection between the client and the server deletes the transport queue from the client's view --- when the client reconnects, the client MUST NOT assume that the transport queue is still valid.
@@ -303,7 +316,7 @@ tqi/rs = receiver set of transport queue i
     {
        "resource-id": "my-routingcost-map"
     }
-          
+
         ]]></artwork>
         <artwork name="" type="" align="left" alt=""><![CDATA[
 
@@ -315,14 +328,14 @@ tqi/rs = receiver set of transport queue i
        :status = 200
        content-type = application/alto-transport+json
        content-length = TBD
-   
+
    DATA
      - END_STREAM
       {"tq": “/tqs/2718281828459”}
 
-          
+
         ]]></artwork>
-        <t>The client can then read the status of the transport queue using the read operation 
+        <t>The client can then read the status of the transport queue using the read operation
           (GET) in the same HTTP connection. Below is an example (structure of incremental updates queue will be specified in the next section):</t>
         <artwork name="" type="" align="left" alt=""><![CDATA[
    Client -> server request
@@ -345,22 +358,22 @@ tqi/rs = receiver set of transport queue i
        :status = 200
        content-type = application/alto-transport+json
        content-length = TBD
-   
+
    DATA
      - END_STREAM
     { "uq":
-       [ 
-         {“seq”:        101, 
+       [
+         {“seq”:        101,
           "media-type": "application/alto-costmap+json",
-          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" }, 
-         {“seq”:        102, 
+          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
+         {“seq”:        102,
           "media-type": "application/merge-patch+json",
           “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
-         {“seq”:        103, 
+         {“seq”:        103,
           "media-type": "application/merge-patch+json",
           “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
-          "link":       "/tqs/2718281828459/snapshot/2e3f"} 
- 
+          "link":       "/tqs/2718281828459/snapshot/2e3f"}
+
        ]
     }
 
@@ -373,22 +386,63 @@ tqi/rs = receiver set of transport queue i
       <name>Transport Information: Incremental Updates Queue</name>
       <section anchor="altoh2uqops" numbered="true" toc="default">
         <name>Incremental Updates Queue Operations</name>
-        <t>Among the CRUD operations, an incremental updates queue supports only the 
+        <t>Among the CRUD operations, an incremental updates queue supports only the
           read operation: a client cannot create, update, or delete incremental updates queue directly---it is read only, and associated with transport queue automatically.</t>
         <t>Reads an incremental updates queue: A client reads the status of an incremental updates queue using the HTTP GET method: GET transport-queue-uri/uq, where the transport-queue-uri is
         the URI returned in the transport queue create method.
         </t>
-        <t>The response informs the client the backlog status, and potential direct links.
-          Specifically, the response is a JSON array, with each element being one incremental 
-          update, with three required fields and one optional field:</t>
-        <ul spacing="normal">
-          <li>"seq": a required JSON integer indicating the sequence number of the incremental update; As JSON allows a large integer space, when the server reaches the largest integer, the server SHOULD close the incremental update queue; </li>
-          <li>"media-type", a required JSON string giving the type of the incremental update  (see ALTO/SSE);</li>
-          <li>"tag": a required JSON string giving a unique tag (see [RFC7285]; </li>
-          <li>"link": an optional JSON string giving an optional link for a client to directly request a resource as a complete snapshot (not through incremental updates).</li>
-        </ul>
-        <t>Note that the server determines the state (window of history and type of each update) 
+        <section anchor="media-type" numbered="true" toc="default">
+          <name>Media Type</name>
+          <t>The media type of the incremental update queue resource is
+ "application/alto-transportqueue+json".</t>
+        </section>
+        <section anchor="http-method" numbered="true" toc="default">
+          <name>HTTP Method</name>
+          <t>The incremental update queue resource is requested using the HTTP GET method.</t>
+        </section>
+        <section anchor="resp" numbered="true" toc="default">
+          <name>Response</name>
+          <t>The response informs the client the backlog status, and potential direct links.
+          Specifically, the response is encoded as a JSON object of type ALTOIncUpdateQueue
+          </t>
+
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+object {
+  ALTOIncUpdate  uq<0..*>;
+} ALTOIncUpdateQueue;
+]]></artwork>
+          <t>with field:</t>
+          <dl>
+            <dt>uq: </dt>
+            <dd>
+              <t>A queue of incremental updates.</t>
+            </dd>
+          </dl>
+
+          <t>Each incremental update is encoded as a JSON object of type
+ALTOIncUpdate</t>
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+object {
+    JSONNumber   seq;
+    JSONString   media-type;
+    JSONString   tag;
+    [JSONString  link;]
+} ALTOIncUpdate;
+]]></artwork>
+        <t>with fields:</t>
+        <dl>
+          <dt>seq:</dt>
+          <dd><t>A required JSON integer indicating the sequence number of the incremental update. As JSON allows a large integer space, when the server reaches the largest integer, the server SHOULD close the incremental update queue. </t></dd>
+          <dt>media-type:</dt>
+          <dd><t>A required JSON string giving the type of the incremental update  (see ALTO/SSE).</t></dd>
+          <dt>tag:</dt>
+          <dd><t>A required JSON string which is defined the same way as the "tag" field of VersionTag (see Section 10.3 of [RFC7285]). </t></dd>
+          <dt>link:</dt>
+          <dd><t>An optional JSON string giving an optional link for a client to directly request a resource as a complete snapshot (not through incremental updates).</t></dd>
+        </dl>
+        <t>Note that the server determines the state (window of history and type of each update)
           in the incremental updates queue, as specified by [R4].</t>
+        </section>
       </section>
       <section anchor="altoh2uqexamples" numbered="true" toc="default">
         <name>Examples</name>
@@ -404,7 +458,7 @@ tqi/rs = receiver set of transport queue i
        :path = /tqs/2718281828459/uq
        host = alto.example.com
        accept = application/alto-error+json,
-                    application/alto-transport+json
+                    application/alto-transportqueue+json
 
    Server -> client response:
 
@@ -412,26 +466,24 @@ tqi/rs = receiver set of transport queue i
      - END_STREAM
      + END_HEADERS
        :status = 200
-       content-type = application/alto-transport+json
+       content-type = application/alto-transportqueue+json
        content-length = TBD
-   
+
    DATA
      - END_STREAM
-    { 
-       [ 
-         {“seq”:        101, 
+    {
+       "uq": [
+         {“seq”:        101,
           "media-type": "application/alto-costmap+json",
-          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" }, 
-         {“seq”:        102, 
+          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
+         {“seq”:        102,
           "media-type": "application/merge-patch+json",
           “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
-         {“seq”:        103, 
+         {“seq”:        103,
           "media-type": "application/merge-patch+json",
           “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
-          "link":       "/tqs/2718281828459/snapshot/2e3f"} 
- 
-       ],
-     
+          "link":       "/tqs/2718281828459/snapshot/2e3f"}
+       ]
     }
           ]]></artwork>
       </section>
@@ -443,11 +495,11 @@ tqi/rs = receiver set of transport queue i
       <section anchor="altoh2updatesops" numbered="true" toc="default">
         <name>Individual Updates Operations</name>
         <t>A client can only read an individual update: A client uses the HTTP GET method on the incremental updates queue concatenated by a sequence number to pull an individual update.The server push model, however,  depends on HTTP specific version.</t>
-        
+
       </section>
       <section anchor="altoh2updatesexamples" numbered="true" toc="default">
         <name>Examples</name>
-        <t>The first example is a client pull example, in which the client directly requests an 
+        <t>The first example is a client pull example, in which the client directly requests an
           individual update. </t>
         <artwork name="" type="" align="left" alt=""><![CDATA[
    Client -> server request:
@@ -470,7 +522,7 @@ tqi/rs = receiver set of transport queue i
        :status = 200
        content-type = application/alto-costmap+json
        content-length = TBD
-   
+
    DATA
      + END_STREAM
     {
@@ -531,7 +583,7 @@ tqi/rs = receiver set of transport queue i
         <name>Client -&gt; Server [Close Transport Queue]</name>
         <t>DELETE to close a transport queue (SID_tq) MUST be sent in SID_tq, with the following requirements:</t>
         <ul spacing="normal">
-          <li>Stream Identifier of the frame is SID_tq, and Stream Dependency in HEADER is 0 
+          <li>Stream Identifier of the frame is SID_tq, and Stream Dependency in HEADER is 0
               (connection), so that a client cannot close a different stream.</li>
           <li>HEADERS indicates END_STREAM; server response SHOULD close the stream.</li>
         </ul>
@@ -549,7 +601,7 @@ tqi/rs = receiver set of transport queue i
         <t/>
         <ul spacing="normal">
           <li>ALTO New Transport must allow concurrency control.</li>
-          <li>From the client to the server direction, there MUST be one stream for each open transport 
+          <li>From the client to the server direction, there MUST be one stream for each open transport
               queue, and hence a client can always close a transport queue (which it uses to open the stream) and hence can also close, without the risk of deadlock.</li>
         </ul>
       </section>
@@ -692,7 +744,7 @@ tqi/rs = receiver set of transport queue i
     </section>
     <section anchor="ianaconsider" numbered="true" toc="default">
       <name>IANA Considerations</name>
-      <t>IANA will need to register the application/alto-transport+json media type under ALTO registry as defined in 
+      <t>IANA will need to register the application/alto-transport+json media type under ALTO registry as defined in
         [RFC7285].</t>
     </section>
     <section numbered="true" toc="default">
@@ -739,7 +791,7 @@ tqi/rs = receiver set of transport queue i
           <seriesInfo name="RFC" value="7230"/>
           <seriesInfo name="DOI" value="10.17487/RFC7230"/>
         </reference>
-        <!-- HTTP/1.1 -->        
+        <!-- HTTP/1.1 -->
     <reference anchor="RFC7285" target="https://www.rfc-editor.org/info/rfc7285" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7285.xml">
           <front>
             <title>Application-Layer Traffic Optimization (ALTO) Protocol</title>
@@ -777,7 +829,7 @@ tqi/rs = receiver set of transport queue i
           <seriesInfo name="RFC" value="7285"/>
           <seriesInfo name="DOI" value="10.17487/RFC7285"/>
         </reference>
-        <!-- alto base -->   
+        <!-- alto base -->
     <reference target="https://www.rfc-editor.org/info/rfc7540" anchor="RFC7540" xml:base="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7540.xml">
           <front>
             <title>Hypertext Transfer Protocol Version 2 (HTTP/2)</title>
@@ -793,7 +845,7 @@ tqi/rs = receiver set of transport queue i
           <seriesInfo name="RFC" value="7540"/>
           <seriesInfo name="DOI" value="10.17487/RFC7540"/>
         </reference>
-        <!-- HTTP/2 -->     
+        <!-- HTTP/2 -->
     <reference anchor="RFC8174" target="https://www.rfc-editor.org/info/rfc8174" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml">
           <front>
             <title>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</title>
@@ -809,7 +861,7 @@ tqi/rs = receiver set of transport queue i
           <seriesInfo name="RFC" value="8174"/>
           <seriesInfo name="DOI" value="10.17487/RFC8174"/>
         </reference>
-        <!-- requirements words -->    
+        <!-- requirements words -->
     <reference anchor="RFC8895" target="https://www.rfc-editor.org/info/rfc8895" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8895.xml">
           <front>
             <title>Application-Layer Traffic Optimization (ALTO) Incremental Updates Using Server-Sent Events (SSE)</title>
@@ -878,15 +930,15 @@ tqi/rs = receiver set of transport queue i
     </references>
     <section numbered="true" toc="default">
       <name>Outlook to ALTO with HTTP/3</name>
-      <t>This draft is focusing on HTTP/2 enhancement of the ALTO protocol and the 
-design takes advantage of HTTP/2 design features such as parallel transfer 
-and respects HTTP/2 semantics (e.g., PUSH_PROMISE). Since QUIC and HTTP/3 
-respectively are coming up for various protocols on the Internet it is 
-understandable that the question arises, if ATLO could also take 
-advantage of the advantages of HTTP/3. QUIC can be seen as a replacement 
-for TCP+TLS+HTTP2. HTTP/3 bases on the QUIC transport protocol and uses 
+      <t>This draft is focusing on HTTP/2 enhancement of the ALTO protocol and the
+design takes advantage of HTTP/2 design features such as parallel transfer
+and respects HTTP/2 semantics (e.g., PUSH_PROMISE). Since QUIC and HTTP/3
+respectively are coming up for various protocols on the Internet it is
+understandable that the question arises, if ATLO could also take
+advantage of the advantages of HTTP/3. QUIC can be seen as a replacement
+for TCP+TLS+HTTP2. HTTP/3 bases on the QUIC transport protocol and uses
 UDP instead of a TCP connection.</t>
-      <t>QUIC has been developed by the IETF QUIC Working Group with the 
+      <t>QUIC has been developed by the IETF QUIC Working Group with the
 following goals:</t>
       <ul spacing="normal">
         <li>Minimizing connection establishment and overall transport latency for applications, starting with HTTP/2</li>
@@ -895,17 +947,17 @@ following goals:</t>
         <li>Enabling multipath and forward error correction extensions</li>
         <li>Providing always-secure transport, using TLS 1.3 by default</li>
       </ul>
-      <t>If HTTP/3 is not supported, it automatically runs on HTTP/2. 
+      <t>If HTTP/3 is not supported, it automatically runs on HTTP/2.
 The prerequisite for HTTP/3 is that both client and server support it.</t>
-      <t>The basic assumption is that an implementation that runs on HTTP/2 should 
-also run-on HTTP/3. This should be transparent. 
-HTTP/3 uses "well known port" UDP 443 analogous to TCP 443. 
+      <t>The basic assumption is that an implementation that runs on HTTP/2 should
+also run-on HTTP/3. This should be transparent.
+HTTP/3 uses "well known port" UDP 443 analogous to TCP 443.
 The network between client and server must not filter HTTP/3.</t>
-      <t>Since many applications still using HTTP/2 it is mandatory for ALTO 
-to support this protocol first. This ensures compatibility. 
-Therefore, this document describes the update of ALTO from HTTP/1.x 
-to HTTP/2. The usage of HTTP/3 will be described in a separate 
-document so that compatibility of ALTO with HTTP/3 will be ensured 
+      <t>Since many applications still using HTTP/2 it is mandatory for ALTO
+to support this protocol first. This ensures compatibility.
+Therefore, this document describes the update of ALTO from HTTP/1.x
+to HTTP/2. The usage of HTTP/3 will be described in a separate
+document so that compatibility of ALTO with HTTP/3 will be ensured
 in a later stage.</t>
     </section>
   </back>
