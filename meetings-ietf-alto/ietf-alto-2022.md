@@ -9,6 +9,16 @@
 
 ------------------------------
 
+**IETF ALTO Meeting: November 22, 2022**
+
+**Agenda:**
+
+- Summary of IETF 115
+- Set the milestones (time, deliverables) of chartered and unchartered items
+
+
+------------------------------
+
 **IETF ALTO Meeting: October 25, 2022**
 
 **Agenda:**
