@@ -89,14 +89,14 @@
   <middle>
     <section anchor="intro" numbered="true" toc="default">
       <name>Introduction</name>
-      <t>Application-Layer Traffic Optimization (ALTO) provides a means for network applications
+      <t>Application-Layer Traffic Optimization (ALTO) provides means for network applications
       to obtain network status information. The ALTO base protocol <xref target="RFC7285" format="default"/> is based on the sequential request and response model of HTTP/1.1 <xref target="RFC7230" format="default"/>. Hence, the base protocol cannot support well the use cases where an ALTO client may need to efficiently monitor the changes to a set of network information resources. If the client opens a single HTTP connection, the request for one resource may block the request for the next resource. </t>
 
       <t>To address the issue using a protocol that is still based on the HTTP/1.1 transport model, the ALTO Working Group introduces ALTO/SSE (ALTO Incremental Update based on Server-Sent-Event)
       <xref target="RFC8895" format="default"/>, so that an ALTO client can manage (i.e., add and remove) a set of
       requests maintained at an ALTO server, and the server can continuously, concurrently, and
       incrementally push updates whenever a monitored network information resource changes.
-      Figure 1 shows the architecture and message flow of ALTO/SSE, which can be considered as a more general transport protocol than the ALTO base transport protocol.  Although ALTO/SSE allows the concurrent transport of multiple ALTO information resources, it has complexities and limitations. For example, it requires that the server provide a separate control URI, leading to complexity in management; it needs its own envelop protocol on top of HTTP encoding to indicate message types.
+      Figure 1 shows the architecture and message flow of ALTO/SSE, which can be considered as a more general transport protocol than the ALTO base transport protocol.  Although ALTO/SSE allows the concurrent transport of multiple ALTO information resources, it has complexities and limitations. For example, it requires that the server provides a separate control URI, leading to complexity in management; it needs its own envelop protocol on top of HTTP encoding to indicate message types.
       </t>
       <figure anchor="FigOverview">
         <name>ALTO SSE Architecture and Message Flow.</name>
@@ -223,17 +223,17 @@ tqi/rs = receiver set of transport queue i
       <figure anchor="FigInfoWorkflow">
         <name>ALTO New Transport Workflow.</name>
         <artwork name="" type="" align="left" alt=""><![CDATA[
-
-
     Client opens a connection to the server
     Client opens/identifies a transport queue tq
-      // pull mode
-      Client requests transport queue status of tq
-      Client requests an element in the incremental update queue
 
-      // push mode
-      Client becomes a receiver
-      Client receives incremental push updates
+    // pull mode
+    Client requests transport queue status of tq
+    Client requests an element in the incremental update queue
+
+    // push mode
+    Client becomes a receiver
+    Client receives incremental push updates
+
     Client closes the transport queue tq
     Client closes the connection
 
@@ -246,9 +246,6 @@ tqi/rs = receiver set of transport queue i
       <name>Transport Information: Transport Queue</name>
       <section anchor="altoh2tqops" numbered="true" toc="default">
         <name>Transport Queue Operations</name>
-        <t>A transport queue supports three basic operations (CRD): create, read
-        (get status), and delete.
-        </t>
         <t>Create a transport queue: An ALTO client creates a transport queue using the HTTP POST method with ALTO SSE AddUpdateReq
         ([RFC 8895] Sec. 6.5) as the parameter:
         </t>
@@ -299,40 +296,26 @@ tqi/rs = receiver set of transport queue i
         <artwork name="" type="" align="left" alt=""><![CDATA[
    Client -> server request
 
-   HEADERS
-     - END_STREAM
-     + END_HEADERS
-       :method = POST
-       :scheme = https
-       :path = /tqs
-       host = alto.example.com
-       accept = application/alto-error+json,
-                    application/alto-transport+json
-       content-type = application/alto-transport+json
-       content-length = TBD
+   POST /tqs HTTP/1.1
+   Host: alto.example.com
+   Accept: application/alto-transport+json, application/alto-error+json
+   Content-Type: application/alto-transportparam+json
+   Content-Length: [TBD]
 
-   DATA
-    - END_STREAM
-    {
-       "resource-id": "my-routingcost-map"
-    }
+   {
+      "resource-id": "my-routingcost-map"
+   }
 
         ]]></artwork>
         <artwork name="" type="" align="left" alt=""><![CDATA[
 
    Server -> client response:
 
-   HEADERS
-     - END_STREAM
-     + END_HEADERS
-       :status = 200
-       content-type = application/alto-transport+json
-       content-length = TBD
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-transport+json
+   Content-Length: [TBD]
 
-   DATA
-     - END_STREAM
-      {"tq": “/tqs/2718281828459”}
-
+   {"tq": “/tqs/2718281828459”}
 
         ]]></artwork>
         <t>The client can then read the status of the transport queue using the read operation
@@ -340,42 +323,30 @@ tqi/rs = receiver set of transport queue i
         <artwork name="" type="" align="left" alt=""><![CDATA[
    Client -> server request
 
-   HEADERS
-     - END_STREAM
-     + END_HEADERS
-       :method = GET
-       :scheme = https
-       :path = /tqs/2718281828459
-       host = alto.example.com
-       accept = application/alto-error+json,
-                    application/alto-transport+json
+   GET /tqs/2718281828459 HTTP/1.1
+   Host: alto.example.com
+   Accept: application/alto-transport+json, application/alto-error+json
 
    Server -> client response:
 
-   HEADERS
-     - END_STREAM
-     + END_HEADERS
-       :status = 200
-       content-type = application/alto-transport+json
-       content-length = TBD
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-transport+json
+   Content-Length: [TBD]
 
-   DATA
-     - END_STREAM
-    { "uq":
-       [
-         {“seq”:        101,
-          "media-type": "application/alto-costmap+json",
-          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
-         {“seq”:        102,
-          "media-type": "application/merge-patch+json",
-          “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
-         {“seq”:        103,
-          "media-type": "application/merge-patch+json",
-          “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
-          "link":       "/tqs/2718281828459/snapshot/2e3f"}
-
-       ]
-    }
+   { "uq":
+      [
+        {“seq”:        101,
+         "media-type": "application/alto-costmap+json",
+         “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
+        {“seq”:        102,
+         "media-type": "application/merge-patch+json",
+         “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
+        {“seq”:        103,
+         "media-type": "application/merge-patch+json",
+         “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+         "link":       "/tqs/2718281828459/snapshot/2e3f" }
+      ]
+   }
 
           ]]></artwork>
       </section>
@@ -450,27 +421,16 @@ object {
         <artwork name="" type="" align="left" alt=""><![CDATA[
    Client -> server request:
 
-   HEADERS
-     - END_STREAM
-     + END_HEADERS
-       :method = GET
-       :scheme = https
-       :path = /tqs/2718281828459/uq
-       host = alto.example.com
-       accept = application/alto-error+json,
-                    application/alto-transportqueue+json
+   GET /tqs/2718281828459/uq HTTP/1.1
+   Host: alto.example.com
+   Accept: application/alto-transportqueue+json, application/alto-error+json
 
    Server -> client response:
 
-   HEADERS
-     - END_STREAM
-     + END_HEADERS
-       :status = 200
-       content-type = application/alto-transportqueue+json
-       content-length = TBD
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-transportqueue+json
+   Content-Length: [TBD]
 
-   DATA
-     - END_STREAM
     {
        "uq": [
          {“seq”:        101,
@@ -504,48 +464,37 @@ object {
         <artwork name="" type="" align="left" alt=""><![CDATA[
    Client -> server request:
 
-   HEADERS
-     + END_STREAM
-     + END_HEADERS
-       :method = GET
-       :scheme = https
-       :path = /tqs/2718281828459/uq/101
-       host = alto.example.com
-       accept = application/alto-error+json,
-                    application/alto-costmap+json
+   GET /tqs/2718281828459/uq/101 HTTP/1.1
+   Host: alto.example.com
+   Accept: application/alto-costmap+json, application/alto-error+json
 
    Server -> client response:
 
-   HEADERS
-     - END_STREAM
-     + END_HEADERS
-       :status = 200
-       content-type = application/alto-costmap+json
-       content-length = TBD
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-costmap+json
+   Content-Length: [TBD]
 
-   DATA
-     + END_STREAM
-    {
-      "meta" : {
-         "dependent-vtags" : [{
-            "resource-id": "my-network-map",
-            "tag": "da65eca2eb7a10ce8b059740b0b2e3f8eb1d4785"
-          }],
-         "cost-type" : {
-           "cost-mode"  : "numerical",
-           "cost-metric": "routingcost"
-         },
-         "vtag": {
-           "resource-id" : "my-routingcost-map",
-           "tag" : "3ee2cb7e8d63d9fab71b9b34cbf764436315542e"
-         }
-      },
-      "cost-map" : {
-        "PID1": { "PID1": 1,  "PID2": 5,  "PID3": 10 },
-        "PID2": { "PID1": 5,  "PID2": 1,  "PID3": 15 },
-        "PID3": { "PID1": 20, "PID2": 15  }
-      }
-   }
+   {
+     "meta" : {
+        "dependent-vtags" : [{
+           "resource-id": "my-network-map",
+           "tag": "da65eca2eb7a10ce8b059740b0b2e3f8eb1d4785"
+         }],
+        "cost-type" : {
+          "cost-mode"  : "numerical",
+          "cost-metric": "routingcost"
+        },
+        "vtag": {
+          "resource-id" : "my-routingcost-map",
+          "tag" : "3ee2cb7e8d63d9fab71b9b34cbf764436315542e"
+        }
+     },
+     "cost-map" : {
+       "PID1": { "PID1": 1,  "PID2": 5,  "PID3": 10 },
+       "PID2": { "PID1": 5,  "PID2": 1,  "PID3": 15 },
+       "PID3": { "PID1": 20, "PID2": 15  }
+     }
+  }
 
           ]]></artwork>
         <t>Note from the transport queue state that the 103 message has an OPTIONAL link to a complete snapshot, which a client can request.</t>
