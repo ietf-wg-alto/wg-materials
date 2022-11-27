@@ -7,7 +7,7 @@
 ]>
 <!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
      by Daniel M Kohn (private) -->
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-03" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-03" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
   <!-- xml2rfc v2v3 conversion 3.12.10 -->
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
@@ -54,7 +54,7 @@
       <organization>Tongji University</organization>
       <address>
         <postal>
-          <street>4800 Cao'An Hwy</street>
+          <street>4800 Cao'An Road</street>
           <city>Shanghai</city>
           <code>201804</code>
           <country>China</country>
@@ -62,7 +62,7 @@
         <email>jingxuan.n.zhang@gmail.com</email>
       </address>
     </author>
-    <date day="21" month="October" year="2022"/>
+    <date day="26" month="November" year="2022"/>
     <area>TSV Area</area>
     <workgroup>ALTO Working Group</workgroup>
     <keyword>RFC</keyword>
@@ -223,6 +223,34 @@ tqi/rs = receiver set of transport queue i
       <figure anchor="FigInfoWorkflow">
         <name>ALTO New Transport Workflow.</name>
         <artwork name="" type="" align="left" alt=""><![CDATA[
+Client                  TQS          TQ      TQ/UQ    ULS
+  o                      .
+  | Open HTTP connection .
+  |--------------------->| Create TQ  o        o       o
+  | Return URI to TQ     |...........>|.......>|......>|
+  |<---------------------|            .        .       .
+  | (Pull Mode)          .            .        .       .
+  | Request update queue status       .        .       .
+  |------------------------------------------->|       .
+  | Return status of the update queue .        |       .
+  |<-------------------------------------------|       .
+  | Request an element in the UQ      .        .       .
+  |--------------------------------------------------->|
+  | Return the content of an incremental update.       |
+  |<---------------------------------------------------|
+  | (Explicit deletion)  .            .        .       .
+  | Close the transport queue         .        .       .
+  |---------------------------------->|.......>|......>|
+  |                      .            o        o       o
+  | Close the connection .
+  |--------------------->|
+  o                      .
+
+  TQS: Transport Queue Service, TQ: Transport Queue
+  UQ: Incremental Update Queue, ULS: Update Log Service
+      ]]></artwork>
+      </figure>
+  <!--
     Client opens a connection to the server
     Client opens/identifies a transport queue tq
 
@@ -235,12 +263,374 @@ tqi/rs = receiver set of transport queue i
     Client receives incremental push updates
 
     Client closes the transport queue tq
-    Client closes the connection
-
-      ]]></artwork>
-      </figure>
+    Client closes the connection -->
     </section>
     <!-- End of overview section -->
+
+    <section anchor="ext" numbered="true" toc="default">
+      <name>Service Extensions</name>
+      <t>As shown in <xref target="FigInfoWorkflow" format="default"/>, this
+      extension defines 4 new ALTO information resources: Transport Queue Service,
+      Transport Queue, Incremental Update Queue, and Update Log Service.
+      </t>
+
+      <section anchor="notations" numbered="true" toc="default">
+        <name>Notations</name>
+        <t>This document uses the same syntax and notations as introduced in Section 8.2 of
+RFC 7285 <xref target="RFC7285" format="default"/> to specify the extensions to existing ALTO resources and
+services.</t>
+      </section>
+
+      <section anchor="tqs-spec" numbered="true" toc="default">
+        <name>Transport Queue Service</name>
+        <section anchor="tqs-media-type" numbered="true" toc="default">
+          <name>Media Type</name>
+          <t>The media type of the Transport Queue Service resource is
+          "application/alto-transport+json".
+          </t>
+        </section>
+        <section anchor="tqs-method" numbered="true" toc="default">
+          <name>HTTP Method</name>
+          <t>The Transport Queue Service resource is requested using the HTTP POST method.
+          </t>
+        </section>
+        <section anchor="tqs-cap" numbered="true" toc="default">
+          <name>Capabilities</name>
+          <t>The capabilities of a Transport Queue Service are the same as the
+          capabilities of an Update Stream Service, as defined in Section 6.3 of
+          <xref target="RFC8895" format="default"/>.
+          </t>
+        </section>
+        <section anchor="tqs-uses" numbered="true" toc="default">
+          <name>Uses</name>
+          <t>The "uses" of a Transport Queue Service has the same format as that of an Update Stream Service, as defined in Section 6.4 of <xref target="RFC8895" format="default"/>.
+          </t>
+        </section>
+        <section anchor="tqs-accept" numbered="true" toc="default">
+          <name>Request: Accept Input Parameters</name>
+          <t>The input parameters of the Transport Queue Service resource are
+          supplied in the body of an HTTP Post request, which MUST be a JSON object of
+          type AddUpdateReq (defined in Section 6.5 of
+          <xref target="RFC8895" format="default"/>), indicated by the media
+          type "application/alto-transportparams+json".
+        </t>
+        </section>
+        <section anchor="tqs-resp" numbered="true" toc="default">
+          <name>Response</name>
+          <t>The response of a successful POST request MUST be a JSON object of
+          type AltoTransportData
+          </t>
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+    object {
+        JSONString tq;
+    } ALTOTransportData;
+        ]]></artwork>
+        <t>with field:</t>
+        <dl>
+          <dt>tq:</dt>
+          <dd><t>The relative URI to the incremental update queue resource.</t></dd>
+        </dl>
+        </section>
+        <section anchor="tqs-example" numbered="true" toc="default">
+          <name>Example</name>
+          <t>For simplicity, assume the ALTO server is using the Basic
+          authentication. If a client with username "client1" and password "helloalto"
+          wants to create a transport queue of an ALTO Cost Map resource with resource ID
+          "my-routingcost-map", it can send the following request:
+          </t>
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+POST /tqs HTTP/1.1
+Host: alto.example.com
+Accept: application/alto-transport+json, application/alto-error+json
+Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
+Content-Type: application/alto-transportparams+json
+Content-Length: [TBD]
+
+{
+  "resource-id": "my-routingcost-map"
+}
+        ]]></artwork>
+          <t>If the operation is successful, the ALTO server returns the following message:
+          </t>
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+HTTP/1.1 200 OK
+Content-Type: application/alto-transport+json
+Content-Length: [TBD]
+
+{"tq": “/tqs/2718281828459”}
+        ]]></artwork>
+        </section>
+      </section>
+      <section anchor="tq-spec" numbered="true" toc="default">
+        <name>Transport Queue</name>
+        <section anchor="tq-media-type" numbered="true" toc="default">
+          <name>Media Type</name>
+          <t>None.</t>
+        </section>
+        <section anchor="tq-method" numbered="true" toc="default">
+          <name>HTTP Method</name>
+          <t>The Transport Queue resource can be requested using the HTTP DELETE method.
+          </t>
+        </section>
+        <section anchor="tq-cap" numbered="true" toc="default">
+          <name>Capabilities</name>
+          <t>None.</t>
+        </section>
+        <section anchor="tq-uses" numbered="true" toc="default">
+          <name>Uses</name>
+          <t>None.</t>
+        </section>
+        <section anchor="tq-accept" numbered="true" toc="default">
+          <name>Request: Accept Input Parameters</name>
+          <t>None.</t>
+        </section>
+        <section anchor="tq-resp" numbered="true" toc="default">
+          <name>Response</name>
+          <t>When receiving a DELETE request, the ALTO server MUST check whether
+          the client has the permission to close the transport queue.
+          Specifically, if the request is issued by the same client that creates
+          the Transport Queue, the ALTO server MUST return an HTTP message with
+          status code 200 (OK) to indicate that the operation is successful.
+          Otherwise, the ALTO server must return an HTTP message with status
+          code 403 (Forbidden).
+          </t>
+        </section>
+        <section anchor="tq-example" numbered="true" toc="default">
+          <name>Example</name>
+          <t>Assume the client wants to close the transport queue, it can send
+          the following request:
+          </t>
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+DELETE /tqs/2718281828459 HTTP/1.1
+Host: alto.example.com
+Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
+          ]]></artwork>
+        <t>As the credential matches the client that creates the transport
+        queue, the request will succeed and the ALTO server returns the following
+        message:
+        </t>
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+HTTP/1.1 200 OK
+          ]]></artwork>
+        </section>
+      </section>
+      <section anchor="uq-spec" numbered="true" toc="default">
+        <name>Incremental Update Queue</name>
+        <section anchor="uq-path" numbered="true" toc="default">
+          <name>Path</name>
+          <t>The path to an Incremental Update Queue resource has the following format:
+          </t>
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+  TQ_URI "/uq"
+          ]]></artwork>
+          <t>where TQ_URI is the URI of the Transport Queue resource and SEQ is
+          the sequence number of an incremental update log.
+          </t>
+          <t>For example, if the relative URI of a transport queue is
+          "/tq/2718281828459", the URI of the corresponding incremental update
+          queue is "/tq/2718281828459/uq".
+          </t>
+        </section>
+        <section anchor="uq-media-type" numbered="true" toc="default">
+          <name>Media Type</name>
+          <t>The media type of an Incremental Update Queue resource is
+          "application/alto-transportqueue+json".
+          </t>
+        </section>
+        <section anchor="uq-method" numbered="true" toc="default">
+          <name>HTTP Method</name>
+          <t>The Incremental Update Queue resource must be requested using the
+          HTTP GET method.
+          </t>
+        </section>
+        <section anchor="uq-cap" numbered="true" toc="default">
+          <name>Capabilities</name>
+          <t>None.</t>
+        </section>
+        <section anchor="uq-uses" numbered="true" toc="default">
+          <name>Uses</name>
+          <t>None.</t>
+        </section>
+        <section anchor="uq-accept" numbered="true" toc="default">
+          <name>Accept Input Parameters</name>
+          <t>None.</t>
+        </section>
+        <section anchor="uq-resp" numbered="true" toc="default">
+          <name>Response</name>
+          <t>If the transport queue indicated by the TQ_URI is closed, the ALTO
+          server MUST return an HTTP message with status code 404 (Not Found).
+          </t>
+          <t>Otherwise, the response is encoded as a JSON object of type
+          AltoIncUpdateQueue
+          </t>
+
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+    object {
+        AltoIncUpdateLog  uq<0..*>;
+    } AltoIncUpdateQueue;
+          ]]></artwork>
+          <t>with field:</t>
+          <dl>
+            <dt>uq: </dt>
+            <dd>
+              <t>An ordered list of update logs.</t>
+            </dd>
+          </dl>
+
+          <t>Each incremental update is encoded as a JSON object of type
+AltoIncUpdateLog</t>
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+    object {
+        JSONNumber   seq;
+        JSONString   media-type;
+        JSONString   tag;
+        [JSONString  link;]
+    } AltoIncUpdateLog;
+]]></artwork>
+        <t>with fields:</t>
+        <dl>
+          <dt>seq:</dt>
+          <dd><t>A required JSON integer indicating the sequence number of the incremental update. As JSON allows a large integer space, when the server reaches the largest integer, the server SHOULD close the incremental update queue. </t></dd>
+          <dt>media-type:</dt>
+          <dd><t>A required JSON string giving the type of the incremental update  (see ALTO/SSE).</t></dd>
+          <dt>tag:</dt>
+          <dd><t>A required JSON string which is defined the same way as the "tag" field of VersionTag (see Section 10.3 of <xref target="RFC7285" format="default"/>). </t></dd>
+          <dt>link:</dt>
+          <dd><t>An optional JSON string giving an optional link for a client to directly request a resource as a complete snapshot (not through incremental updates).</t></dd>
+        </dl>
+        </section>
+        <section anchor="uq-example" numbered="true" toc="default">
+          <name>Example</name>
+          <t>Assume the client wants to query the status of the incremental update
+          queue of the transport queue whose URI is "/tqs/2718281828459", it can
+          send the following request:
+          </t>
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+GET /tqs/2718281828459/uq HTTP/1.1
+Host: alto.example.com
+Accept: application/alto-transportqueue+json,
+        application/alto-error+json
+          ]]></artwork>
+
+          <t>Assume the server returns the following response:
+          </t>
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+HTTP/1.1 200 OK
+Content-Type: application/alto-transportqueue+json
+Content-Length: [TBD]
+
+{
+  "uq": [
+    {"seq":        101,
+     "media-type": "application/alto-costmap+json",
+     "tag":        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
+    {"seq":        102,
+     "media-type": "application/merge-patch+json",
+     "tag":        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
+    {"seq":        103,
+     "media-type": "application/merge-patch+json",
+     "tag":        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+     "link":       "/tqs/2718281828459/snapshot/2e3f" }
+  ]
+}
+          ]]></artwork>
+        <t>The media type of the first update log (with sequence number 101) is
+        "application/alto-costmap+json", which indicates that the update
+        contains a full replacement. The media types of the logs with sequence
+        number 102 and 103 are both "application/merge-patch+json", which
+        indicates that the two updates contain incremental updates encoded as
+        JSON merge patches. Note that the "link" attribute of the log with
+        sequence number 103 is present. Thus, the client can request a full
+        replacement by sending a GET message to "/tqs/2718281828459/snapshot/2e3f".
+        </t>
+        </section>
+      </section>
+      <section anchor="ums-spec" numbered="true" toc="default">
+        <name>Update Log Service</name>
+        <section anchor="ums-path" numbered="true" toc="default">
+          <name>Path</name>
+          <t>The path to an Incremental Update Log Service resource has the following format:
+          </t>
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+  TQ_URI "/uq/" SEQ
+          ]]></artwork>
+          <t>where TQ_URI is the URI of the Transport Queue resource and SEQ is
+          the sequence number of an incremental update log.
+          </t>
+          <t>For example, if the client wants to query the content of the first
+          update log (with sequence number 101), it can send a request to
+          "/tqs/2718281828459/uq/101".
+          </t>
+        </section>
+        <section anchor="ums-media-type" numbered="true" toc="default">
+          <name>Media Type</name>
+          <t>The media type of an Update Log  Service resource MUST be the
+          same as the "media-type" field of the update log with sequence number
+          SEQ in the transport queue identified by the TQ_URI.
+          </t>
+          <t>For example, if the client wants to query the content of the first
+          update log (with sequence number 101) whose media type is
+          "application/alto-costmap+json", it must set the "Accept" header to
+          "application/alto-costmap+json, application/alto-error+json" in the request.
+          </t>
+        </section>
+        <section anchor="ums-method" numbered="true" toc="default">
+          <name>HTTP Method</name>
+          <t>The Incremental Update Queue resource must be requested using the
+          HTTP GET method.
+          </t>
+        </section>
+        <section anchor="ums-cap" numbered="true" toc="default">
+          <name>Capabilities</name>
+          <t>None.</t>
+        </section>
+        <section anchor="ums-uses" numbered="true" toc="default">
+          <name>Uses</name>
+          <t>None.</t>
+        </section>
+        <section anchor="ums-accept" numbered="true" toc="default">
+          <name>Accept Input Parameters</name>
+          <t>None.</t>
+        </section>
+        <section anchor="ums-resp" numbered="true" toc="default">
+          <name>Response</name>
+          <t>Let TQ_URI and SEQ denote the URI of the Transport Queue resource
+          and the sequence number of an incremental update log indicated in the
+          path. If the transport queue indicated by TQ_URI is closed, the ALTO
+          server MUST return an error HTTP message with status code 404 (Not
+          Found) and media type "application/alto-error+json". Otherwise, let
+          LOW_SEQ and HIGH_SEQ represent the smallest and largest sequence
+          number in the incremental update queue of the transport queue
+          respectively. If SEQ is smaller than LOW_SEQ, the ALTO server MUST
+          return an error HTTP message with status code 410 (Gone) and media
+          type "application/alto-error+json". If SEQ is greater than HIGH_SEQ,
+          the ALTO server MAY either treat the request as a long polling request
+          or return an error HTTP message with status code 400 (Bad Request).
+          </t>
+          <t>If the request is valid, the response is encoded as a JSON object
+          whose data format is indicated by the media type.
+          </t>
+        </section>
+        <section anchor="ums-example" numbered="true" toc="default">
+          <name>Example</name>
+          <t>Assume the client wants to get the contents of updates 101, the request is:
+          </t>
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+GET /tqs/2718281828459/uq/101 HTTP/1.1
+Host: alto.example.com
+Accept: application/alto-costmap+json, application/alto-error+json
+          ]]></artwork>
+        <t>And the response will be</t>
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+HTTP/1.1 200 OK
+Content-Type: application/alto-costmap+json
+Content-Length: [TBD]
+
+{ ... full replacement of my-routingcost-map ... }
+          ]]></artwork>
+        </section>
+      </section>
+    </section>
 
     <section anchor="altoh2tq" numbered="true" toc="default">
       <name>Transport Information: Transport Queue</name>
@@ -298,14 +688,14 @@ tqi/rs = receiver set of transport queue i
 
    POST /tqs HTTP/1.1
    Host: alto.example.com
-   Accept: application/alto-transport+json, application/alto-error+json
-   Content-Type: application/alto-transportparam+json
+   Accept: application/alto-transport+json,
+           application/alto-error+json
+   Content-Type: application/alto-transportparams+json
    Content-Length: [TBD]
 
    {
       "resource-id": "my-routingcost-map"
    }
-
         ]]></artwork>
         <artwork name="" type="" align="left" alt=""><![CDATA[
 
@@ -325,7 +715,8 @@ tqi/rs = receiver set of transport queue i
 
    GET /tqs/2718281828459 HTTP/1.1
    Host: alto.example.com
-   Accept: application/alto-transport+json, application/alto-error+json
+   Accept: application/alto-transport+json,
+           application/alto-error+json
 
    Server -> client response:
 
@@ -419,36 +810,37 @@ object {
         <name>Examples</name>
         <t>Assume the same example in the preceding section. The client can check the status of the incremental updates queue of a transport queue from the same connection:</t>
         <artwork name="" type="" align="left" alt=""><![CDATA[
-   Client -> server request:
+Client -> server request:
 
-   GET /tqs/2718281828459/uq HTTP/1.1
-   Host: alto.example.com
-   Accept: application/alto-transportqueue+json, application/alto-error+json
+GET /tqs/2718281828459/uq HTTP/1.1
+Host: alto.example.com
+Accept: application/alto-transportqueue+json,
+        application/alto-error+json
 
-   Server -> client response:
+Server -> client response:
 
-   HTTP/1.1 200 OK
-   Content-Type: application/alto-transportqueue+json
-   Content-Length: [TBD]
+HTTP/1.1 200 OK
+Content-Type: application/alto-transportqueue+json
+Content-Length: [TBD]
 
-    {
-       "uq": [
-         {“seq”:        101,
-          "media-type": "application/alto-costmap+json",
-          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
-         {“seq”:        102,
-          "media-type": "application/merge-patch+json",
-          “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
-         {“seq”:        103,
-          "media-type": "application/merge-patch+json",
-          “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
-          "link":       "/tqs/2718281828459/snapshot/2e3f"}
-       ]
-    }
+ {
+    "uq": [
+      {“seq”:        101,
+       "media-type": "application/alto-costmap+json",
+       “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
+      {“seq”:        102,
+       "media-type": "application/merge-patch+json",
+       “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
+      {“seq”:        103,
+       "media-type": "application/merge-patch+json",
+       “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+       "link":       "/tqs/2718281828459/snapshot/2e3f"}
+    ]
+ }
           ]]></artwork>
       </section>
     </section>
-    <!-- Incremental Update Message Queue Section -->
+    <!-- Incremental Update Log Queue Section -->
 
     <section anchor="altoh2updates" numbered="true" toc="default">
       <name>Information Resource Information: Client Pull Individual Updates</name>
@@ -637,10 +1029,10 @@ object {
       "support-stream-control": true
     }
   },
-  "update-my-costs-h2": {
-    "uri": "https://alto.example.com/updates-h2/costs",
+  "update-my-costs-new": {
+    "uri": "https://alto.example.com/updates-new/costs",
     "media-type": "application/alto-transport+json",
-    "accepts": "application/alto-updatestreamparams+json",
+    "accepts": "application/alto-transportparams+json",
     "uses": [
        "my-network-map",
        "my-routingcost-map",
@@ -689,12 +1081,191 @@ object {
       <name>Security Considerations</name>
       <t>The properties defined in this document present no security
       considerations beyond those in Section 15 of the base ALTO specification
-      [RFC7285].</t>
+      <xref target="RFC7285" format="default"/> and in Section 10 of the ALTO SSE specification <xref target="RFC8895" format="default"/>.</t>
     </section>
     <section anchor="ianaconsider" numbered="true" toc="default">
       <name>IANA Considerations</name>
-      <t>IANA will need to register the application/alto-transport+json media type under ALTO registry as defined in
-        [RFC7285].</t>
+      <t>IANA will need to register the following media type under ALTO registry as defined in <xref target="RFC7285" format="default"/>:
+      </t>
+      <ul spacing="normal">
+        <li>application/alto-transport+json: as described in <xref target="tqs-resp" format="default"/>;</li>
+        <li>application/alto-transportparams+json: as described in <xref target="tqs-accept" format="default"/>;</li>
+        <li>application/alto-transportqueue+json: as described in <xref target="uq-resp" format="default"/></li>
+      </ul>
+      <section numbered="true" toc="default">
+        <name>application/alto-transport+json Media Type</name>
+        <dl>
+          <dt>Type name:</dt>
+          <dd>application</dd>
+          <dt>Subtype name:</dt>
+          <dd>alto-transport+json</dd>
+          <dt>Required parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Optional parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Encoding considerations:</dt>
+          <dd>Encoding considerations are identical to those specified for the
+          "application/json" media type. See <xref target="RFC8259" format="default"/>.
+          </dd>
+          <dt>Security considerations:</dt>
+          <dd>Security considerations relating to the generation and consumption
+          of ALTO Protocol messages are discussed in Section 10 of
+          <xref target="RFC8895"/> and Section 15 of <xref target="RFC7285"/>.
+          </dd>
+          <dt>Interoperability considerations:</dt>
+          <dd>This document specifies format of conforming messages and the
+          interpretation thereof.
+          </dd>
+          <dt>Published specification:</dt>
+          <dd><xref target="tqs-resp"/> of this document.</dd>
+          <dt>Applications that use this media type:</dt>
+          <dd>ALTO servers and ALTO clients either stand alone or are embedded
+          within other applications.</dd>
+          <dt>Fragment identifier considerations:</dt>
+          <dd>N/A</dd>
+          <dt>Additional information:</dt>
+          <dd>
+            <t><br/></t>
+            <dl>
+              <dt>Deprecated alias names for this type:</dt>
+              <dd>N/A</dd>
+              <dt>Magic number(s):</dt>
+              <dd>N/A</dd>
+              <dt>File extension(s):</dt>
+              <dd>This document uses the media type to refer to protocol messages
+              and thus does not require a file extension.</dd>
+              <dt>Macintosh file type code(s):</dt>
+              <dd>N/A</dd>
+            </dl>
+          </dd>
+          <dt>Person and email address to contact for further information:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Intended usage:</dt>
+          <dd>COMMON</dd>
+          <dt>Restrictions on usage:</dt>
+          <dd>N/A</dd>
+          <dt>Author:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Change controller:</dt>
+          <dd>Internet Engineering Task Force (mailto:iesg@ietf.org).</dd>
+        </dl>
+      </section>
+      <section numbered="true" toc="default">
+        <name>application/alto-transportparams+json Media Type</name>
+        <dl>
+          <dt>Type name:</dt>
+          <dd>application</dd>
+          <dt>Subtype name:</dt>
+          <dd>alto-transportparams+json</dd>
+          <dt>Required parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Optional parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Encoding considerations:</dt>
+          <dd>Encoding considerations are identical to those specified for the
+          "application/json" media type. See <xref target="RFC8259" format="default"/>.
+          </dd>
+          <dt>Security considerations:</dt>
+          <dd>Security considerations relating to the generation and consumption
+          of ALTO Protocol messages are discussed in Section 10 of
+          <xref target="RFC8895"/> and Section 15 of <xref target="RFC7285"/>.
+          </dd>
+          <dt>Interoperability considerations:</dt>
+          <dd>This document specifies format of conforming messages and the
+          interpretation thereof.
+          </dd>
+          <dt>Published specification:</dt>
+          <dd><xref target="tqs-accept"/> of this document.</dd>
+          <dt>Applications that use this media type:</dt>
+          <dd>ALTO servers and ALTO clients either stand alone or are embedded
+          within other applications.</dd>
+          <dt>Fragment identifier considerations:</dt>
+          <dd>N/A</dd>
+          <dt>Additional information:</dt>
+          <dd>
+            <t><br/></t>
+            <dl>
+              <dt>Deprecated alias names for this type:</dt>
+              <dd>N/A</dd>
+              <dt>Magic number(s):</dt>
+              <dd>N/A</dd>
+              <dt>File extension(s):</dt>
+              <dd>This document uses the media type to refer to protocol messages
+              and thus does not require a file extension.</dd>
+              <dt>Macintosh file type code(s):</dt>
+              <dd>N/A</dd>
+            </dl>
+          </dd>
+          <dt>Person and email address to contact for further information:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Intended usage:</dt>
+          <dd>COMMON</dd>
+          <dt>Restrictions on usage:</dt>
+          <dd>N/A</dd>
+          <dt>Author:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Change controller:</dt>
+          <dd>Internet Engineering Task Force (mailto:iesg@ietf.org).</dd>
+        </dl>
+      </section>
+      <section numbered="true" toc="default">
+        <name>application/alto-transportqueue+json Media Type</name>
+        <dl>
+          <dt>Type name:</dt>
+          <dd>application</dd>
+          <dt>Subtype name:</dt>
+          <dd>alto-transportqueue+json</dd>
+          <dt>Required parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Optional parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Encoding considerations:</dt>
+          <dd>Encoding considerations are identical to those specified for the
+          "application/json" media type. See <xref target="RFC8259" format="default"/>.
+          </dd>
+          <dt>Security considerations:</dt>
+          <dd>Security considerations relating to the generation and consumption
+          of ALTO Protocol messages are discussed in Section 10 of
+          <xref target="RFC8895"/> and Section 15 of <xref target="RFC7285"/>.
+          </dd>
+          <dt>Interoperability considerations:</dt>
+          <dd>This document specifies format of conforming messages and the
+          interpretation thereof.
+          </dd>
+          <dt>Published specification:</dt>
+          <dd><xref target="uq-resp"/> of this document.</dd>
+          <dt>Applications that use this media type:</dt>
+          <dd>ALTO servers and ALTO clients either stand alone or are embedded
+          within other applications.</dd>
+          <dt>Fragment identifier considerations:</dt>
+          <dd>N/A</dd>
+          <dt>Additional information:</dt>
+          <dd>
+            <t><br/></t>
+            <dl>
+              <dt>Deprecated alias names for this type:</dt>
+              <dd>N/A</dd>
+              <dt>Magic number(s):</dt>
+              <dd>N/A</dd>
+              <dt>File extension(s):</dt>
+              <dd>This document uses the media type to refer to protocol messages
+              and thus does not require a file extension.</dd>
+              <dt>Macintosh file type code(s):</dt>
+              <dd>N/A</dd>
+            </dl>
+          </dd>
+          <dt>Person and email address to contact for further information:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Intended usage:</dt>
+          <dd>COMMON</dd>
+          <dt>Restrictions on usage:</dt>
+          <dd>N/A</dd>
+          <dt>Author:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Change controller:</dt>
+          <dd>Internet Engineering Task Force (mailto:iesg@ietf.org).</dd>
+        </dl>
+      </section>
     </section>
     <section numbered="true" toc="default">
       <name>Acknowledgments</name>
@@ -779,6 +1350,21 @@ object {
           <seriesInfo name="DOI" value="10.17487/RFC7285"/>
         </reference>
         <!-- alto base -->
+<reference anchor="RFC8259" target="https://www.rfc-editor.org/info/rfc8259">
+  <front>
+    <title>The JavaScript Object Notation (JSON) Data Interchange Format</title>
+    <author fullname="T. Bray" initials="T." role="editor" surname="Bray"/>
+    <date month="December" year="2017"/>
+    <abstract>
+      <t>JavaScript Object Notation (JSON) is a lightweight, text-based, language-independent data interchange format. It was derived from the ECMAScript Programming Language Standard. JSON defines a small set of formatting rules for the portable representation of structured data.</t>
+      <t>This document removes inconsistencies with other specifications of JSON, repairs specification errors, and offers experience-based interoperability guidance.</t>
+    </abstract>
+  </front>
+  <seriesInfo name="STD" value="90"/>
+  <seriesInfo name="RFC" value="8259"/>
+  <seriesInfo name="DOI" value="10.17487/RFC8259"/>
+  <format target="https://www.rfc-editor.org/info/rfc8259" type="TXT"/>
+</reference>
     <reference target="https://www.rfc-editor.org/info/rfc7540" anchor="RFC7540" xml:base="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7540.xml">
           <front>
             <title>Hypertext Transfer Protocol Version 2 (HTTP/2)</title>
