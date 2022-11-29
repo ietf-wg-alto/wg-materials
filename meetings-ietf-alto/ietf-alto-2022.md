@@ -6,7 +6,38 @@
 - **Location:** https://ietf.webex.com/ietf/j.php?MTID=ma0e97cc97c4cd71bb59cf1a094682686
 
 - **Minute takers:** Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
+------------------------------
 
+**IETF ALTO Meeting: November 29, 2022**
+
+**Agenda:**
+
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+
+**Minutes:**
+
+- New transport
+  - Kai provided updates about the new transport base document
+  - Dicussions:
+    - Whether the document should be a replacement or built on the SSE document (RFC 8895)
+      - Conclusion is that new transport should be built on RFC 8895 and the transition should be smooth.
+    - How other protocols (e.g., NetConf) handle incremental updates
+      - NetConf offers periodic/on-demand subscriptions
+    - Whether and how to split the current base document
+      - One proposal is to split the current base document into 1) a transmission-independent part and 2) the basic transmission mechanism using HTTP GET and long GET
+      - Need to discuss this in the mailing list and confirm with the AD
+  - Action:
+    - Richard will summarize the conversation and send the email to the mailing list including Martin and Mark. Then proceed in the direction that is agreed on.
+- OAM
+  - Jensen provided updates about the OAM document, in particular the issue that it currently depends on some non-standard documents.
+  - Qin made the comment that OAM is still in the stage of preparing for WGLC. The dependent documents may get mature enough to be published before OAM can be published.
+- Wiki migration
+  - Kai and Jie will finish the migration of implementation wiki page before the next meeting.
+- The discussion on OAM data model can be closed.
+- The item "Service queries spanning multiple domains" should be kept open.
+  - Need someone look into OpenALTO and see how to make it work for other networks.
+- ALTO & security
+  - Motoyoshi will discuss with his collegues and decide when and how long the security presentation will be.
 ------------------------------
 
 **IETF ALTO Meeting: November 22, 2022**
