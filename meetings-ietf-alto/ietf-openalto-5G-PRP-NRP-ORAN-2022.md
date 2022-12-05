@@ -16,7 +16,7 @@
 
 Applications:
 - Hololens 
-- Deadline bound traffic, predictability is needed.
+- Deadline bound traffic
 
 Control knobs:
 - Path selection
