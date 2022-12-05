@@ -2,15 +2,32 @@
 
 **Logistics:**
 
-- **Meeting times:** Mon 9:00 to 10:00am PST, Wed 9:00 to 9:30am EST, Thu 10:00 to 10:30am EST
+- **Meeting times:** Mon 9:00am to 10:00am PST
 
 - **Location:** https://caltech.zoom.us/j/95461704189?pwd=Y0xjZFhpbjJaSHBINFZvRThMYS83Zz09
 
 ----
 
-**5G Network Optimization in PRP**
+**Agenda 12/05/2022:**
 
-**Agenda:**
+- Control knobs and applications
+
+**Minutes:**
+
+Applications:
+- Hololens 
+- Deadline bound traffic, predictability is needed.
+
+Control knobs:
+- Path selection
+- Rate selection
+- Access link selection
+- Service selection
+- Topology reconfiguration
+
+-------
+
+**Agenda 05/18/2022:**
 
 - Definition of Scope of Work
 
