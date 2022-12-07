@@ -8,6 +8,46 @@
 - **Minute takers:** Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
 ------------------------------
 
+**IETF, ALTO Meeting: December 6, 2022**
+
+**Agenda:**
+
+- Round-table updates
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+
+**Minutes:**
+
+Note taker: Jensen
+
+Logistics:
+
+- Richard suggested to involve everyone to give quick round-table updates at the beginning of every weekly meeting
+
+Round-table updates:
+
+- Richard updates:
+  - Submit a 5-page summary to IEEE communication magazine
+  - Work in progress on ALTO/TCN with CERN/FTS/Rucio team, call for collaborators
+- Chunshan just came back and is willing to contribute the recharter again
+- Motoyoshi will go over security related discussion next week
+- Qin updates discussions about measurement architecture which can be related to ALTO
+- Jensen is working on the revision of the ALTO O&M draft
+- Sabine is working on leveraging ALTO to support service function chain setting
+- Ziyang is working on pushing ALTO/MPQUIC work to standard track and call for reviews
+
+Charter Items:
+
+- New transport
+  - Richard is updating new revision of the bundle of ALTO new transport drafts
+  - Qin suggested to finish a simple version first without deeply involving httpbis
+- ALTO O&M
+  - Jensen went over the updated ALTO O&M YANG module
+  - For the access control part, Richard and Qin have different opinions. Qin suggested to check some OAuth mechanisms to identify clients. Qin was asking Motoyoshi for more feedback because of his expertise in security area. Motyoshi would like to get more details about the problem description.
+  - Action:
+    - Jensne will send an email to start the conversation of discusssion about how to realize access control in ALTO O&M
+
+------------------------------
+
 **IETF ALTO Meeting: November 29, 2022**
 
 **Agenda:**
