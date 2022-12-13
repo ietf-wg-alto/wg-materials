@@ -23,6 +23,12 @@
 
 Note taker: 
 
+Fujitsu presentation on Network Trust:
+
+- Safety of data geolocation
+- Reliability of partners with whom we work with
+- => trust
+- Robust localization: verifies geolocation of data and paths
 
 
 ------------------------------
