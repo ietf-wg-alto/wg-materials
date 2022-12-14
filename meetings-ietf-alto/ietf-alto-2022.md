@@ -23,12 +23,46 @@
 
 Note taker: 
 
-Fujitsu presentation on Network Trust:
+Fujitsu presentation on Network Trust: ([white paper](https://www.fujitsu.com/global/about/research/article/202212-trust-enhanced-networking.html))
 
 - Safety of data geolocation
 - Reliability of partners with whom we work with
 - => trust
 - Robust localization: verifies geolocation of data and paths
+- quality-of-trust (QoT) introduced as a metric of trust
+  - use cases:
+    - provide trust requirements
+    - transmit data meeting QoT
+- Why QoT
+  - What is QoT: measurable trust level of network components and/or data sources
+  - QoT seen as a logical evolution for QoS & QoE
+  - One key in QoT is that an appropriate trust funtion need to be selected
+  - Examples and relations to routing and emerging networking technologies such as DCN/SDN/NFV
+- Vision of Fujitsu: trust-centric networking (TCN)
+  - TCN - trust-centric networking
+  - DCN - data-centric networking
+  - Connection-based: TCP/IP
+- Q&A
+  - Jordi asked what would be the examples of QoT that can be integrated with what ALTO WG is doing
+  - Ayoub replied that the Fujitsu team finds ALTO very relevant but does not have a full understanding of ALTO yet. The team is open to discussions on QoT/TCN and ALTO deployments.
+  - Richard asked how complex the Fujitsu team envisions the TCN will handle. The case of handling legal issues with e-doc providers in a hospital is used as an example. He also made the point that end-to-end QoT can be very complex to measure.
+  - Ayoub agreed that e-health use case is very relevant and mentioned some of his collegues are working on security level measurement in IoT domain. The complexity level depends on the interactions with ALTO WG/NMRG/IRTF/... In the ALTO WG, the team focuses on protocol design and deployment. In the research groups, they focus on research problems.
+  - Richard asked about the business model and how will the business/trasaction be taken place.
+  - Ayoub replied that some questions are being explored actively, including examples such as cloud provider ranking by the trustworthiness. Auditing & passive/active probing are being used.
+  - ACTION: Fujitsu team will work on an I-D and the ALTO WG will help.
+  - Richard asked whether the discussion can be brought to the mailing list
+  - Qin agreed that some discussion on the topic can be raised in the mailing list. He also brought up several questions: How will this related to Zero-trust network? What use cases and applications can be supported? Will this help the multi-domain setting in ALTO? How to calculate the QoT? Who will consume the data?
+  - Ayoub replied that the Fujitsu team is focusing on 1/2 use cases related to ALTO. e.g., application-layer trust from end-to-end. 
+  - Qin further pointed to the SASE architecture and privacy preserving measurement.
+  - Richard argued that topics of last week and this TCN represent the same trend that applications want to know a little more about the network. Charter of ALTO is to provide enough information that application/endpoints cannot infer themselves. What we are missing are 1) UP: how the information can be composed 2) DOWN: how to obtain the information.
+  - Ayoub mentioned that the goal of the Fujitsu team is to 1) identify the maps and gaps. 2) get help from the WG on the I-D.
+  - Jordi and Kai will be able to help. Ayoub mentioned they will reach out after Christmas.
+  - Richard suggested that deployment will be very useful in IETF and it is useful to think of how to leverage existing services. Jordi also suggested that in IETF, research groups will give suggestions on which WG your technogolies can end up landing.
+
+WG documents:
+
+- Richard reported the progress of new transport. Meeting with Mark is scheduled on 7am EST Thursday.
+- Jensen reported the update on OAM. A key issue discussed is how to define models to realize per-resource access control. Qin suggested using IETF system management YANG model instead of openconfig. Also the use of ACL is not suggested.
 
 
 ------------------------------
