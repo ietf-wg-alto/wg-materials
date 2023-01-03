@@ -10,6 +10,21 @@
 
 ------------------------------
 
+**IETF, ALTO Meeting: January 3, 2023**
+
+**Agenda:**
+
+- Round-table updates
+- Chartered items
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+
+**Minutes:**
+
+Note taker: 
+
+
+------------------------------
+
 **IETF, ALTO Meeting: December 13, 2022**
 
 **Agenda:**
