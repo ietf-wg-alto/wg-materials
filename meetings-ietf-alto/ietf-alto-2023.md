@@ -65,10 +65,10 @@ More offline-discussion is needed for clarification.
 Lauren:
 Open-ALTO project came up with requirements on Multi-Domain.
 e.g., easy to use, stable design, correctness.
-Suggestions of the group regarding the requirements is welcome.
+Suggestions of the group regarding the requirements are welcome.
 Ambition is to demonstrate for Rucio.
 Write a paper and go to IRTF.
-Pseudo-Code is available and can by shared.
+Pseudo-Code is available and can be shared.
 
 Qin:
 Not ready to go for re-chartering and need to finish already chartered items first.
@@ -77,6 +77,6 @@ New Transport still requires a revision.
 Mahdi:
 OAM still needs some updates and comments.
 
-=> prioritisation of chartered items is necessary.
+Conclusion: => prioritisation of chartered items is necessary.
 
 ------------------------------
