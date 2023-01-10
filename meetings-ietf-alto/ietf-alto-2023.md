@@ -46,7 +46,7 @@ Chunshan (chunshan.xiong@cictmobile.com):
 Background information on 5G in China, 5G service is currently not heavily used and operators want
 to push the usage of 5G network. Segment Routing (SR) will be deployed and the 5G capabilities are increased
 for use case like gaming. 
-Question: What is the relevant capability of SR that is beneficial for this use cases?
+Question of Richard: What is the relevant capability of SR that is beneficial for this use cases?
 Answer: Helping to reduce bandwidth for real-time communication. 
 
 *Start Discussion:*
