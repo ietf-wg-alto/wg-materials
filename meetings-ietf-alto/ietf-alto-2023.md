@@ -27,7 +27,8 @@ Note Taker: Roland
 Participants:
 Lauren, Kai, Chunshan Xiong, Jensen, Jordi, Mahdi, Marcos Schwarz, Motoyoshi Sekiya, Qin, Richard, Roland
 
-Round-table updates:
+
+*Round-table updates:*
 
 Motoyoshi:
 Preparation of a presentation regarding "Secure Trusted Networks" for the next IETF Bits & Bytes.
