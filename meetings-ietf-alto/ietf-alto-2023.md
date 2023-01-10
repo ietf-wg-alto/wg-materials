@@ -16,7 +16,7 @@
 
 - Round-table updates
 - Chartered items
-- Upated on ALTO Multi-Domain activity
+- Update on ALTO Multi-Domain activity
 - Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 
 
@@ -43,21 +43,24 @@ Jensen:
 OAM document, going over the document reviewing data model.
 
 Chunshan (chunshan.xiong@cictmobile.com):
-Background information on 5G in China, 5G service is currently not heavily used and operartors want
+Background information on 5G in China, 5G service is currently not heavily used and operators want
 to push the usage of 5G network. Segment Routing (SR) will be deployed and the 5G capabilities are increased
 for use case like gaming. 
-Question: What is the relavant capability of SR that is beneficial for this use cases?
+Question: What is the relevant capability of SR that is beneficial for this use cases?
 Answer: Helping to reduce bandwidth for real-time communication. 
 
-*Discussion:*
-Discussion on congestion and congestion prediciton and estimation of capacity on the path and is inline
+*Start Discussion:*
+
+Discussion on congestion and congestion prediciton and estimation of capacity on the path and if it is inline
 with the ALTO bottleneck discussion in this group.
 
 Congestion Control -> impact on RTT
 
 Bottleneck Structure -> predict future behaviour
 
-More offline-discussion is needed.
+More offline-discussion is needed for clarification.
+
+*End Discussion:*
 
 Lauren:
 Open-ALTO project came up with requirements on Multi-Domain.
@@ -67,6 +70,13 @@ Ambition is to demonstrate for Rucio.
 Write a paper and go to IRTF.
 Pseudo-Code is available and can by shared.
 
+Qin:
+Not ready to go for re-chartering and need to finish already chartered items first.
+New Transport still requires a revision.
 
+Mahdi:
+OAM still needs some updates and comments.
+
+=> prioritisation of chartered items is necessary.
 
 ------------------------------
