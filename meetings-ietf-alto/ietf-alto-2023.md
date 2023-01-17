@@ -7,6 +7,23 @@
 
 - **Minute takers:** Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
 
+------------------------------
+
+**IETF, ALTO Meeting: January 17, 2023**
+
+**Agenda:**
+
+- Round-table updates
+- Chartered items
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+
+
+**Minutes:**
+
+
+
+
+
 
 ------------------------------
 
