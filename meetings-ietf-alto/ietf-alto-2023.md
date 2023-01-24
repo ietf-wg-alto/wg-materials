@@ -50,29 +50,6 @@ Deployments:
 
 **IETF, ALTO Meeting: January 17, 2023**
 
-**Agenda:**
-
-- Round-table updates
-- Chartered items
-- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
-
-
-**Minutes:**
-
-Transport:
-- RY: targeting sending a new version today.
-
-O&M:
-- RY: O&M is very overarching, a lot of content. Is it standard or experimental.
-- JZ: The target is standard
-- JRG: 
-
-Deployments:
-- JRG: reminder to update the wiki with your deployments info: https://wiki.ietf.org/en/group/ALTO/deployment
-
-CERN/OpenALTO Project:
-- Two pieces: (1) Scheduler and (2) data orchestrator
-- 
 
 
 
