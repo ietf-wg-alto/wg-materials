@@ -9,6 +9,45 @@
 
 ------------------------------
 
+**IETF, ALTO Meeting: January 24, 2023**
+
+**Agenda:**
+
+- Round-table updates
+- Chartered items
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+
+
+**Minutes:**
+
+Transport:
+- RY: targeting sending a new version today.
+
+O&M:
+- [RY] O&M is very overarching, a lot of content. Is it standard or experimental.
+- [JZ] The target is standard
+- [JR] Any plans to implement a portion of the O&M in the standard to OpenALTO?
+- [RY] Would be very positive and we can consider
+
+Deployments:
+- [JR] reminder to update the wiki with your deployments info: https://wiki.ietf.org/en/group/ALTO/deployment
+
+[RY] CERN/OpenALTO Project:
+- Two pieces: (1) Scheduler and (2) data orchestrator
+- ALTO for visibility and scheduling. 
+
+- [QW] Time slot request for next IETF meeting
+- [QW] Goal for next IETF meeting for transport should be working group last call
+- [RY] We will push for it
+- [QW] Who will be going to Japan? We need to start organizing.
+
+[RY] Three directions:
+- General path model for multidomain visibility. Can be presented at PANRG too. Presentation with CERN, NRP, etc.
+- Collecting visibility info about environmental impact. For hackathon, to work together to get energy impact
+- Trust
+
+------------------------------
+
 **IETF, ALTO Meeting: January 17, 2023**
 
 **Agenda:**
@@ -20,8 +59,20 @@
 
 **Minutes:**
 
+Transport:
+- RY: targeting sending a new version today.
 
+O&M:
+- RY: O&M is very overarching, a lot of content. Is it standard or experimental.
+- JZ: The target is standard
+- JRG: 
 
+Deployments:
+- JRG: reminder to update the wiki with your deployments info: https://wiki.ietf.org/en/group/ALTO/deployment
+
+CERN/OpenALTO Project:
+- Two pieces: (1) Scheduler and (2) data orchestrator
+- 
 
 
 
