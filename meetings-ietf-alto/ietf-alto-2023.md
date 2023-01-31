@@ -81,7 +81,64 @@ Deployments:
 
 **IETF, ALTO Meeting: January 17, 2023**
 
+**Agenda:**
 
+- Round-table updates
+- Chartered items
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+
+Chartered items
+--- Transport - Richard 
+new name added way of publishing...
+major change: 4 requirements = tips. R5 optional (no MUST)
+R14 = MUST
+overall, pip can request server from anywhere. session-based transport. 
+ready to be posted when tips are done. 
+qin: intro still keeps SSE fig => will be deleted. no need compare w SSE. 
+richard: abstract positions wrt SSE that is great. Pb: SSE not allows naming individual updates. Thus all pushed updt are anonymus updates => client cannot pull them (no ID).
+=> tips incl allowing distribution of ID from server to client. server can now push. 
+qin: diff in workflow? 
+richard: use tips, ID see fig before section 3
+qin: SSE needs 2 channels: ctrl + data. new transport does not need to introduce any specific channel, just a transp queue 
+richard: bundled in same connection
+qin: hopefully post this week?
+
+--- O&M - Jensen
+simplified Yang model for ctrl part. 
+client auth delegated to other server. no need passwd & user name => role-name. example in appendix
+auth server can be 3rd party, see fig 3. 
+qin: why use oauth in ALTO scenario? 
+jensen: can be different server. 
+qin: not convinced oauth is more relevant. Commented on the list. compliancy w base protocol is needed. base prot does not use "access control" term. Can be rather TLS. need double check. 
+jensen: will discuss on mailing list. 
+kai: ...
+jensen: can use other prot, user & passwd. can drop oauth if too complex. 
+qin: use TLS maybe. better not expand to oauth. 
+kai: jensen put text in appendix showing how can extend to oauth. oauth = example
+qin: ok if appendix as an example. 
+jensen: can upload after meeting to have feedback. 
+
+qiufang: ALTO server can push (reactive) data and pull (proactive)?? . There should be these 2 modes for ALTO server, with relevant config eg how often pull data. also need to specify data store. 
+qin: URI not enough to spec yang data store, you need target path to locate...
+kai: data store only specifies the type. 
+qiu: to identify data store.... 
+qin: maybe add example in appx. we can schedule editing session. 
+
+--- ALTO deployments: 
+qin: reminder we have wiki page. please populate your section. right now, NRP documented only (nat research platform)
+richard: can add info on CERN. 
+jordi: is a wiki page ok as a deployment deliverable?
+qin: is ok, we also need Luis input. we also have Internet protocol journal (IPJ) paper. 
+qin: wiki needs distinguish ALTO deployment (cern, telefonica) from  implementations experiments. IETF wants shutdown old wiki pages. We need complete migration and advise secretary. 
+jordi: will edit to separate. 
+
+---  IPJ article
+qin: exchanged w editor who provided suggestions. 
+
+AOB: richard will discuss next meeting. 
+we also have Marcos Schwarz
+Ayoub: could not catch up, hopefully will update next week integrate fujistsu work in ALTO WG. need talk w jordi and luis. 
+Meeting concluded
 
 
 ------------------------------
