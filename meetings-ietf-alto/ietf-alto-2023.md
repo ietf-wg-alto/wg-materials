@@ -20,7 +20,23 @@
 
 **Minutes:**
 
+Note Taker: Jensen
 
+WG charter items:
+- New transport (Richard):
+  - Allow client to request information of each update queue; client can delete the queue later.
+  - Incremental update queue
+  - Use stack to maintain queue status
+  - Kai: whether to reuse info in IRD
+- OAM (Jensen):
+- Deployment (Jordi & Luis):
+  - Kai and his students have migrated Client/Server/App implementation table from the old wiki page
+  - Luis will update telefonica deployment
+WG Recharter:
+  - Richard introduced the on-going network-aware, application-layer connection control work
+  - Richard talked about a tree-structure resource constraint spec mentioned by CERN
+    - Another potential use case: pods network traffic shaping
+    - Whether it should be consider as a charter item in the future
 
 ------------------------------
 
