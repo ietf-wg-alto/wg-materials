@@ -7,6 +7,26 @@
 
 - **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
 
+
+------------------------------
+
+**IETF, ALTO Meeting: February 7th, 2023**
+
+**Agenda:**
+
+- Round-table updates
+- Chartered items
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+
+
+**Minutes:**
+
+Note Taker: Ayoub Messos
+
+
+
+
+
 ------------------------------
 
 **IETF, ALTO Meeting: January 31, 2023**
