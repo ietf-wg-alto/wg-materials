@@ -24,7 +24,60 @@
 Note Taker: Ayoub Messos
 
 
+**Attendees:**
+Qin, Jordi, Richard, Sabine, Roland, Jensen, Kai, Ayoub (taking minutes)
+**Agenda:**
+1-	Round table / Priority Items
+2-	Chartered items:
 
+----------------------------------------------------------------
+**1. Priority Items**
+
+	- Date for the "interim meeting" 23rd or 24th of Feb (to be closed very soon).
+	- Focus on the Chartered items and have them validated:
+		- ALTO new Transport draft update
+		- ALTO O&M data model draft update
+		- ALTO Deployment
+		
+- Qin, Jordi, Richard, Sabine:
+	- ALTO New Transport
+		- Richard uploaded a new version of the draft.
+		- Review is needed from partners.
+		- Need some volunteers to help review both documents:
+			- ALTO New Transport : Sabine, Jordi, (Luis?)
+			
+			
+	- New time is the 23th of Feb: 9pm EST (3pm CET) (Qin will send the invite shortly)
+	
+	- Discussions for plans and the tentative agenda for the meeting in IETF 116 in Yokohama.
+		- 1 hour meeting is planned. 
+
+- Richard <> Qin:
+	- Discussion about: "Multi domain contact use case": the sparsity of information (issue#1), ambiguity of information(issue#2)
+		- Scenario 1:
+		- Scenario 2: Multi-Domain Settings (2 ALTO entities in 2 different domains)
+
+------------------------------------------------------
+**2. Chartered items: **
+
+*2.1- O&M:
+	Jensen (Reviewer of the O&M document)
+	- Already have 2 colleagues helping with the review, but might need other volunteer!
+	- Update about the progress on the latest O&M document.
+	- Will uploaded the new version before Friday for others to review.
+	
+	- Qin will send the template for Jensen's consideration and will ask some other people to help with review.
+	- Richard will also provide some review.
+
+
+*2.2- Transport documents (Richard)
+	- Already submitted a newer version with a lot of changes with the help of Roland and Kai.
+	- Provides details about the updates related to references and InfoWorkFlow.
+	- Comments from Qin about: Lifecyle /  maybe a diagram would be helpful/ Transport State: Create, Read or Delete / use of absolute uri and relative uri /
+	- Taking the discussion about the use of "Absolute/Relative" State to the mailing list for further discussions.
+	- Should decide: What to include as part of the current draft and what to cover as part of a future document/work. (a full comprehensive read is needed)
+
+*2.3- Deployment
 
 
 ------------------------------
