@@ -28,8 +28,11 @@ Note Taker: Roland Schott
 Sabine, Motoyoshi, Qin, Jordi, Richard, Luis, Jensen, Ayoub, Roland
 
 **Agenda:**
+
 1-	Round table / Priority Items
+
 2-	Chartered items:
+
 3-	Interim Meeting
 
 **1. Priority Items**
@@ -42,7 +45,7 @@ Bottlenecks might be storage, network capacity etc....
 One of the major use cases for concurrent links is congestion control of those bottlenecks especially storage.
 CERN and Rucio activities of Richard are examples to improve the behavior here.
 
-**2. Chartered items: **
+**2. Chartered items:**
 
 *2.1- O&M:
 	Jensen (Reviewer of the O&M document)
@@ -64,11 +67,11 @@ CERN and Rucio activities of Richard are examples to improve the behavior here.
 *2.4- ALTO Performance Metric 
 	- Work is ongoing, but dependency to other documents and feedback
 
-**3. Interim Meeting: **
+**3. Interim Meeting:**
 
 Focus on charted items and less on deployments
 
-**4. AoB: **
+**4. AoB:**
 
 Idea to go with ALTO to a conference called Mobicom - one of the flagship conferences.
 Focus there is lying on wireless and 5G. https://www.sigmobile.org/mobicom/2023/
