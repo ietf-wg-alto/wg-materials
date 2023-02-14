@@ -26,6 +26,7 @@ Note Taker: Roland Schott
 
 **Attendees:**
 Sabine, Motoyoshi, Qin, Jordi, Richard, Luis, Jensen, Ayoub, Roland
+
 **Agenda:**
 1-	Round table / Priority Items
 2-	Chartered items:
