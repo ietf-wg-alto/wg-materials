@@ -31,7 +31,7 @@ Sabine, Motoyoshi, Qin, Jordi, Richard, Luis, Jensen, Ayoub, Roland
 
 1-	Round table / Priority Items
 
-2-	Chartered items:
+2-	Chartered items
 
 3-	Interim Meeting
 
