@@ -81,7 +81,9 @@ Focus on charted items and less on deployments
 Idea to go with ALTO to a conference called Mobicom - one of the flagship conferences.
 Focus there is lying on wireless and 5G. https://www.sigmobile.org/mobicom/2023/
 
+
 https://dl.acm.org/doi/proceedings/10.1145/3447993
+
 https://educationscientists.com/mobicom/
 
 ------------------------------
