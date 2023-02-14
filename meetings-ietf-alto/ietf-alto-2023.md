@@ -27,13 +27,14 @@ Note Taker: Roland Schott
 **Attendees:**
 Sabine, Motoyoshi, Qin, Jordi, Richard, Luis, Jensen, Ayoub, Roland
 
-**Agenda:**
+**Agenda on 14th:**
 
 1-	Round table / Priority Items
 
 2-	Chartered items:
 
 3-	Interim Meeting
+
 
 **1. Priority Items**
 Preparation of next interim and IETF ALTO meeting.
