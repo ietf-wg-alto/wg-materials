@@ -10,6 +10,73 @@
 
 ------------------------------
 
+**IETF, ALTO Meeting: February 14th, 2023**
+
+**Agenda:**
+
+- Round-table updates
+- Chartered items
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+
+
+**Minutes:**
+
+Note Taker: Roland Schott
+
+
+**Attendees:**
+Sabine, Motoyoshi, Qin, Jordi, Richard, Luis, Jensen, Ayoub, Roland
+**Agenda:**
+1-	Round table / Priority Items
+2-	Chartered items:
+3-	Interim Meeting
+
+**1. Priority Items**
+Preparation of next interim and IETF ALTO meeting.
+Only 1h for the ALTO meeting in Yokohama. Idea to align with CAN activity.
+One additional point is the multi-domain use case being of interest for
+the ALTO community. 
+Discussion regarding the content to be presented in the next group meetings.
+Bottlenecks might be storage, network capacity etc....
+One of the major use cases for concurrent links is congestion control of those bottlenecks especially storage.
+CERN and Rucio activities of Richard are examples to improve the behavior here.
+
+**2. Chartered items: **
+
+*2.1- O&M:
+	Jensen (Reviewer of the O&M document)
+	- Send info to the mailing list and include delta info
+	- Request for volunteers to provide feedback in the next days
+	- Provide feedback until next Tuesday latest, please (=> Luis, Jordi, Sabine and others are welcome)
+	- Qin needs slides for the interim on Sunday
+	- Check draft regarding interdependencies or complexity e.g., multi-cast
+
+
+*2.2- Transport documents (Richard)
+	- Jordi, Adrian and Med sent feedback to the authors (=> answer needs to be sent to the list)
+	- Summary of major changes needs to be sent to the list (Med request => Richard, Kai, Roland will synch regarding response)
+	- Goal to provide responses to the feedback on the list by beginning of next week, before interims meeting
+		
+*2.3- Deployment
+ 	- Populate deployments to the wiki
+	
+*2.4- ALTO Performance Metric 
+	- Work is ongoing, but dependency to other documents and feedback
+
+**3. Interim Meeting: **
+
+Focus on charted items and less on deployments
+
+**4. AoB: **
+
+Idea to go with ALTO to a conference called Mobicom - one of the flagship conferences.
+Focus there is lying on wireless and 5G. https://www.sigmobile.org/mobicom/2023/
+
+https://dl.acm.org/doi/proceedings/10.1145/3447993
+https://educationscientists.com/mobicom/
+
+------------------------------
+
 **IETF, ALTO Meeting: February 7th, 2023**
 
 **Agenda:**
