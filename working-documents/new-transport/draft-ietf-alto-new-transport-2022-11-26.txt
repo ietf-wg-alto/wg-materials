@@ -1,0 +1,1792 @@
+
+
+
+
+ALTO Working Group                                             R. Schott
+Internet-Draft                                          Deutsche Telekom
+Intended status: Standards Track                                 Y. Yang
+Expires: 30 May 2023                                     Yale University
+                                                                  K. Gao
+                                                      Sichuan University
+                                                                J. Zhang
+                                                       Tongji University
+                                                        26 November 2022
+
+
+       ALTO New Transport: ALTO Transport Information Structures
+                    draft-ietf-alto-new-transport-03
+
+Abstract
+
+   The ALTO base protocol [RFC7285] defines both the ALTO information
+   resources and their transport from the server to the client.  Using
+   HTTP/1.x as the transport protocol, the ALTO transport in the base
+   protocol includes the limitations of HTTP/1.x.  ALTO/SSE [RFC8895]
+   defines a new transport design addressing some of the limitations,
+   but is still based on HTTP/1.x.  This document introduces ALTO new
+   transport, which introduces ALTO transport information structures
+   (TIS) at an ALTO server.  The introduction of ALTO TIS allows at
+   least two types of efficient transport using HTTP: (1) HTTP/2/3
+   independent client (long) pull allowed by non-blocking, newer HTTP,
+   and (2) HTTP/2 specific server push.  This document defines ALTO TIS
+   and the first design.  A companion document
+   [draft-schott-alto-new-transport-push] defines server-push ALTO
+   transport based on ALTO TIS.
+
+Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119][RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+
+
+Schott, et al.             Expires 30 May 2023                  [Page 1]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 30 May 2023.
+
+Copyright Notice
+
+   Copyright (c) 2022 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
+   2.  ALTO New Transport Design Requirements  . . . . . . . . . . .   5
+   3.  ALTO New Transport Design Overview  . . . . . . . . . . . . .   6
+   4.  Service Extensions  . . . . . . . . . . . . . . . . . . . . .   8
+     4.1.  Notations . . . . . . . . . . . . . . . . . . . . . . . .   8
+     4.2.  Transport Queue Service . . . . . . . . . . . . . . . . .   8
+       4.2.1.  Media Type  . . . . . . . . . . . . . . . . . . . . .   9
+       4.2.2.  HTTP Method . . . . . . . . . . . . . . . . . . . . .   9
+       4.2.3.  Capabilities  . . . . . . . . . . . . . . . . . . . .   9
+       4.2.4.  Uses  . . . . . . . . . . . . . . . . . . . . . . . .   9
+       4.2.5.  Request: Accept Input Parameters  . . . . . . . . . .   9
+       4.2.6.  Response  . . . . . . . . . . . . . . . . . . . . . .   9
+       4.2.7.  Example . . . . . . . . . . . . . . . . . . . . . . .   9
+     4.3.  Transport Queue . . . . . . . . . . . . . . . . . . . . .  10
+       4.3.1.  Media Type  . . . . . . . . . . . . . . . . . . . . .  10
+       4.3.2.  HTTP Method . . . . . . . . . . . . . . . . . . . . .  10
+       4.3.3.  Capabilities  . . . . . . . . . . . . . . . . . . . .  10
+       4.3.4.  Uses  . . . . . . . . . . . . . . . . . . . . . . . .  10
+       4.3.5.  Request: Accept Input Parameters  . . . . . . . . . .  10
+       4.3.6.  Response  . . . . . . . . . . . . . . . . . . . . . .  11
+       4.3.7.  Example . . . . . . . . . . . . . . . . . . . . . . .  11
+     4.4.  Incremental Update Queue  . . . . . . . . . . . . . . . .  11
+       4.4.1.  Path  . . . . . . . . . . . . . . . . . . . . . . . .  11
+       4.4.2.  Media Type  . . . . . . . . . . . . . . . . . . . . .  11
+       4.4.3.  HTTP Method . . . . . . . . . . . . . . . . . . . . .  12
+
+
+
+Schott, et al.             Expires 30 May 2023                  [Page 2]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+       4.4.4.  Capabilities  . . . . . . . . . . . . . . . . . . . .  12
+       4.4.5.  Uses  . . . . . . . . . . . . . . . . . . . . . . . .  12
+       4.4.6.  Accept Input Parameters . . . . . . . . . . . . . . .  12
+       4.4.7.  Response  . . . . . . . . . . . . . . . . . . . . . .  12
+       4.4.8.  Example . . . . . . . . . . . . . . . . . . . . . . .  13
+     4.5.  Update Log Service  . . . . . . . . . . . . . . . . . . .  14
+       4.5.1.  Path  . . . . . . . . . . . . . . . . . . . . . . . .  14
+       4.5.2.  Media Type  . . . . . . . . . . . . . . . . . . . . .  14
+       4.5.3.  HTTP Method . . . . . . . . . . . . . . . . . . . . .  14
+       4.5.4.  Capabilities  . . . . . . . . . . . . . . . . . . . .  14
+       4.5.5.  Uses  . . . . . . . . . . . . . . . . . . . . . . . .  15
+       4.5.6.  Accept Input Parameters . . . . . . . . . . . . . . .  15
+       4.5.7.  Response  . . . . . . . . . . . . . . . . . . . . . .  15
+       4.5.8.  Example . . . . . . . . . . . . . . . . . . . . . . .  15
+   5.  Transport Information: Transport Queue  . . . . . . . . . . .  15
+     5.1.  Transport Queue Operations  . . . . . . . . . . . . . . .  16
+     5.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  17
+   6.  Transport Information: Incremental Updates Queue  . . . . . .  18
+     6.1.  Incremental Updates Queue Operations  . . . . . . . . . .  18
+       6.1.1.  Media Type  . . . . . . . . . . . . . . . . . . . . .  18
+       6.1.2.  HTTP Method . . . . . . . . . . . . . . . . . . . . .  19
+       6.1.3.  Response  . . . . . . . . . . . . . . . . . . . . . .  19
+     6.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  20
+   7.  Information Resource Information: Client Pull Individual
+           Updates . . . . . . . . . . . . . . . . . . . . . . . . .  20
+     7.1.  Individual Updates Operations . . . . . . . . . . . . . .  20
+     7.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  21
+   8.  ALTO New Transport Stream Management  . . . . . . . . . . . .  22
+     8.1.  Objectives  . . . . . . . . . . . . . . . . . . . . . . .  22
+     8.2.  Client -> Server [Create Transport Queue] . . . . . . . .  22
+     8.3.  Client -> Server [Close Transport Queue]  . . . . . . . .  22
+     8.4.  Client -> Server [Request on Data of a Transport Queue on
+           Stream SID_tq]  . . . . . . . . . . . . . . . . . . . . .  23
+     8.5.  Concurrency Management  . . . . . . . . . . . . . . . . .  23
+   9.  ALTO New Transport Information Resource Directory (IRD) . . .  23
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  26
+   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  26
+     11.1.  application/alto-transport+json Media Type . . . . . . .  26
+     11.2.  application/alto-transportparams+json Media Type . . . .  27
+     11.3.  application/alto-transportqueue+json Media Type  . . . .  28
+   12. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  30
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  30
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  30
+     13.2.  Informative References . . . . . . . . . . . . . . . . .  30
+   Appendix A.  Outlook to ALTO with HTTP/3  . . . . . . . . . . . .  31
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  32
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                  [Page 3]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+1.  Introduction
+
+   Application-Layer Traffic Optimization (ALTO) provides means for
+   network applications to obtain network status information.  The ALTO
+   base protocol [RFC7285] is based on the sequential request and
+   response model of HTTP/1.1 [RFC7230].  Hence, the base protocol
+   cannot support well the use cases where an ALTO client may need to
+   efficiently monitor the changes to a set of network information
+   resources.  If the client opens a single HTTP connection, the request
+   for one resource may block the request for the next resource.
+
+   To address the issue using a protocol that is still based on the
+   HTTP/1.1 transport model, the ALTO Working Group introduces ALTO/SSE
+   (ALTO Incremental Update based on Server-Sent-Event) [RFC8895], so
+   that an ALTO client can manage (i.e., add and remove) a set of
+   requests maintained at an ALTO server, and the server can
+   continuously, concurrently, and incrementally push updates whenever a
+   monitored network information resource changes.  Figure 1 shows the
+   architecture and message flow of ALTO/SSE, which can be considered as
+   a more general transport protocol than the ALTO base transport
+   protocol.  Although ALTO/SSE allows the concurrent transport of
+   multiple ALTO information resources, it has complexities and
+   limitations.  For example, it requires that the server provides a
+   separate control URI, leading to complexity in management; it needs
+   its own envelop protocol on top of HTTP encoding to indicate message
+   types.
+
+    ------------------------------------------------------------------
+   |                                                                  |
+   |          +-------+         +-------+ 1. init request  +------+   |
+   |          |       |         |       | <-------------   |      |   |
+   |          |       |         |       | ------------->   |      |   |
+   | 3.add/   |       |         |       | 1'. control uri  |      |   |
+   | remove   |       |         |       |                  |      |   |
+   | resource |Stream |         |Update |                  |      |   |
+     -------->|Control| private |Stream | 2a. data update  |Client| --
+              |Server |<------->|Server | messages         |      |
+     -------- |       |         |       | -------------->  |      | <-
+   | response |       |         |       | -------------->  |      |   |
+   |          |       |         |       | 2b.control update|      |   |
+   |          +-------+         +-------+ messages         +------+   |
+   |                                                                  |
+    ------------------------------------------------------------------
+
+
+             Figure 1: ALTO SSE Architecture and Message Flow.
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                  [Page 4]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   This document specifies ALTO New Transport, which realizes ALTO/SSE
+   functions but takes advantage of newer versions of HTTP (e.g., HTTP/2
+   [RFC7540]) that support concurrent, non-blocking transport of
+   multiple streams in the same HTTP connection.
+
+2.  ALTO New Transport Design Requirements
+
+   ALTO New Transport is designed to satisfy a set of requirements.
+   First, it should satisfy the following requirements to realize the
+   functions of ALTO/SSE:
+
+   *  R0: Client can request any resource using the connection, just as
+      using ALTO base protocol using HTTP/1.x.
+
+   *  R1: The client can request the addition (start) of incremental
+      updates to a resource.
+
+   *  R2: The client can request the deletion (stop) of incremental
+      updates to a resource.
+
+   *  R3: The server can signal to the client the start or stop of
+      incremental updates to a resource.
+
+   *  R4: The server can choose the type of each incremental update
+      encoding, as long as the type is indicated to be acceptable by the
+      client.
+
+   Following the ALTO framework [RFC7285] [RFC7971], ALTO New Transport
+   should still be HTTP based:
+
+   *  R5: The design follows the basic principle of HTTP---
+      Representational State Transfer and hence can use only HTTP verbs
+      (GET, POST, PUT, DELETE, HEAD).
+
+   ALTO New Transport should be designed to take advantage of newer HTTP
+   design features, in particular, parallel transfers, but be as
+   transparent to versions (HTTP/2, HTTP/3) as possible.  If a design is
+   based on a particular HTTP version, it should respect its semantics:
+
+   *  R6: The design respects specific HTTP semantics such as the
+      semantics of PUSH_PROMISE, if the feature is used.
+
+   To allow flexible deployment, the new transport protocol should be
+   flexible, in particular,
+
+   *  R7: The design should support capability negotiation.
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                  [Page 5]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+3.  ALTO New Transport Design Overview
+
+   A key design of ALTO New Transport is to distinguish between
+   information about ALTO resources and information about ALTO
+   transport.  The latter information is called transport management
+   information, which provides meta information about the transport of
+   ALTO information resources:
+
+   *  The transport state from the ALTO server to an ALTO client (or a
+      set of clients) for an ALTO information resource is conceptually
+      through a transport queue.  A static ALTO information resource
+      (e.g., Cost Map, Network Map) has a single transport queue, and a
+      dynamic ALTO information resource (e.g., Filtered Cost Map) may
+      create a queue for each unique filter request.
+
+   *  The base transport queue defined in this document includes only a
+      single element: the incremental update message queue, which
+      includes a sequence of incremental update messages.  A particular
+      transport design may extend the base design to include additional
+      state.  For example, the server-push design
+      [draft-schott-alto-new-transport-push] may include the additional
+      receiver set state, which includes the set of receivers receiving
+      incremental push updates from the ALTO server.
+
+   *  The transport queue state is exposed to clients through views;
+      that is, a client can see only a virtual view of the server state.
+
+   Figure 2 shows an example illustrating the aforementioned
+   information.  It includes the additional receiver-set state, to
+   illustrate the possibility of extension.  Each ALTO client (Client 1,
+   Client 2, or Client 3) maintains a single HTTP connection with the
+   ALTO server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                  [Page 6]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   Information Resource:
+
+   a) Static resource (#1) such as NetworkMap
+   b) Filterable resource (#3) such as FilteredCostMap
+
+
+                                 +-------------+
+                                 |             |
+            +--------------------| ALTO Server |-----------+
+            |                  +-|             |-+         |
+            |                  | +-------------+ |         |
+            |                  |                 |         |
+   ---------|------------------|-----------------|---------|------------
+            |                  |                 |         | Information
+            |                  |                 |         | Resource
+   +-------------+   +-------------+   +-------------+   +-------------+
+   | Information |   | Information |   | Information |   | Information |
+   | Resource #1 |   | Resource #2 |   | Resource #3 |   | Resource #4 |
+   +-------------+   +-------------+   +-------------+   +-------------+
+          |                              /    \
+   -------|-----------------------------/------\------------------------
+          |                            /        \            Transport
+          |                      +----/          \------+    Queues
+          |                      |                      |
+     +--------+             +--------+             +--------+
+     |   tq1  |-----+       |   tq2  |-----+       |   tq3  |-----+
+     +----|---+     |       +----|---+     |       +----|---+     |
+          |         |            |         |            |         |
+     +----|---+ +---|----+  +----|---+ +---|----+  +----|---+ +---|----+
+     | tq1/uq | | tq1/rs |  | tq2/uq | | tq2/rs |  | tq3/uq | | tq3/rs |
+     +--------+ +--------+  +--------+ +--------+  +--------+ +--------+
+          |\       /\              |         /           |          |
+   -------|-\-----/--\-------------|--------/------------|----------|---
+          |  \   /    +-------+    |       /             |          |
+          |   +-/-----------+  \   |      /              |          |
+          |    /             \  \  |     /   A           +          +
+          |   /            +--\--\-|----/--+ single       \        /
+          |  /             +---\--\|---/---+ http2/3       \      /
+      +----------+             +----------+  connection   +----------+
+      | Client 1 |             | Client 2 |               | Client 3 |
+      +----------+             +------- --+               +----------+
+
+   tqi    = transport queue i
+   tqi/uq = incremental updates queue of transport queue i
+   tqi/rs = receiver set of transport queue i
+
+
+       Figure 2: ALTO New Transport Transport Management Information.
+
+
+
+Schott, et al.             Expires 30 May 2023                  [Page 7]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   The basic work flow of a client connecting to an ALTO server is the
+   following:
+
+   Client                  TQS          TQ      TQ/UQ    ULS
+     o                      .
+     | Open HTTP connection .
+     |--------------------->| Create TQ  o        o       o
+     | Return URI to TQ     |...........>|.......>|......>|
+     |<---------------------|            .        .       .
+     | (Pull Mode)          .            .        .       .
+     | Request update queue status       .        .       .
+     |------------------------------------------->|       .
+     | Return status of the update queue .        |       .
+     |<-------------------------------------------|       .
+     | Request an element in the UQ      .        .       .
+     |--------------------------------------------------->|
+     | Return the content of an incremental update.       |
+     |<---------------------------------------------------|
+     | (Explicit deletion)  .            .        .       .
+     | Close the transport queue         .        .       .
+     |---------------------------------->|.......>|......>|
+     |                      .            o        o       o
+     | Close the connection .
+     |--------------------->|
+     o                      .
+
+     TQS: Transport Queue Service, TQ: Transport Queue
+     UQ: Incremental Update Queue, ULS: Update Log Service
+
+                   Figure 3: ALTO New Transport Workflow.
+
+4.  Service Extensions
+
+   As shown in Figure 3, this extension defines 4 new ALTO information
+   resources: Transport Queue Service, Transport Queue, Incremental
+   Update Queue, and Update Log Service.
+
+4.1.  Notations
+
+   This document uses the same syntax and notations as introduced in
+   Section 8.2 of RFC 7285 [RFC7285] to specify the extensions to
+   existing ALTO resources and services.
+
+4.2.  Transport Queue Service
+
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                  [Page 8]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+4.2.1.  Media Type
+
+   The media type of the Transport Queue Service resource is
+   "application/alto-transport+json".
+
+4.2.2.  HTTP Method
+
+   The Transport Queue Service resource is requested using the HTTP POST
+   method.
+
+4.2.3.  Capabilities
+
+   The capabilities of a Transport Queue Service are the same as the
+   capabilities of an Update Stream Service, as defined in Section 6.3
+   of [RFC8895].
+
+4.2.4.  Uses
+
+   The "uses" of a Transport Queue Service has the same format as that
+   of an Update Stream Service, as defined in Section 6.4 of [RFC8895].
+
+4.2.5.  Request: Accept Input Parameters
+
+   The input parameters of the Transport Queue Service resource are
+   supplied in the body of an HTTP Post request, which MUST be a JSON
+   object of type AddUpdateReq (defined in Section 6.5 of [RFC8895]),
+   indicated by the media type "application/alto-transportparams+json".
+
+4.2.6.  Response
+
+   The response of a successful POST request MUST be a JSON object of
+   type AltoTransportData
+
+       object {
+           JSONString tq;
+       } ALTOTransportData;
+
+   with field:
+
+   tq:  The relative URI to the incremental update queue resource.
+
+4.2.7.  Example
+
+   For simplicity, assume the ALTO server is using the Basic
+   authentication.  If a client with username "client1" and password
+   "helloalto" wants to create a transport queue of an ALTO Cost Map
+   resource with resource ID "my-routingcost-map", it can send the
+   following request:
+
+
+
+Schott, et al.             Expires 30 May 2023                  [Page 9]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   POST /tqs HTTP/1.1
+   Host: alto.example.com
+   Accept: application/alto-transport+json, application/alto-error+json
+   Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
+   Content-Type: application/alto-transportparams+json
+   Content-Length: [TBD]
+
+   {
+     "resource-id": "my-routingcost-map"
+   }
+
+   If the operation is successful, the ALTO server returns the following
+   message:
+
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-transport+json
+   Content-Length: [TBD]
+
+   {"tq": “/tqs/2718281828459”}
+
+4.3.  Transport Queue
+
+4.3.1.  Media Type
+
+   None.
+
+4.3.2.  HTTP Method
+
+   The Transport Queue resource can be requested using the HTTP DELETE
+   method.
+
+4.3.3.  Capabilities
+
+   None.
+
+4.3.4.  Uses
+
+   None.
+
+4.3.5.  Request: Accept Input Parameters
+
+   None.
+
+
+
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 10]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+4.3.6.  Response
+
+   When receiving a DELETE request, the ALTO server MUST check whether
+   the client has the permission to close the transport queue.
+   Specifically, if the request is issued by the same client that
+   creates the Transport Queue, the ALTO server MUST return an HTTP
+   message with status code 200 (OK) to indicate that the operation is
+   successful.  Otherwise, the ALTO server must return an HTTP message
+   with status code 403 (Forbidden).
+
+4.3.7.  Example
+
+   Assume the client wants to close the transport queue, it can send the
+   following request:
+
+   DELETE /tqs/2718281828459 HTTP/1.1
+   Host: alto.example.com
+   Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
+
+   As the credential matches the client that creates the transport
+   queue, the request will succeed and the ALTO server returns the
+   following message:
+
+   HTTP/1.1 200 OK
+
+4.4.  Incremental Update Queue
+
+4.4.1.  Path
+
+   The path to an Incremental Update Queue resource has the following
+   format:
+
+     TQ_URI "/uq"
+
+   where TQ_URI is the URI of the Transport Queue resource and SEQ is
+   the sequence number of an incremental update log.
+
+   For example, if the relative URI of a transport queue is
+   "/tq/2718281828459", the URI of the corresponding incremental update
+   queue is "/tq/2718281828459/uq".
+
+4.4.2.  Media Type
+
+   The media type of an Incremental Update Queue resource is
+   "application/alto-transportqueue+json".
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 11]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+4.4.3.  HTTP Method
+
+   The Incremental Update Queue resource must be requested using the
+   HTTP GET method.
+
+4.4.4.  Capabilities
+
+   None.
+
+4.4.5.  Uses
+
+   None.
+
+4.4.6.  Accept Input Parameters
+
+   None.
+
+4.4.7.  Response
+
+   If the transport queue indicated by the TQ_URI is closed, the ALTO
+   server MUST return an HTTP message with status code 404 (Not Found).
+
+   Otherwise, the response is encoded as a JSON object of type
+   AltoIncUpdateQueue
+
+       object {
+           AltoIncUpdateLog  uq<0..*>;
+       } AltoIncUpdateQueue;
+
+   with field:
+
+   uq:  An ordered list of update logs.
+
+   Each incremental update is encoded as a JSON object of type
+   AltoIncUpdateLog
+
+       object {
+           JSONNumber   seq;
+           JSONString   media-type;
+           JSONString   tag;
+           [JSONString  link;]
+       } AltoIncUpdateLog;
+
+   with fields:
+
+   seq:  A required JSON integer indicating the sequence number of the
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 12]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+      incremental update.  As JSON allows a large integer space, when
+      the server reaches the largest integer, the server SHOULD close
+      the incremental update queue.
+
+   media-type:  A required JSON string giving the type of the
+      incremental update (see ALTO/SSE).
+
+   tag:  A required JSON string which is defined the same way as the
+      "tag" field of VersionTag (see Section 10.3 of [RFC7285]).
+
+   link:  An optional JSON string giving an optional link for a client
+      to directly request a resource as a complete snapshot (not through
+      incremental updates).
+
+4.4.8.  Example
+
+   Assume the client wants to query the status of the incremental update
+   queue of the transport queue whose URI is "/tqs/2718281828459", it
+   can send the following request:
+
+   GET /tqs/2718281828459/uq HTTP/1.1
+   Host: alto.example.com
+   Accept: application/alto-transportqueue+json,
+           application/alto-error+json
+
+   Assume the server returns the following response:
+
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-transportqueue+json
+   Content-Length: [TBD]
+
+   {
+     "uq": [
+       {"seq":        101,
+        "media-type": "application/alto-costmap+json",
+        "tag":        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
+       {"seq":        102,
+        "media-type": "application/merge-patch+json",
+        "tag":        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
+       {"seq":        103,
+        "media-type": "application/merge-patch+json",
+        "tag":        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+        "link":       "/tqs/2718281828459/snapshot/2e3f" }
+     ]
+   }
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 13]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   The media type of the first update log (with sequence number 101) is
+   "application/alto-costmap+json", which indicates that the update
+   contains a full replacement.  The media types of the logs with
+   sequence number 102 and 103 are both "application/merge-patch+json",
+   which indicates that the two updates contain incremental updates
+   encoded as JSON merge patches.  Note that the "link" attribute of the
+   log with sequence number 103 is present.  Thus, the client can
+   request a full replacement by sending a GET message to
+   "/tqs/2718281828459/snapshot/2e3f".
+
+4.5.  Update Log Service
+
+4.5.1.  Path
+
+   The path to an Incremental Update Log Service resource has the
+   following format:
+
+     TQ_URI "/uq/" SEQ
+
+   where TQ_URI is the URI of the Transport Queue resource and SEQ is
+   the sequence number of an incremental update log.
+
+   For example, if the client wants to query the content of the first
+   update log (with sequence number 101), it can send a request to
+   "/tqs/2718281828459/uq/101".
+
+4.5.2.  Media Type
+
+   The media type of an Update Log Service resource MUST be the same as
+   the "media-type" field of the update log with sequence number SEQ in
+   the transport queue identified by the TQ_URI.
+
+   For example, if the client wants to query the content of the first
+   update log (with sequence number 101) whose media type is
+   "application/alto-costmap+json", it must set the "Accept" header to
+   "application/alto-costmap+json, application/alto-error+json" in the
+   request.
+
+4.5.3.  HTTP Method
+
+   The Incremental Update Queue resource must be requested using the
+   HTTP GET method.
+
+4.5.4.  Capabilities
+
+   None.
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 14]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+4.5.5.  Uses
+
+   None.
+
+4.5.6.  Accept Input Parameters
+
+   None.
+
+4.5.7.  Response
+
+   Let TQ_URI and SEQ denote the URI of the Transport Queue resource and
+   the sequence number of an incremental update log indicated in the
+   path.  If the transport queue indicated by TQ_URI is closed, the ALTO
+   server MUST return an error HTTP message with status code 404 (Not
+   Found) and media type "application/alto-error+json".  Otherwise, let
+   LOW_SEQ and HIGH_SEQ represent the smallest and largest sequence
+   number in the incremental update queue of the transport queue
+   respectively.  If SEQ is smaller than LOW_SEQ, the ALTO server MUST
+   return an error HTTP message with status code 410 (Gone) and media
+   type "application/alto-error+json".  If SEQ is greater than HIGH_SEQ,
+   the ALTO server MAY either treat the request as a long polling
+   request or return an error HTTP message with status code 400 (Bad
+   Request).
+
+   If the request is valid, the response is encoded as a JSON object
+   whose data format is indicated by the media type.
+
+4.5.8.  Example
+
+   Assume the client wants to get the contents of updates 101, the
+   request is:
+
+   GET /tqs/2718281828459/uq/101 HTTP/1.1
+   Host: alto.example.com
+   Accept: application/alto-costmap+json, application/alto-error+json
+
+   And the response will be
+
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-costmap+json
+   Content-Length: [TBD]
+
+   { ... full replacement of my-routingcost-map ... }
+
+5.  Transport Information: Transport Queue
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 15]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+5.1.  Transport Queue Operations
+
+   Create a transport queue: An ALTO client creates a transport queue
+   using the HTTP POST method with ALTO SSE AddUpdateReq ([RFC 8895]
+   Sec. 6.5) as the parameter:
+
+       object {
+           ResourceID   resource-id;
+           [JSONString  tag;]
+           [Boolean     incremental-changes;]
+           [Object      input;]
+        } AddUpdateReq;
+
+
+
+   In the base design, the client should not include the incremental-
+   changes field.
+
+   A successful POST request MUST return a JSON object of type
+   ALTOTransportQueueData
+
+       object {
+           JSONString tq;
+       } ALTOTransportQueueData;
+
+
+   with field:
+
+   tq:  The relative URI to the incremental update queue resource.
+
+   Read a transport queue: A client reads the status of a transport
+   queue by issuing a GET request to the transport queue URI returned
+   from the POST method.
+
+   Delete a transport queue: a transport queue exposed to a client can
+   be closed (deleted) either explicitly or implicitly.
+
+   *  Explicit delete: A client uses the HTTP DELETE method to
+      explicitly delete a transport queue.  If successful, the transport
+      queue is deleted from the local view of the client, although the
+      server may still maintain the transport queue for other client
+      connections.
+
+   *  Implicit delete: Transport queue for a client is ephemeral: the
+      close of the HTTP connection between the client and the server
+      deletes the transport queue from the client's view --- when the
+      client reconnects, the client MUST NOT assume that the transport
+      queue is still valid.
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 16]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   Error codes: ALTO New Transport uses HTTP error codes.
+
+5.2.  Examples
+
+   The first example is a client creating a transport queue.
+
+      Client -> server request
+
+      POST /tqs HTTP/1.1
+      Host: alto.example.com
+      Accept: application/alto-transport+json,
+              application/alto-error+json
+      Content-Type: application/alto-transportparams+json
+      Content-Length: [TBD]
+
+      {
+         "resource-id": "my-routingcost-map"
+      }
+
+      Server -> client response:
+
+      HTTP/1.1 200 OK
+      Content-Type: application/alto-transport+json
+      Content-Length: [TBD]
+
+      {"tq": “/tqs/2718281828459”}
+
+
+   The client can then read the status of the transport queue using the
+   read operation (GET) in the same HTTP connection.  Below is an
+   example (structure of incremental updates queue will be specified in
+   the next section):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 17]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+      Client -> server request
+
+      GET /tqs/2718281828459 HTTP/1.1
+      Host: alto.example.com
+      Accept: application/alto-transport+json,
+              application/alto-error+json
+
+      Server -> client response:
+
+      HTTP/1.1 200 OK
+      Content-Type: application/alto-transport+json
+      Content-Length: [TBD]
+
+      { "uq":
+         [
+           {“seq”:        101,
+            "media-type": "application/alto-costmap+json",
+            “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
+           {“seq”:        102,
+            "media-type": "application/merge-patch+json",
+            “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
+           {“seq”:        103,
+            "media-type": "application/merge-patch+json",
+            “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+            "link":       "/tqs/2718281828459/snapshot/2e3f" }
+         ]
+      }
+
+
+6.  Transport Information: Incremental Updates Queue
+
+6.1.  Incremental Updates Queue Operations
+
+   Among the CRUD operations, an incremental updates queue supports only
+   the read operation: a client cannot create, update, or delete
+   incremental updates queue directly---it is read only, and associated
+   with transport queue automatically.
+
+   Reads an incremental updates queue: A client reads the status of an
+   incremental updates queue using the HTTP GET method: GET transport-
+   queue-uri/uq, where the transport-queue-uri is the URI returned in
+   the transport queue create method.
+
+6.1.1.  Media Type
+
+   The media type of the incremental update queue resource is
+   "application/alto-transportqueue+json".
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 18]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+6.1.2.  HTTP Method
+
+   The incremental update queue resource is requested using the HTTP GET
+   method.
+
+6.1.3.  Response
+
+   The response informs the client the backlog status, and potential
+   direct links.  Specifically, the response is encoded as a JSON object
+   of type ALTOIncUpdateQueue
+
+   object {
+     ALTOIncUpdate  uq<0..*>;
+   } ALTOIncUpdateQueue;
+
+   with field:
+
+   uq:  A queue of incremental updates.
+
+   Each incremental update is encoded as a JSON object of type
+   ALTOIncUpdate
+
+   object {
+       JSONNumber   seq;
+       JSONString   media-type;
+       JSONString   tag;
+       [JSONString  link;]
+   } ALTOIncUpdate;
+
+   with fields:
+
+   seq:  A required JSON integer indicating the sequence number of the
+      incremental update.  As JSON allows a large integer space, when
+      the server reaches the largest integer, the server SHOULD close
+      the incremental update queue.
+
+   media-type:  A required JSON string giving the type of the
+      incremental update (see ALTO/SSE).
+
+   tag:  A required JSON string which is defined the same way as the
+      "tag" field of VersionTag (see Section 10.3 of [RFC7285]).
+
+   link:  An optional JSON string giving an optional link for a client
+      to directly request a resource as a complete snapshot (not through
+      incremental updates).
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 19]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   Note that the server determines the state (window of history and type
+   of each update) in the incremental updates queue, as specified by
+   [R4].
+
+6.2.  Examples
+
+   Assume the same example in the preceding section.  The client can
+   check the status of the incremental updates queue of a transport
+   queue from the same connection:
+
+   Client -> server request:
+
+   GET /tqs/2718281828459/uq HTTP/1.1
+   Host: alto.example.com
+   Accept: application/alto-transportqueue+json,
+           application/alto-error+json
+
+   Server -> client response:
+
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-transportqueue+json
+   Content-Length: [TBD]
+
+    {
+       "uq": [
+         {“seq”:        101,
+          "media-type": "application/alto-costmap+json",
+          “tag”:        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" },
+         {“seq”:        102,
+          "media-type": "application/merge-patch+json",
+          “tag”:        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" },
+         {“seq”:        103,
+          "media-type": "application/merge-patch+json",
+          “tag”:        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+          "link":       "/tqs/2718281828459/snapshot/2e3f"}
+       ]
+    }
+
+7.  Information Resource Information: Client Pull Individual Updates
+
+7.1.  Individual Updates Operations
+
+   A client can only read an individual update: A client uses the HTTP
+   GET method on the incremental updates queue concatenated by a
+   sequence number to pull an individual update.The server push model,
+   however, depends on HTTP specific version.
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 20]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+7.2.  Examples
+
+   The first example is a client pull example, in which the client
+   directly requests an individual update.
+
+      Client -> server request:
+
+      GET /tqs/2718281828459/uq/101 HTTP/1.1
+      Host: alto.example.com
+      Accept: application/alto-costmap+json, application/alto-error+json
+
+      Server -> client response:
+
+      HTTP/1.1 200 OK
+      Content-Type: application/alto-costmap+json
+      Content-Length: [TBD]
+
+      {
+        "meta" : {
+           "dependent-vtags" : [{
+              "resource-id": "my-network-map",
+              "tag": "da65eca2eb7a10ce8b059740b0b2e3f8eb1d4785"
+            }],
+           "cost-type" : {
+             "cost-mode"  : "numerical",
+             "cost-metric": "routingcost"
+           },
+           "vtag": {
+             "resource-id" : "my-routingcost-map",
+             "tag" : "3ee2cb7e8d63d9fab71b9b34cbf764436315542e"
+           }
+        },
+        "cost-map" : {
+          "PID1": { "PID1": 1,  "PID2": 5,  "PID3": 10 },
+          "PID2": { "PID1": 5,  "PID2": 1,  "PID3": 15 },
+          "PID3": { "PID1": 20, "PID2": 15  }
+        }
+     }
+
+
+   Note from the transport queue state that the 103 message has an
+   OPTIONAL link to a complete snapshot, which a client can request.
+
+   One important design is that the "seq" must be sequentially
+   increasing.  Hence, by issuing a request on the next sequence number,
+   the client realizes long pull.
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 21]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+8.  ALTO New Transport Stream Management
+
+8.1.  Objectives
+
+   A main benefit of ALTO New Transport is to take advantage of
+   concurrent streams in newer versions of HTTP (HTTP/2 and later).  In
+   particular, the objectives of ALTO New Transport include:
+
+   *  Allow stream concurrency to reduce latency
+
+   *  Minimize the number of streams created
+
+   *  Enforce dependency among streams (so that if A depends on B, then
+      A should be sent after B)
+
+   *  Encode dependency to enforce semantics (correctness)
+
+   To realize the objectives, ALTO New Transport MUST satisfy the
+   following stream management requirements in all 4 phases specified in
+   the next 4 subsections.
+
+8.2.  Client -> Server [Create Transport Queue]
+
+   Each request to create a transport queue (POST) MUST choose a new
+   client selected stream ID (SID_tq), with the following requirements:
+
+   *  Stream Identifier of the frame is a new client-selected stream ID;
+      Stream Dependency in HEADERS is 0 (connection) for an independent
+      resource, the other transport queue if the dependency is known.
+
+   *  Invariant: Stream keeps open until close or error.
+
+8.3.  Client -> Server [Close Transport Queue]
+
+   DELETE to close a transport queue (SID_tq) MUST be sent in SID_tq,
+   with the following requirements:
+
+   *  Stream Identifier of the frame is SID_tq, and Stream Dependency in
+      HEADER is 0 (connection), so that a client cannot close a
+      different stream.
+
+   *  HEADERS indicates END_STREAM; server response SHOULD close the
+      stream.
+
+
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 22]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+8.4.  Client -> Server [Request on Data of a Transport Queue on Stream
+      SID_tq]
+
+   The request and response MUST satisfy the following requirements:
+
+   *  The Stream Identifier of the frame is a new client-selected stream
+      ID, and Stream Dependency in HEADERs MUST be SID_tq, so that a
+      client cannot issue request on a closed transport queue;
+
+   *  Both the request and the response MUST indicate END_STREAM.
+
+8.5.  Concurrency Management
+
+
+   *  ALTO New Transport must allow concurrency control.
+
+   *  From the client to the server direction, there MUST be one stream
+      for each open transport queue, and hence a client can always close
+      a transport queue (which it uses to open the stream) and hence can
+      also close, without the risk of deadlock.
+
+9.  ALTO New Transport Information Resource Directory (IRD)
+
+   Extending the IRD example in Section 8.1 of [RFC8895], below is the
+   IRD of an ALTO server supporting ALTO base protocol, ALTO/SSE, and
+   ALTO New Transport.
+
+   In particular,
+
+     "my-network-map": {
+       "uri": "https://alto.example.com/networkmap",
+       "media-type": "application/alto-networkmap+json",
+     },
+     "my-routingcost-map": {
+       "uri": "https://alto.example.com/costmap/routingcost",
+       "media-type": "application/alto-costmap+json",
+       "uses": ["my-networkmap"],
+       "capabilities": {
+         "cost-type-names": ["num-routingcost"]
+       }
+     },
+     "my-hopcount-map": {
+       "uri": "https://alto.example.com/costmap/hopcount",
+       "media-type": "application/alto-costmap+json",
+       "uses": ["my-networkmap"],
+       "capabilities": {
+         "cost-type-names": ["num-hopcount"]
+       }
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 23]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+     },
+     "my-filtered-cost-map": {
+       "uri": "https://alto.example.com/costmap/filtered/constraints",
+       "media-type": "application/alto-costmap+json",
+       "accepts": "application/alto-costmapfilter+json",
+       "uses": ["my-networkmap"],
+       "capabilities": {
+         "cost-type-names": ["num-routingcost", "num-hopcount"],
+         "cost-constraints": true
+       }
+     },
+     "my-simple-filtered-cost-map": {
+       "uri": "https://alto.example.com/costmap/filtered/simple",
+       "media-type": "application/alto-costmap+json",
+       "accepts": "application/alto-costmapfilter+json",
+       "uses": ["my-networkmap"],
+       "capabilities": {
+         "cost-type-names": ["num-routingcost", "num-hopcount"],
+         "cost-constraints": false
+       }
+     },
+     "my-props": {
+       "uri": "https://alto.example.com/properties",
+       "media-type": "application/alto-endpointprops+json",
+       "accepts": "application/alto-endpointpropparams+json",
+       "capabilities": {
+         "prop-types": ["priv:ietf-bandwidth"]
+       }
+     },
+     "my-pv": {
+       "uri": "https://alto.example.com/endpointcost/pv",
+       "media-type": "multipart/related;
+                      type=application/alto-endpointcost+json",
+       "accepts": "application/alto-endpointcostparams+json",
+       "capabilities": {
+         "cost-type-names": [ "path-vector" ],
+         "ane-properties": [ "maxresbw", "persistent-entities" ]
+       }
+     },
+     "update-my-costs": {
+       "uri": "https://alto.example.com/updates/costs",
+       "media-type": "text/event-stream",
+       "accepts": "application/alto-updatestreamparams+json",
+       "uses": [
+          "my-network-map",
+          "my-routingcost-map",
+          "my-hopcount-map",
+          "my-simple-filtered-cost-map"
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 24]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+       ],
+       "capabilities": {
+         "incremental-change-media-types": {
+           "my-network-map": "application/json-patch+json",
+           "my-routingcost-map": "application/merge-patch+json",
+           "my-hopcount-map": "application/merge-patch+json"
+         },
+         "support-stream-control": true
+       }
+     },
+     "update-my-costs-new": {
+       "uri": "https://alto.example.com/updates-new/costs",
+       "media-type": "application/alto-transport+json",
+       "accepts": "application/alto-transportparams+json",
+       "uses": [
+          "my-network-map",
+          "my-routingcost-map",
+          "my-hopcount-map",
+          "my-simple-filtered-cost-map"
+       ],
+       "capabilities": {
+         "incremental-change-media-types": {
+           "my-network-map": "application/json-patch+json",
+           "my-routingcost-map": "application/merge-patch+json",
+           "my-hopcount-map": "application/merge-patch+json"
+         },
+         "support-stream-control": true
+       }
+     },
+
+     "update-my-props": {
+       "uri": "https://alto.example.com/updates/properties",
+       "media-type": "text/event-stream",
+       "uses": [ "my-props" ],
+       "accepts": "application/alto-updatestreamparams+json",
+       "capabilities": {
+         "incremental-change-media-types": {
+           "my-props": "application/merge-patch+json"
+         },
+         "support-stream-control": true
+       }
+     },
+     "update-my-pv": {
+       "uri": "https://alto.example.com/updates/pv",
+       "media-type": "text/event-stream",
+       "uses": [ "my-pv" ],
+       "accepts": "application/alto-updatestreamparams+json",
+       "capabilities": {
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 25]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+         "incremental-change-media-types": {
+           "my-pv": "application/merge-patch+json"
+         },
+         "support-stream-control": true
+       }
+     }
+
+   Note that it is straightforward for an ALTO sever to run HTTP/2 and
+   support concurrent retrieval of multiple resources such as "my-
+   network-map" and "my-routingcost-map" using multiple HTTP/2 streams
+   with the need to introducing ALTO/H2.
+
+   The resource "update-my-costs-h2" provides an ALTO New Transport
+   based connection, and this is indicated by the media-type
+   "application/alto-transport+json".  For an ALTO New Transport
+   connection, the client can send in a sequence of control requests
+   using media type application/alto-updatestreamparams+json.  The
+   server creates HTTP/2 streams and pushes updates to the client.
+
+10.  Security Considerations
+
+   The properties defined in this document present no security
+   considerations beyond those in Section 15 of the base ALTO
+   specification [RFC7285] and in Section 10 of the ALTO SSE
+   specification [RFC8895].
+
+11.  IANA Considerations
+
+   IANA will need to register the following media type under ALTO
+   registry as defined in [RFC7285]:
+
+   *  application/alto-transport+json: as described in Section 4.2.6;
+
+   *  application/alto-transportparams+json: as described in
+      Section 4.2.5;
+
+   *  application/alto-transportqueue+json: as described in
+      Section 4.4.7
+
+11.1.  application/alto-transport+json Media Type
+
+   Type name:  application
+
+   Subtype name:  alto-transport+json
+
+   Required parameters:  N/A
+
+   Optional parameters:  N/A
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 26]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   Encoding considerations:  Encoding considerations are identical to
+      those specified for the "application/json" media type.  See
+      [RFC8259].
+
+   Security considerations:  Security considerations relating to the
+      generation and consumption of ALTO Protocol messages are discussed
+      in Section 10 of [RFC8895] and Section 15 of [RFC7285].
+
+   Interoperability considerations:  This document specifies format of
+      conforming messages and the interpretation thereof.
+
+   Published specification:  Section 4.2.6 of this document.
+
+   Applications that use this media type:  ALTO servers and ALTO clients
+      either stand alone or are embedded within other applications.
+
+   Fragment identifier considerations:  N/A
+
+   Additional information:
+
+      Deprecated alias names for this type:  N/A
+
+      Magic number(s):  N/A
+
+      File extension(s):  This document uses the media type to refer to
+         protocol messages and thus does not require a file extension.
+
+      Macintosh file type code(s):  N/A
+
+   Person and email address to contact for further information:  See Aut
+      hors' Addresses section.
+
+   Intended usage:  COMMON
+
+   Restrictions on usage:  N/A
+
+   Author:  See Authors' Addresses section.
+
+   Change controller:  Internet Engineering Task Force
+      (mailto:iesg@ietf.org).
+
+11.2.  application/alto-transportparams+json Media Type
+
+   Type name:  application
+
+   Subtype name:  alto-transportparams+json
+
+   Required parameters:  N/A
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 27]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   Optional parameters:  N/A
+
+   Encoding considerations:  Encoding considerations are identical to
+      those specified for the "application/json" media type.  See
+      [RFC8259].
+
+   Security considerations:  Security considerations relating to the
+      generation and consumption of ALTO Protocol messages are discussed
+      in Section 10 of [RFC8895] and Section 15 of [RFC7285].
+
+   Interoperability considerations:  This document specifies format of
+      conforming messages and the interpretation thereof.
+
+   Published specification:  Section 4.2.5 of this document.
+
+   Applications that use this media type:  ALTO servers and ALTO clients
+      either stand alone or are embedded within other applications.
+
+   Fragment identifier considerations:  N/A
+
+   Additional information:
+
+      Deprecated alias names for this type:  N/A
+
+      Magic number(s):  N/A
+
+      File extension(s):  This document uses the media type to refer to
+         protocol messages and thus does not require a file extension.
+
+      Macintosh file type code(s):  N/A
+
+   Person and email address to contact for further information:  See Aut
+      hors' Addresses section.
+
+   Intended usage:  COMMON
+
+   Restrictions on usage:  N/A
+
+   Author:  See Authors' Addresses section.
+
+   Change controller:  Internet Engineering Task Force
+      (mailto:iesg@ietf.org).
+
+11.3.  application/alto-transportqueue+json Media Type
+
+   Type name:  application
+
+   Subtype name:  alto-transportqueue+json
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 28]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   Required parameters:  N/A
+
+   Optional parameters:  N/A
+
+   Encoding considerations:  Encoding considerations are identical to
+      those specified for the "application/json" media type.  See
+      [RFC8259].
+
+   Security considerations:  Security considerations relating to the
+      generation and consumption of ALTO Protocol messages are discussed
+      in Section 10 of [RFC8895] and Section 15 of [RFC7285].
+
+   Interoperability considerations:  This document specifies format of
+      conforming messages and the interpretation thereof.
+
+   Published specification:  Section 4.4.7 of this document.
+
+   Applications that use this media type:  ALTO servers and ALTO clients
+      either stand alone or are embedded within other applications.
+
+   Fragment identifier considerations:  N/A
+
+   Additional information:
+
+      Deprecated alias names for this type:  N/A
+
+      Magic number(s):  N/A
+
+      File extension(s):  This document uses the media type to refer to
+         protocol messages and thus does not require a file extension.
+
+      Macintosh file type code(s):  N/A
+
+   Person and email address to contact for further information:  See Aut
+      hors' Addresses section.
+
+   Intended usage:  COMMON
+
+   Restrictions on usage:  N/A
+
+   Author:  See Authors' Addresses section.
+
+   Change controller:  Internet Engineering Task Force
+      (mailto:iesg@ietf.org).
+
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 29]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+12.  Acknowledgments
+
+   The authors of this document would also like to thank many for the
+   reviews and comments.
+
+13.  References
+
+13.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC7230]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
+              Protocol (HTTP/1.1): Message Syntax and Routing",
+              RFC 7230, DOI 10.17487/RFC7230, June 2014,
+              <https://www.rfc-editor.org/info/rfc7230>.
+
+   [RFC7285]  Alimi, R., Ed., Penno, R., Ed., Yang, Y., Ed., Kiesel, S.,
+              Previdi, S., Roome, W., Shalunov, S., and R. Woundy,
+              "Application-Layer Traffic Optimization (ALTO) Protocol",
+              RFC 7285, DOI 10.17487/RFC7285, September 2014,
+              <https://www.rfc-editor.org/info/rfc7285>.
+
+   [RFC7540]  Belshe, M., Peon, R., and M. Thomson, "Hypertext Transfer
+              Protocol Version 2 (HTTP/2)", RFC 7540,
+              DOI 10.17487/RFC7540, May 2015,
+              <https://www.rfc-editor.org/info/rfc7540>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [RFC8259]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+              Interchange Format", STD 90, RFC 8259,
+              DOI 10.17487/RFC8259, December 2017,
+              <https://www.rfc-editor.org/info/rfc8259>.
+
+   [RFC8895]  Roome, W. and Y. Yang, "Application-Layer Traffic
+              Optimization (ALTO) Incremental Updates Using Server-Sent
+              Events (SSE)", RFC 8895, DOI 10.17487/RFC8895, November
+              2020, <https://www.rfc-editor.org/info/rfc8895>.
+
+13.2.  Informative References
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 30]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   [draft-schott-alto-new-transport-push]
+              Schott, R. and Y. Yang, "ALTO New Transport: Server Push",
+              Internet Draft ID, October 2022,
+              <https://datatracker.ietf.org/doc/draft-schott-alto-new-
+              transport-push/>.
+
+   [RFC7971]  Stiemerling, M., Kiesel, S., Scharf, M., Seidel, H., and
+              S. Previdi, "Application-Layer Traffic Optimization (ALTO)
+              Deployment Considerations", RFC 7971,
+              DOI 10.17487/RFC7971, October 2016,
+              <https://www.rfc-editor.org/info/rfc7971>.
+
+Appendix A.  Outlook to ALTO with HTTP/3
+
+   This draft is focusing on HTTP/2 enhancement of the ALTO protocol and
+   the design takes advantage of HTTP/2 design features such as parallel
+   transfer and respects HTTP/2 semantics (e.g., PUSH_PROMISE).  Since
+   QUIC and HTTP/3 respectively are coming up for various protocols on
+   the Internet it is understandable that the question arises, if ATLO
+   could also take advantage of the advantages of HTTP/3.  QUIC can be
+   seen as a replacement for TCP+TLS+HTTP2.  HTTP/3 bases on the QUIC
+   transport protocol and uses UDP instead of a TCP connection.
+
+   QUIC has been developed by the IETF QUIC Working Group with the
+   following goals:
+
+   *  Minimizing connection establishment and overall transport latency
+      for applications, starting with HTTP/2
+
+   *  Providing multiplexing without head-of-line blocking
+
+   *  Requiring only changes to path endpoints to enable deployment
+
+   *  Enabling multipath and forward error correction extensions
+
+   *  Providing always-secure transport, using TLS 1.3 by default
+
+   If HTTP/3 is not supported, it automatically runs on HTTP/2.  The
+   prerequisite for HTTP/3 is that both client and server support it.
+
+   The basic assumption is that an implementation that runs on HTTP/2
+   should also run-on HTTP/3.  This should be transparent.  HTTP/3 uses
+   "well known port" UDP 443 analogous to TCP 443.  The network between
+   client and server must not filter HTTP/3.
+
+   Since many applications still using HTTP/2 it is mandatory for ALTO
+   to support this protocol first.  This ensures compatibility.
+   Therefore, this document describes the update of ALTO from HTTP/1.x
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 31]
+
+Internet-Draft                   ALTO/H2                   November 2022
+
+
+   to HTTP/2.  The usage of HTTP/3 will be described in a separate
+   document so that compatibility of ALTO with HTTP/3 will be ensured in
+   a later stage.
+
+Authors' Addresses
+
+   Roland Schott
+   Deutsche Telekom
+   Heinrich-Hertz-Strasse 3-7
+   64295 Darmstadt
+   Germany
+
+   Email: Roland.Schott@telekom.de
+
+
+   Y. Richard Yang
+   Yale University
+   51 Prospect St
+   New Haven, CT 06520
+   United States of America
+
+   Email: yry@cs.yale.edu
+
+
+   Kai Gao
+   Sichuan University
+   Chengdu
+   201804
+   China
+
+   Email: kgao@scu.edu.cn
+
+
+   Jingxuan Jensen Zhang
+   Tongji University
+   4800 Cao'An Road
+   Shanghai
+   201804
+   China
+
+   Email: jingxuan.n.zhang@gmail.com
+
+
+
+
+
+
+
+
+
+
+Schott, et al.             Expires 30 May 2023                 [Page 32]
