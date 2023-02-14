@@ -36,7 +36,8 @@ Sabine, Motoyoshi, Qin, Jordi, Richard, Luis, Jensen, Ayoub, Roland
 3-	Interim Meeting
 
 
-**1. Priority Items**
+**1. Priority Items:**
+
 Preparation of next interim and IETF ALTO meeting.
 Only 1h for the ALTO meeting in Yokohama. Idea to align with CAN activity.
 One additional point is the multi-domain use case being of interest for
