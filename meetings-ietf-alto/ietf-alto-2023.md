@@ -63,7 +63,7 @@ CERN and Rucio activities of Richard are examples to improve the behavior here.
 
 	- Jordi, Adrian and Med sent feedback to the authors (=> answer needs to be sent to the list)
 	- Summary of major changes needs to be sent to the list (Med request => Richard, Kai, Roland will synch regarding response)
-	- Goal to provide responses to the feedback on the list by beginning of next week, before interims meeting
+	- Goal to provide responses to the feedback on the list at the beginning of next week, before interims meeting
 		
 *2.3- Deployment
 
