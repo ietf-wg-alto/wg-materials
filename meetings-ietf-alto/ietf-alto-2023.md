@@ -50,6 +50,7 @@ CERN and Rucio activities of Richard are examples to improve the behavior here.
 
 *2.1- O&M:
 	Jensen (Reviewer of the O&M document)
+	
 	- Send info to the mailing list and include delta info
 	- Request for volunteers to provide feedback in the next days
 	- Provide feedback until next Tuesday latest, please (=> Luis, Jordi, Sabine and others are welcome)
@@ -58,14 +59,17 @@ CERN and Rucio activities of Richard are examples to improve the behavior here.
 
 
 *2.2- Transport documents (Richard)
+
 	- Jordi, Adrian and Med sent feedback to the authors (=> answer needs to be sent to the list)
 	- Summary of major changes needs to be sent to the list (Med request => Richard, Kai, Roland will synch regarding response)
 	- Goal to provide responses to the feedback on the list by beginning of next week, before interims meeting
 		
 *2.3- Deployment
+
  	- Populate deployments to the wiki
 	
 *2.4- ALTO Performance Metric 
+
 	- Work is ongoing, but dependency to other documents and feedback
 
 **3. Interim Meeting:**
