@@ -7,13 +7,13 @@
 ]>
 <!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
      by Daniel M Kohn (private) -->
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-05" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-06" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
   <!-- xml2rfc v2v3 conversion 3.12.10 -->
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
   <front>
     <title abbrev="ALTO TIPS">ALTO Transport Information Publication Service</title>
-    <seriesInfo name="Internet-Draft" value="draft-ietf-alto-new-transport-05"/>
+    <seriesInfo name="Internet-Draft" value="draft-ietf-alto-new-transport-06"/>
     <author fullname="Roland Schott" initials="R." surname="Schott">
       <organization>Deutsche Telekom</organization>
       <address>
