@@ -1,0 +1,2113 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE rfc [
+  <!ENTITY nbsp    "&#160;">
+  <!ENTITY zwsp   "&#8203;">
+  <!ENTITY nbhy   "&#8209;">
+  <!ENTITY wj     "&#8288;">
+]>
+<!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
+     by Daniel M Kohn (private) -->
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-05" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
+  <!-- xml2rfc v2v3 conversion 3.12.10 -->
+  <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+
+  <front>
+    <title abbrev="ALTO TIPS">ALTO Transport Information Publication Service</title>
+    <seriesInfo name="Internet-Draft" value="draft-ietf-alto-new-transport-05"/>
+    <author fullname="Roland Schott" initials="R." surname="Schott">
+      <organization>Deutsche Telekom</organization>
+      <address>
+        <postal>
+          <street>Heinrich-Hertz-Strasse 3-7</street>
+          <city>64295 Darmstadt</city>
+          <country>Germany</country>
+        </postal>
+        <email>Roland.Schott@telekom.de</email>
+      </address>
+    </author>
+    <author fullname="Y. Richard Yang" initials="Y." surname="Yang">
+      <organization>Yale University</organization>
+      <address>
+        <postal>
+          <street>51 Prospect St</street>
+          <city>New Haven</city>
+          <region>CT</region>
+          <code>06520</code>
+          <country>USA</country>
+        </postal>
+        <email>yry@cs.yale.edu</email>
+      </address>
+    </author>
+    <author fullname="Kai Gao" initials="K." surname="Gao">
+      <organization>Sichuan University</organization>
+      <address>
+        <postal>
+          <street/>
+          <city>Chengdu</city>
+          <code>201804</code>
+          <country>China</country>
+        </postal>
+        <email>kgao@scu.edu.cn</email>
+      </address>
+    </author>
+    <author fullname="Lauren Delwiche" initials="L." surname="Delwiche">
+      <organization>Yale University</organization>
+      <address>
+        <postal>
+          <street>51 Prospect St</street>
+          <city>New Haven</city>
+          <region>CT</region>
+          <code>06520</code>
+          <country>USA</country>
+        </postal>
+        <email>lauren.delwiche@yale.edu</email>
+      </address>
+    </author>
+    <author fullname="Lachlan Keller" initials="L." surname="Keller">
+      <organization>Yale University</organization>
+      <address>
+        <postal>
+          <street>51 Prospect Street</street>
+          <city>New Haven</city>
+          <code>06511</code>
+          <country>USA</country>
+        </postal>
+        <email>lachlan.keller@yale.edu</email>
+      </address>
+    </author>
+    <date day="20" month="February" year="2023"/>
+    <area>TSV Area</area>
+    <workgroup>ALTO Working Group</workgroup>
+    <keyword>RFC</keyword>
+    <keyword>Request for Comments</keyword>
+    <keyword>I-D</keyword>
+    <keyword>Internet-Draft</keyword>
+    <keyword>Application-Layer Traffic Optimization, HTTP/2, HTTP/3, SSE, Message Queue</keyword>
+    <abstract>
+      <t>   
+      The ALTO protocol (RFC 7285) leverages HTTP/1.x and is designed for the simple, 
+      sequential request-reply use case, in which an ALTO client requests a
+      sequence of information resources, and the server responds with the complete 
+      content of each resource one at a time.  
+      </t>
+      
+      <t>
+      ALTO/SSE (RFC 8895) defines a multiplexing protocol on top 
+      of HTTP/1.x, so that the server can incrementally push resource updates 
+      to the client whenever monitored network information resources change, allowing the
+      client to monitor multiple resources at the same time.  
+      However, HTTP/2 and later versions already support concurrent, non-blocking transport of
+      multiple streams in the same HTTP connection.
+      </t>
+
+      <t>
+      To take advantage of newer HTTP features, this document introduces the ALTO Transport Information Publication   
+      Service (TIPS).  TIPS allows the naming of (i.e., assigning resource 
+      identifiers to) individual incremental updates to multiple ALTO       
+      information resources, and the distribution of those names.  It 
+      gives an ALTO client the capability to explicitly request (pull) a
+      specific incremental update.  It also provides an ALTO server the     
+      capability to push a specific incremental update.  This document defines 
+      TIPS as a service, with client pull and server push.                 
+      </t>
+    </abstract>
+  </front>
+  <middle>
+    <section anchor="intro" numbered="true" toc="default">
+      <name>Introduction</name>
+      <t>Application-Layer Traffic Optimization (ALTO) provides means for
+       network applications to obtain network status information.  So far,
+       two transport protocols have been designed: (1) The ALTO base
+       protocol <xref target="RFC7285" format="default"/>, which is designed for the simple use case in
+       which an ALTO client requests a network information resource, and the
+       server sends the complete content of the requested information
+       resource to the client; and (2) ALTO/SSE (ALTO Incremental Updates
+       Using Server-Sent Events) <xref target="RFC8895" format="default"/>, 
+       which is designed for the use case that an ALTO client indicates to the server that it wants to
+       receive updates for a set of resources, and the server can then
+       concurrently, and incrementally push updates to the client whenever
+       monitored resources change.</t>
+
+   
+      <t>Both protocols are designed for HTTP/1.x <xref target="RFC9112" format="default"/> and, ideally, 
+        they should be able to automatically take advantage of newer HTTP 
+        versions such as HTTP/2 <xref target="RFC9113" format="default"/> 
+        and HTTP/3 <xref target="RFC9114" format="default"/>.  However, 
+        there are issues with both protocols when HTTP moves to higher versions.  
+        First consider the ALTO base protocol, which is designed to transfer 
+        only complete information resources.  Hence, a client can run the 
+        base protocol on top of HTTP/2 or HTTP/3 to request multiple information 
+        resources concurrently, in concurrent streams, but each request must be 
+        for a complete information resource; there is no capability of 
+        transferring incremental updates.  Hence, there can be large overhead 
+        when the client already has an information resource and then there are 
+        small changes to the resource.  Next, consider ALTO/SSE.  Although ALTO/SSE
+        can transfer incremental updates, it introduces a customized
+        multiplexing protocol on top of HTTP, assuming a total-order message
+        channel from the server to the client.  The multiplexing design does
+        not provide naming (i.e., providing resource identifier) to
+        individual incremental updates.  Hence, the design cannot use
+        concurrent per-stream server push or non-blocking per-stream client
+        pull, available in HTTP/2 and HTTP/3, because both cases require the
+        resource identifier. Additionally, ALTO/SSE is a push-only protocol,
+        which denies the client flexibility in choosing how and when it 
+        receives updates. 
+      </t>
+
+      <t>This document introduces a new ALTO service called the transport
+        information publication service (TIPS), which allows an ALTO server
+        to publish the naming of individual incremental updates to multiple
+        ALTO information resources.  TIPS gives an ALTO client the new
+        capability to explicitly, concurrently (non-blocking) request (pull)
+        specific incremental updates using native HTTP/2 or HTTP/3, while still
+        functioning for HTTP/1.x.  It also provides an ALTO server the new capability 
+        to concurrently push specific incremental updates using native HTTP/2 or HTTP/3 
+        server push.
+      </t>
+
+      <section anchor="requirements-language" numbered="true" toc="default">
+          <name>Requirements Language</name>
+          <t>
+              The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+              "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY",
+              and "OPTIONAL" in this document are to be interpreted as described
+              in BCP 14 <xref target="RFC2119" format="default"/><xref target="RFC8174" format="default"/> 
+              when, and only when, they appear in all capitals, as shown here.
+          </t>
+      </section>
+
+    </section>
+
+    <section anchor="altoh2overview" numbered="true" toc="default">
+      <name>TIPS Overview</name>
+
+      <section anchor="tipsinfo-terms" numbered="true" toc="default">
+        <name>Component Terminology</name>
+          <t>This document uses the following components:</t>
+          <dl newline="true" spacing="normal" indent="3">
+
+            <dt>Network information resource:</dt>
+            <dd>A piece of retrievable information about network state, per <xref target="RFC7285" format="default"/>.</dd>
+
+            <!-- TODO: Would it make more sense to call it a transport state view (tsv)?
+                        This would clarify the idea of what DELETE really means. -->
+            <dt>Transport state (ts):</dt>
+            <dd>Defined in this document to be the container of transport information that is 
+            information about the network information resource.  Though the transport state 
+            may include other transport information, it has two basic components: updates queue (uq) 
+            and receiver set (rs).</dd>
+
+            <dt>Updates queue (uq):</dt>
+            <dd> Contains a sequence of incremental updates about a network information resource.  
+            Each incremental update is assigned a sequence number, and a URI can be constructed using 
+            the sequence number.  A static network information resource (e.g., Cost Map, Network
+            Map) may need only a single updates queue.  A dynamic network
+            information resource (e.g., Filtered Cost Map) may create an
+            updates queue within the transport state for each unique filter request.</dd>
+
+            <dt>Receiver set (rs):</dt>
+            <dd>The receiver set contains the set of clients who have requested to receive server push updates.</dd>
+
+            <dt>Information Resource Directory (IRD):</dt>
+            <dd>Requested by an ALTO client to discover available information resources provided by an 
+            ALTO server, per <xref target="RFC7285" format="default"/>.  Each entry in an IRD indicates a URI at which an ALTO server 
+            accepts requests, and returns either an information resource or an information resource 
+            directory that references additional information resources.  An ALTO server's IRD MAY 
+            define one or more transport information publication services, which ALTO clients use 
+            to request new TIPS instances.</dd>
+
+            <dt>Transport Information Publication Service (TIPS):</dt>
+            <dd>Allows an ALTO client to create transport state, read transport state, and delete the 
+            transport state (from client’s view) for an ALTO information resource.</dd>
+
+            <dt>TIPS Queue State Service (QSS):</dt>
+            <dd>Allows an ALTO client to read the updates queue.</dd>
+
+            <dt>TIPS Update Read Service (URS):</dt>
+            <dd>Allows an ALTO client to read the content of a an update item from the updates queue</dd>
+
+            <dt>TIPS Update Push Service (UPS):</dt>
+            <dd>Allows an ALTO client to receive an element pushed by the ALTO server.</dd>
+
+          </dl>
+        <t>Figure 1 shows an example illustrating the TIPS abstraction.
+           Each ALTO client (Client 1, Client 2, or Client 3) 
+           maintains a single HTTP connection with the ALTO server.
+        </t>
+
+        <!-- TODO: explain somewhere why Informtion Resource #3 has two transport states -->
+        <figure anchor="FigInfoStruct">
+          <name>ALTO Transport Information.</name>
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+
+Network Information Resource:
+
+a) Static resource (#1) such as NetworkMap
+b) Filterable resource (#3) such as FilteredCostMap
+
+
+                                   +-------------+
+    +-----------+ +--------------+ |  Dynamic    | +-----------+
+    |  Routing  | | Provisioning | |  Network    | | External  |
+    | Protocols | |    Policy    | | Information | | Interface |
+    +-----------+ +--------------+ +-------------+ +-----------+
+          |              |                |              |
+          |              |                |              |
++----------------------------------------------------------------------+
+| ALTO Server                                                          |
+|                                                                      |
+| +------------------------------------------------------------------+ |
+| |                                              Network Information | |
+| |                                                                  | |
+| | +-------------+     +-------------+     +-------------+          | |
+| | | Information |     | Information |     | Information |          | |
+| | | Resource #1 |     | Resource #2 |     | Resource #3 |          | |
+| | +-------------+     +-------------+     +-------------+          | |
+| |     |                                       /     \              | |
+| +-----|--------------------------------------/-------\-------------+ |
+|       |                                     /         \              |
+| +-----|------------------------------------/-----------\-----------+ |
+| |     |       Transport Information       /             \          | |
+| |     |                                  /               \         | |
+| | +--------+                     +--------+        +--------+      | |
+| | |  ts1   |----+          +-----|  ts2   |        |  ts3   |---+  | |
+| | +--------+    |          |     +--------+        +--------+   |  | |
+| |     |         |          |           |             |          |  | |
+| | +--------+ +--------+ +--------+ +--------+ +--------+ +--------+| |
+| | | ts1/uq | | ts1/rs | | ts2/uq | | ts2/rs | | ts3/uq | | ts3/rs || |
+| | +--------+ +--------+ +--------+ +--------+ +--------+ +--------+| |
+| +----|\---------/\---------|---------/---------------|-------------+ |
+|      | \       /  \        |        /                |               |
++------|--\-----/----\-------|-------/-----------------|---------------+
+       |   \   /      \      |      /                  |       
+       |    +-/-----+  \     |     /                   |
+       |     /       \  \    |    /  A single          |   A single
+       |    /       ==\==\===|===/== HTTP/2 or /3    ==|== HTTP/1.x
+       |   /           \  \  |  /    connection        |   connection
+   +----------+       +----------+                 +----------+
+   | Client 1 |       | Client 2 |                 | Client 3 |
+   +----------+       +----------+                 +----------+
+
+tsi   = transport state information i
+tsi/uq = incremental updates queue associated with tsi
+tqi/rs = receiver set of transport queue i (for server push)
+
+      ]]></artwork>
+        </figure>
+      </section>
+
+      <section anchor="tipsinfo-workflow" numbered="true" toc="default">
+        <name>TIPS Workflow</name>
+
+        <t>The intended use case of TIPS is to run it as a service
+           inside an HTTP/2 or HTTP/3 connection (though it can run inside
+           an HTTP/1.x connection, without server push functionality).  
+           Specifically, an ALTO client opens an HTTP connection with an ALTO server, and uses 
+           TIPS to create (or at least receive a view of) a transport state at the server for each network 
+           information resource that the client wants to monitor. The 
+           transport state provides (1) the base URI that the server will host
+           incremental updates for the information resource and (2) the 
+           start sequence number that the server will order the updates. 
+           The server will assign each additional update with a consecutive
+           sequence number.
+        </t>
+
+        <t>In the simplest use case, the transport state provides enough
+           information for the client to continuously pull each additional
+           update, resulting in the following workflow:
+        </t>
+
+        <figure anchor="FigInfoWorkflowPull">        
+          <name>ALTO TIPS Workflow Supporting Client Pull.</name>
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+Client                                  TIPS         URS
+  o                                       .           .
+  | Open HTTP connection                  .           .
+  |-------------------------------------->|           .
+  |                                       .           .
+  | POST to create/receive transport      .           .
+  |    state for resource 1               .           .
+  | ------------------------------------> |           .
+  | <updates-queue-uri1>, <start-seq>     .           .
+  |<------------------------------------- |           .
+  |                                       .           .
+  | GET <updates-queue-uri1>/content/<start-seq>      .
+  | ------------------------------------------------->|
+  | update <start-seq> content            .           .
+  |<------------------------------------------------->|
+  |                                       .           .
+  | GET <updates-queue-uri1>/content/<start-seq+1>    .       
+  | ------------------------------------------------->|
+  | update <start-seq+1> content          .           .
+  |<------------------------------------------------->|
+  |
+  | DELETE transport state for resource 1 .
+  |-------------------------------------> |
+  |
+  | Close HTTP connection                 .
+  |-------------------------------------->|
+  o
+
+  TIPS: Transport Information Publication Service
+  URS : Update Read Service
+
+      ]]></artwork>
+      </figure>        
+
+      <t>A client that prefers server push can use the following workflow:</t>
+        <figure anchor="FigInfoWorkflowPush">        
+          <name>ALTO TIPS Workflow Supporting Server Push.</name>
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+Client                                  TIPS         UPS
+  o                                       .           .
+  | Open HTTP connection                  .           .
+  |-------------------------------------->|           .
+  |                                       .           .
+  | POST to create/receive transport      .           .
+  |   state for resource 1 and add        .           .
+  |   self to receiver set                .           .
+  | ------------------------------------> |           .
+  | <updates-queue-uri1>, <start-seq>     .           .
+  |<------------------------------------- |           .
+  |                                       .           .
+  | PUSH <updates-queue-uri1>/content/<start-seq>     .
+  | <------------------------------------------------ |
+  |                                       .           .
+  | PUSH <updates-queue-uri1>/content/<start-seq+1>   .
+  | <------------------------------------------------ |
+  |
+  | DELETE self from receiver set of      . 
+  |   resource 1                          .
+  |-------------------------------------> |
+  |
+  | Close HTTP connection                 .
+  |-------------------------------------->|
+  o
+
+  TIPS: Transport Information Publication Service
+  UPS : Update Push Service
+
+      ]]></artwork>
+      </figure>
+
+  <!--
+    Client opens a connection to the server
+    Client opens/identifies a transport queue tq
+
+    // pull mode
+    Client requests transport queue status of tq
+    Client requests an element in the incremental updates queue
+
+    // push mode
+    Client becomes a receiver
+    Client receives incremental push updates
+
+    Client closes the transport queue tq
+    Client closes the connection -->
+
+    <!--
+      <t>In particular, TIPS workflow should satisfy the following requirements to realize the functions of ALTO/SSE:</t>
+      <ul spacing="normal">
+        <li>R1: The client can request the addition (start) of transport of incremental updates to a resource.</li>
+        <li>R2: The client can request the deletion (stop) of transport of incremental updates to a resource.</li>
+        <li>R3: The server can signal to the client the start or stop of transport of incremental updates to a resource.</li>
+        <li>R4: The server can choose the type of each incremental update encoding, as long as the type is indicated to be acceptable by the client.</li>
+      </ul>
+    -->
+
+    </section>
+
+    <section anchor="tipsinfo-http1" numbered="true" toc="default">
+        <name>TIPS With HTTP/1.x</name>
+
+        <t>
+            While TIPS is designed to take advantage of newer HTTP features,
+            TIPS still functions with HTTP/1.x for client pull functionality only,
+            with the limitation that to cancel a long pull request for a resource
+            update, it cannot send a DELETE request. Additionally, only one request
+            can be outstanding at a time due to the blocking nature of HTTP/1.x.  
+        </t>
+
+    </section>
+    </section>
+    <!-- end of overview -->
+
+    <section anchor="ext" numbered="true" toc="default">
+      <name>TIPS Information Resources</name>
+      <t>The TIPS framework defines 4 types of service: Transport Information Publication Service (TIPS),
+          the TIPS Queue State Service (QSS), the TIPS Update Read Service (URS), and the TIPS
+          Update Push Service (UPS).  This document defines TIPS (Section 4), the QSS (Section 5), the URS (Section 6),
+          and the UPS (Section 7). 
+      </t>
+
+      <section anchor="notations" numbered="true" toc="default">
+        <name>Notations</name>
+        <t>This document uses the same syntax and notations as introduced in Section 8.2 of
+            RFC 7285 <xref target="RFC7285" format="default"/> to specify the extensions to existing ALTO resources and
+            services.
+        </t>
+      </section>
+    </section>
+
+    <section anchor="tips-spec" numbered="true" toc="default">
+        <name>Transport Information Publication Service</name>
+
+        <t>A TIPS service allows an ALTO client to create transport state, 
+           read transport state and delete the transport state for an ALTO
+           information resource. 
+        </t>
+
+        <section anchor="tips-ird" numbered="true" toc="default">
+          <name>TIPS Information Resource Directory</name>
+
+          <t>An ALTO server's IRD (Information Resource Directory) MAY define
+             one or more transport information publication services, which 
+             ALTO clients use to request new TIPS instances.  An IRD entry 
+             defining a TIPS MUST declare the "media-type", and specify
+             "capabilities" and "uses" as follows.
+          </t>
+
+          <section anchor="tips-media-type" numbered="true" toc="default">
+            <name>Media Type</name>
+            <t>The media type of the Transport Information Publication Service resource is
+             "application/alto-tips+json".
+            </t>
+           </section>
+
+           <section anchor="tips-cap" numbered="true" toc="default">
+             <name>Capabilities</name>
+             <t>The capabilities declaration of TIPS is modelled on that defined 
+                in Section 6.3 of <xref target="RFC8895" format="default"/>.
+             </t>
+
+            <t>Specifically, the capabilities are defined as an object of 
+              type TIPSCapabilities:
+            </t>
+            <artwork name="" type="" align="left" alt=""><![CDATA[
+     object {
+       IncrementalUpdateMediaTypes incremental-change-media-types;
+       Boolean                     support-server-push;
+     } TIPSCapabilities;
+
+     object-map {
+        ResourceID -> String;
+     } IncrementalUpdateMediaTypes;
+          ]]></artwork>
+
+          <t>with field:</t>
+          <dl>
+            <dt>incremental-change-media-types: </dt>
+            <dd>
+            <t>If a TIPS can provide updates with incremental changes 
+               for a resource, the "incremental-change-media-types" field has an 
+               entry for that resource-id, and the value is the
+               supported media types of the incremental change separated by commas.
+               For the implementation of this specification, this will be 
+               "application/merge-patch+json", "application/json-patch+json", 
+               or "application/merge-patch+json,application/json-patch+json".  
+               Future extensions may define other types of incremental changes.
+            </t>
+
+            <t>When choosing the media types to encode incremental updates for a
+               resource, the server MUST consider the limitations of
+               the encoding.  For example, when a JSON merge patch specifies that
+               the value of a field is null, its semantics are that the field is
+               removed from the target and hence the field is no longer defined
+               (i.e., undefined).  This, however, may not be the intended
+               result for the resource, when null and undefined have different
+               semantics for the resource.  In such a case, the server
+               MUST choose JSON patch over JSON merge patch if JSON patch is
+               indicated as a capability of the TIPS.  If the server
+               does not support JSON patch to handle such a case, the server then
+               needs to send a full replacement.
+            </t>
+            </dd>
+            <dt>support-server-push: </dt>
+            <dd>
+            <t>The "support-server-push" field specifies whether the given TIPS
+               supports server push.  If the "support-server-push"
+               field is "true", this TIPS will allow a client to start or stop server
+            push.</t>
+            </dd>
+          </dl>
+            </section>
+
+            <section anchor="tips-uses" numbered="true" toc="default">
+              <name>Uses</name>
+                <t>The "uses" attribute MUST be an array with the resource-ids of every
+                   network information resource for which this TIPS can provide service. </t>
+
+                <t>This set may be any subset of the ALTO server's network information resources and may
+                   include resources defined in linked IRDs.  However, it is RECOMMENDED
+                   that the ALTO server selects a set that is closed under the resource
+                   dependency relationship.  That is, if a TIPS' "uses" set
+                   includes resource R1 and resource R1 depends on ("uses") resource R0,
+                   then the TIPS' "uses" set SHOULD include R0 as well as R1.
+                   For example, a TIPS for a cost map SHOULD also provide
+                   transport state for the network map upon which that cost map depends.
+                 </t>
+            </section>
+
+            <section anchor="tips-ird-example" numbered="true" toc="default">
+              <name>Example</name>
+
+              <t>Extending the IRD example in Section 8.1 of <xref target="RFC8895" format="default"/>, below is the
+                IRD of an ALTO server supporting ALTO base protocol, ALTO/SSE, and
+                ALTO TIPS.
+              </t>
+
+                <artwork name="" type="" align="left" alt=""><![CDATA[
+            "my-network-map": {
+              "uri": "https://alto.example.com/networkmap",
+              "media-type": "application/alto-networkmap+json",
+            },
+            "my-routingcost-map": {
+              "uri": "https://alto.example.com/costmap/routingcost",
+              "media-type": "application/alto-costmap+json",
+              "uses": ["my-networkmap"],
+              "capabilities": {
+                "cost-type-names": ["num-routingcost"]
+              }
+            },
+            "my-hopcount-map": {
+              "uri": "https://alto.example.com/costmap/hopcount",
+              "media-type": "application/alto-costmap+json",
+              "uses": ["my-networkmap"],
+              "capabilities": {
+                "cost-type-names": ["num-hopcount"]
+              }
+            },
+
+            "my-filtered-cost-map": {
+              "uri": 
+                "https://alto.example.com/costmap/filtered/constraints",
+              "media-type": "application/alto-costmap+json",
+              "accepts": "application/alto-costmapfilter+json",
+              "uses": ["my-networkmap"],
+              "capabilities": {
+                "cost-type-names": ["num-routingcost", "num-hopcount"],
+                "cost-constraints": true
+              }
+            },
+
+            "my-simple-filtered-cost-map": {
+              "uri": "https://alto.example.com/costmap/filtered/simple",
+              "media-type": "application/alto-costmap+json",
+              "accepts": "application/alto-costmapfilter+json",
+              "uses": ["my-networkmap"],
+              "capabilities": {
+                "cost-type-names": ["num-routingcost", "num-hopcount"],
+                "cost-constraints": false
+              }
+            },
+
+            "my-props": {
+              "uri": "https://alto.example.com/properties",
+              "media-type": "application/alto-endpointprops+json",
+              "accepts": "application/alto-endpointpropparams+json",
+              "capabilities": {
+                "prop-types": ["priv:ietf-bandwidth"]
+              }
+            },
+
+            "my-pv": {
+              "uri": "https://alto.example.com/endpointcost/pv",
+              "media-type": "multipart/related;
+                              type=application/alto-endpointcost+json",
+              "accepts": "application/alto-endpointcostparams+json",
+              "capabilities": {
+                "cost-type-names": [ "path-vector" ],
+                "ane-properties": [ "maxresbw", "persistent-entities" ]
+              }
+            },
+
+            "update-my-costs": {
+              "uri": "https://alto.example.com/updates/costs",
+              "media-type": "text/event-stream",
+              "accepts": "application/alto-updatestreamparams+json",
+              "uses": [
+                  "my-network-map",
+                  "my-routingcost-map",
+                  "my-hopcount-map",
+                  "my-simple-filtered-cost-map"
+              ],
+              "capabilities": {
+                "incremental-change-media-types": {
+                  "my-network-map": "application/json-patch+json",
+                  "my-routingcost-map": "application/merge-patch+json",
+                  "my-hopcount-map": "application/merge-patch+json"
+                },
+                "support-stream-control": true
+              }
+            },
+
+            "update-my-costs-tips": {
+              "uri": "https://alto.example.com/updates-new/costs",
+              "media-type": "application/alto-tips+json",
+              "accepts": "application/alto-tipsparams+json",
+              "uses": [
+                  "my-network-map",
+                  "my-routingcost-map",
+                  "my-hopcount-map",
+                  "my-simple-filtered-cost-map"
+              ],
+              "capabilities": {
+                "incremental-change-media-types": {
+                  "my-network-map": "application/json-patch+json",
+                  "my-routingcost-map": "application/merge-patch+json",
+                  "my-hopcount-map": "application/merge-patch+json",
+                  "my-simple-filtered-cost-map":
+                                      "application/merge-patch+json"
+                },
+                "support-server-push": true
+              }
+            },
+
+            "update-my-props": {
+              "uri": "https://alto.example.com/updates/properties",
+              "media-type": "text/event-stream",
+              "uses": [ "my-props" ],
+              "accepts": "application/alto-updatestreamparams+json",
+              "capabilities": {
+                "incremental-change-media-types": {
+                  "my-props": "application/merge-patch+json"
+                },
+                "support-stream-control": true
+              }
+            },
+            "update-my-pv": {
+              "uri": "https://alto.example.com/updates/pv",
+              "media-type": "text/event-stream",
+              "uses": [ "my-pv" ],
+              "accepts": "application/alto-updatestreamparams+json",
+              "capabilities": {
+                "incremental-change-media-types": {
+                  "my-pv": "application/merge-patch+json"
+                },
+                "support-stream-control": true
+              }
+            }
+                ]]></artwork>
+
+                <t>Note that it is straightforward for an ALTO sever to run HTTP/2 and
+                  support concurrent retrieval of multiple resources such as "my-
+                  network-map" and "my-routingcost-map" using multiple HTTP/2 streams.</t>
+
+                <t>The resource "update-my-costs-tips" provides an ALTO TIPS based
+                  connection, and this is indicated by the media-type 
+                  "application/alto-tips+json".</t>
+
+            </section> <!-- IRD Sec-->
+
+          </section> <!-- TIPS IRD -->
+              
+          <section anchor="tips-create" numbered="true" toc="default">
+            <name>Create Transport State using TIPS</name>
+
+            <section anchor="tips-createreq" numbered="true" toc="default">
+              <name>Request</name>
+              <t>An ALTO client requests that the server sets up transport state for a 
+                 given resource by sending an HTTP POST body with the media type 
+                 "application/alto-tipsparams+json".  That body contains a JSON object 
+                 of type TIPSReq, where:</t>
+              <artwork name="" type="" align="left" alt=""><![CDATA[
+
+     object {
+        ResourceID   resource-id;
+        [JSONString  tag;]
+        [Object      input;]
+     } TIPSReq;
+
+          ]]></artwork>
+          <t>with the following fields:</t>
+          <dl>
+            <dt>resource-id/tag: </dt>
+            <dd>
+              <t>The resource-id of an ALTO resource and MUST be in the TIPS' "uses" 
+                 list (Section 4.1).  If the resource-id is a GET-
+                 mode resource with a version tag (or "vtag"), as defined in
+                 Sections 6.3 and 10.3 of <xref target="RFC7285" format="default"/>, and the ALTO client has
+                 previously retrieved a version of that resource from ALTO, 
+                 the ALTO client MAY set the "tag" field to the tag
+                 part of the client's version of that resource. The server MAY
+                 use the tag when creating the updates queue. Note that the client MUST support all 
+                 incremental methods from the set announced in the server's capabilities for this 
+                 resource.  If a client does not support all incremental methods 
+                 from the set announced in the server's capabilities, the client 
+                 MUST NOT use the TIPS service.
+               </t>
+            </dd>
+            <dt>input: </dt>
+            <dd>
+              <t>If the resource is a POST-mode service that requires input, the
+                 ALTO client MUST set the "input" field to a JSON object with the
+                 parameters that the resource expects.
+              </t>
+            </dd>
+          </dl>
+            </section>
+
+            <section anchor="tips-createresp" numbered="true" toc="default">
+              <name>Response</name>
+              <t>If the request has any errors, the TIPS service MUST return an HTTP "400 Bad 
+                 Request" to the ALTO client; the body of the response follows the generic 
+                 ALTO error response format specified in Section 8.5.2 of 
+                 <xref target="RFC7285" format="default"/>.  
+                 Hence, an example ALTO error response has the format:
+              </t>
+              <artwork name="" type="" align="left" alt=""><![CDATA[
+          HTTP/1.1 400 Bad Request
+          Content-Length: 131
+          Content-Type: application/alto-error+json
+          Connection: Closed
+
+          {
+              "meta":{
+                  "code":  "E_INVALID_FIELD_VALUE",
+                  "field": "resource-id",
+                  "value": "my-networkmap/#"
+              }
+          }
+
+          ]]></artwork>
+
+
+          <t>Note that "field" and "value" are optional fields.  If the "value"
+             field exists, the "field" field MUST exist.</t>
+
+           <ul spacing="normal">
+            <li>If the TIPS request does not have a "resource-id" field, the error    
+                code of the error message MUST be E_MISSING_FIELD and the "field" 
+                field SHOULD be "resource-id".  The TIPS service MUST NOT create
+                any transport state.
+            </li>
+
+            <li>If the "resource-id" field is invalid or is not associated with
+                the TIPS, the error code of the error message MUST be
+                E_INVALID_FIELD_VALUE.  The "field" field SHOULD be the full path
+                of the "resource-id" field, and the "value" field SHOULD be the
+                invalid resource-id.
+            </li>
+      
+            <li>If the resource is a POST-mode service that requires input, the
+      client MUST set the "input" field to a JSON object with the
+      parameters that that resource expects.  If the "input" field is
+      missing or invalid, TIPS MUST return the same error response that  
+      resource would return for missing or invalid input (see <xref target="RFC7285" format="default"/>).</li>
+            </ul>
+
+            <t>The response to a valid request MUST be a JSON object of
+   type AddTIPSResponse, denoted as media type "application/alto-tips+json": </t>
+
+<artwork name="" type="" align="left" alt=""><![CDATA[
+      object {
+        JSONString        transport-state-uri;
+        TransportState    transport-state;
+      } AddTIPSResponse;
+
+      object {
+        UpdatesQueueMeta  updates-queue-meta;
+       [PushUpdatesMeta   push-updates-meta;]
+      } TransportState;
+    
+      object {
+        JSONString         uri; 
+        UpdatesQueueStateSummary state-summary;
+      } UpdatesQueueMeta;
+
+      object {
+        JSONNumber         start-seq;
+      } UpdatesQueueStateSummary;
+
+      object {
+        JSONString       uri;
+        PushUpdatesState state;
+      } PushUpdatesMeta;
+
+      object {
+         Boolean          push-enabled;
+        [JSONNumber       next-seq;]
+      } PushUpdatesState;
+]]></artwork>
+       <t>with field:</t>
+          <dl>
+            <dt>transport-state-uri: </dt>
+            <dd>
+              <t>The ALTO client MUST evaluate the URI according to <xref target="RFC3986" format="default"/>. Hence, the 
+                transport state may be located at the same host as the invoking TIPS or on a 
+                different host. Let absolute-transport-state-uri be the absolute URI after resolution.
+              </t>
+
+              <t>When creating the URI for the transport state, the TIPS service MUST 
+                 NOT use other properties of an HTTP request, such as cookies or 
+                 the client's IP address, to determine the transport state.  
+                 Furthermore, TIPS MUST NOT reuse a URI for a different object
+                 in the same connection. 
+              </t>
+
+              <t>It is expected that there is an internal mechanism to map a 
+                 transport-state-uri to the transport state to be accessed.
+                 For example, TIPS may assign a unique, internal state id to each 
+                 transport state instance.  However, the exact mechanism is left to 
+                 the TIPS provider.
+              </t>
+            </dd>
+            <dt>transport-state/updates-queue-meta/uri: </dt>
+            <dd>
+              <t>This must be a relative URI segment. 
+                Specifically, let uq-uri denote transport-state/updates-queue-meta/uri and define
+                absolute-transport-state-uri/uq-uri
+                absolute-transport-state-uri/uq-uri/number
+                absolute-transport-state-uri/uq-uri/content/number. Each of them MUST be
+                a valid URI.
+              </t>
+            </dd>
+
+          <!-- TODO: explain how server chooses a start-seq for a client -->
+          <dt>transport-state/updates-queue-meta/state-summary/start-seq: </dt>
+
+          <dd> <t>This MUST be a valid non-negative integer.  The start-seq 
+          tells the client where to start reading from the updates queue.</t>
+          </dd>
+          </dl>
+
+          </section>
+
+          </section>
+
+          <section anchor="tips-read" numbered="true" toc="default">
+            <name>Read Transport State using TIPS</name>
+
+            <t>An ALTO client can read the transport state using the returned 
+               absolute-transport-state-uri (see Section 4.2.2) using the HTTP GET method. 
+               For example, if it is on the same connection as that of the
+               invoking TIPS, it is </t>
+
+            <artwork name="" type="" align="left" alt=""><![CDATA[
+    GET <transport-state-uri>
+             ]]></artwork>
+
+             <t>The response to a valid request MUST be a JSON object of
+   type TransportState defined in Section 4.2, denoted as media type "application/alto-tips+json".</t> 
+
+           </section>
+
+          <section anchor="tips-delete" numbered="true" toc="default">
+            <name>Delete Transport State using TIPS</name>
+
+            <t>An ALTO client can delete the transport state (from its view) using the returned 
+               absolute-transport-state-uri using the HTTP DELETE method.  Whether or not the server
+               actually deletes the transport is implementation dependent.  A server will not want to 
+               delete a transport state if another client is using it.  If the transport state is 
+               on the same connection as that of the invoking TIPS, the DELETE request looks like:
+            </t>
+
+            <artwork name="" type="" align="left" alt=""><![CDATA[
+    DELETE <transport-state-uri>
+             ]]></artwork>
+
+             <t>The response to a valid request MUST be 200 if success, and the corresponding error code if there is any error.
+             </t> 
+
+           </section>
+
+           <section anchor="tips-example" numbered="true" toc="default">
+             <name>Example</name>
+             <t>For simplicity, assume that the ALTO server is using the Basic
+                authentication.  If a client with username "client1" and password
+                "helloalto" wants to create a transport state of an ALTO Cost Map
+                resource with resource ID "my-routingcost-map", it can send the
+                following request:
+              </t>
+
+              <artwork name="" type="" align="left" alt=""><![CDATA[
+   POST /tips HTTP/1.1
+   Host: alto.example.com
+   Accept: application/alto-tips+json, application/alto-error+json
+   Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
+   Content-Type: application/alto-tipsparams+json
+   Content-Length: 41
+
+   {
+     "resource-id": "my-routingcost-map"
+   }
+               ]]></artwork>
+
+               <t>If the operation is successful, the ALTO server returns the following message:</t>
+
+               <artwork name="" type="" align="left" alt=""><![CDATA[
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-tips+json
+   Content-Length: 291
+
+   {
+      "transport-state-uri": "/tips/2718281828459",
+      "transport-state": {
+        "updates-queue-meta" : {
+           "uri": "uq",
+           "state-summary": {
+             "start-seq": 101
+           }
+        },
+        "push-updates-meta" : {
+           "uri": "rs",
+           "state-summary": ["self"],
+        },
+
+      }
+   }
+              ]]></artwork>
+           </section> 
+
+      </section>  <!-- end of TIPS-spec -->
+
+      <section anchor="qss" numbered="true" toc="default">
+        <name>TIPS Queue State Service (QSS)</name>
+
+        <t>The TIPS QSS service allows an ALTO client to read the updates queue. 
+           It uses the URI returned in Section 4.
+        </t>
+
+        <section anchor="qss-mediatype" numbered="true" toc="default">
+          <name>Media Type</name>
+
+          <t>A QSS response uses "application/alto-tipsqueue+json" media type.</t>
+        </section>
+
+        <section anchor="qss-httpmethod" numbered="true" toc="default">
+          <name>HTTP Method</name>
+
+          <t>An ALTO QSS resource is requested using the HTTP GET method.   
+          </t>
+        </section>
+
+        <section anchor="qss-ird" numbered="true" toc="default">
+          <name>IRD Capabilities and Uses</name>
+
+          <t>None (QSS does not appear in the IRD).
+          </t>
+        </section>
+
+        <section anchor="qss-req" numbered="true" toc="default">
+          <name>Request</name>
+
+          <t>An ALTO client reads the queue state using an HTTP GET method, with the path constructed as: 
+          </t>
+
+<artwork name="" type="" align="left" alt=""><![CDATA[
+      <updates-queue-complete-uri> :=
+            <transport-state-uri>/<updates-queue-meta.uri> 
+            specified in Section 4.
+               ]]></artwork>
+
+        </section>
+
+        <section anchor="qss-resp" numbered="true" toc="default">
+          <name>Response</name>
+          <t>If the transport state is closed, the ALTO server MUST return an 
+             error HTTP message with status code 404 (Not Found) and media type 
+             "application/alto-error+json".</t>
+
+          <t>The response from the server, if no error, is the UpdatesQueue object indicated as "application/alto-tipsqueue+json" media type:</t>
+
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+    object-map {
+        Seq -> UpdateItem;
+    } UpdatesQueue;
+
+    object-map {
+        JSONString     media-type;
+        JSONString     tag;
+       [JSONString     link;]
+    } UpdateItem;
+               ]]></artwork>
+       <t>with field:</t>
+          <dl>
+            <dt>Seq:</dt>
+            <!-- TODO: What is the alternative to this "SHOULD"-->
+            <dd><t>A required, positive JSON integer indicating the sequence 
+                   number of the incremental update.  As JSON allows a large integer space, 
+                   when the server reaches the largest integer, the server 
+                   SHOULD close the incremental updates queue.</t>
+            </dd>        
+            <dt>media-type:</dt>
+            <dd> <t>A required JSON string giving the type of the
+      incremental update (see <xref target="RFC8895" format="default"/>).</t>
+            </dd>
+            <dt>tag: </dt>
+            <dd> <t>A required JSON string which is defined the same way as the
+      "tag" field of VersionTag (see Section 10.3 of <xref target="RFC7285" format="default"/>).</t>
+            </dd>
+            <dt>link: </dt>
+            <dd><t>An optional JSON string giving an optional link for a client
+      to directly request a resource as a complete snapshot (not through
+      incremental updates).</t>
+            </dd>
+         </dl>  
+        </section>
+
+        <section anchor="qss-example" numbered="true" toc="default">
+          <name>Example</name>
+
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+   GET /tips/2718281828459/uq HTTP/1.1
+   Host: alto.example.com
+   Accept: application/alto-tipsqueue+json, application/alto-error+json
+   Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
+
+
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-tipsqueue+json
+   Content-Length: 488
+
+   {
+
+        101 : {
+            "media-type": "application/alto-costmap+json",
+            "tag":        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe" 
+        },
+        102 : {
+            "media-type": "application/merge-patch+json",
+            "tag":        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe" 
+        },        
+        103 : {
+            "media-type": "application/merge-patch+json",
+            "tag":        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+            "link":       "/tips/2718281828459/snapshot/2e3f" 
+        }
+   }
+            ]]></artwork>
+
+          <t>An ALTO client can also read the (meta data) of an individual element 
+            in the updates queue. The HTTP method is a GET, and the URI is
+            constructed by appending the corresponding seq to preceding URI:
+          </t>
+
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+
+      <uq-elem-seq-meta> := <updates-queue-complete-uri>/<seq>
+
+          ]]></artwork>
+        </section>
+
+    </section>
+
+    <section anchor="urs" numbered="true" toc="default">
+      <name>TIPS Update Read Service (URS)</name>
+
+      <t>The TIPS URS service allows an ALTO client to read the content of
+         an update item from the updates queue. </t>
+
+      <section anchor="urs-path" numbered="true" toc="default">
+        <name>Path</name>
+
+        <t>The path to the content of an update item resource has the
+           following format:</t>
+
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+
+      <uq-elem-seq> := <updates-queue-complete-uri>/content/<seq>
+
+        ]]></artwork>
+
+        <t>where updates-queue-complete-uri is specified in Section 5.4.</t> 
+
+        <t>For example, if the client wants to query the content of the first
+           update item (with sequence number 101), it can send a request to
+           "/tips/2718281828459/uq/content/101".
+        </t>
+      </section>
+
+      <section anchor="urs-mediatype" numbered="true" toc="default">
+        <name>Media Type</name>
+
+        <t>The media type of an Update Item resource MUST be the same as
+           the "media-type" field of the update item with sequence number seq in
+           the updates queue.</t>
+
+        <t>For example, if the client wants to query the content of the first
+           update item (with sequence number 101) whose media type is
+           "application/alto-costmap+json", it must set the "Accept" header to
+           "application/alto-costmap+json, application/alto-error+json" in the
+           request.
+        </t>
+      </section>
+
+      <section anchor="urs-http" numbered="true" toc="default">
+        <name>HTTP Method</name>
+        <t>The Update Read Service resource is requested using the
+          HTTP GET method.
+        </t>
+      </section>
+
+
+      <section anchor="urs-cap" numbered="true" toc="default">
+        <name>Capabilities and Uses</name>
+        <t>None</t>
+      </section>
+
+
+      <section anchor="urs-response" numbered="true" toc="default">
+        <name>Response</name>
+        <t>If the transport state is closed, the ALTO server MUST return an           
+           error HTTP message with status code 404 (Not Found) and media type 
+           "application/alto-error+json".</t>
+
+        <t>Otherwise, let LOW_SEQ and HIGH_SEQ represent the smallest and 
+           largest sequence number in the updates queue of the transport state
+           respectively.  If seq is smaller than LOW_SEQ, the ALTO server MUST
+           return an error HTTP message with status code 410 (Gone) and media
+           type "application/alto-error+json".  If seq is greater than HIGH_SEQ,
+           the ALTO server MAY either treat the request as a long polling
+           request and save it as a pending request; if the server wants to 
+           conduct resource control, the server can return an error code and indicate the 
+           "Re-Try After" headers.
+        </t>
+
+        <t>If the request is valid, the response is encoded as a JSON object
+           whose data format is indicated by the media type.
+        </t>
+
+        <t>When a client reads an entry from the updates queue, that entry is not removed from the queue.
+        This is particularly important if two clients have access to the same updates queue, as they may
+        be reading from different places in the queue (depending on the frequency of client pull and 
+        the starting seq the server determined for each client). 
+        </t>
+      </section>
+
+      <section anchor="urs-example" numbered="true" toc="default">
+        <name>Example</name>
+
+        <t>Assume the client wants to get the contents of updates item 101, the
+           request is:</t>
+
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+      GET /tips/2718281828459/uq/content/101 HTTP/1.1
+      Host: alto.example.com
+      Accept: application/alto-costmap+json, application/alto-error+json
+        ]]></artwork>
+
+        <t>And the response will be</t>
+
+        <artwork name="" type="" align="left" alt=""><![CDATA[
+   HTTP/1.1 200 OK
+   Content-Type: application/alto-costmap+json
+   Content-Length: 50
+
+   { ... full replacement of my-routingcost-map ... }        
+        ]]></artwork>
+      </section>
+
+    </section> <!-- URS -->
+
+
+    <section anchor="ups" numbered="true" toc="default">
+      <name>TIPS Update Push Service (UPS)</name>
+
+      <t>The TIPS UPS service allows an ALTO client to receive an element pushed by the ALTO server. </t>
+
+      <t>If a client registers for UPS, it should not request updates via URS to avoid receiving the same information twice,
+      unless the client does not receive the expected updates (see Section 9.2).</t> 
+
+      <section anchor="altoh2rs" numbered="true" toc="default">
+        <name>Manage Server Push: Receiver Set</name>
+
+        <section anchor="altoh2rsops" numbered="true" toc="default">
+          <name>Receiver Set Operations</name>
+
+          <t>A client starts to receive server push when it is added to the receiver set. A client can add itself to the receiver set when creating the transport queue, or add itself explicitly to the receiver set. A client can  read the status of the receiver set and delete itself from the receiver set to stop server push.</t>
+
+          <t>Implicit Create: As a short cut, when creating a transport queue, an ALTO client can start server push by setting the "incremental-changes" field to be true when creating a transport queue using the HTTP POST method with ALTO SSE AddUpdateReq 
+          (<xref target="RFC8895" format="default"/> Sec. 6.5) as the parameter:</t>
+
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+        
+      object {
+          ResourceID   resource-id;
+          [JSONString  tag;]
+          [Boolean     incremental-changes;]
+          [Object      input;]
+      } AddUpdateReq;
+
+            
+          ]]></artwork>
+
+          <t>PUT Create: A client can add itself in the receiver set by using the HTTP PUT method: PUT transport-queue/rs/self</t>
+
+          <t>Read: A client can see only itself in the receiver set. The appearance of self in the receiver set (read does not return "not exists" error) is an indication that push starts.</t>
+
+          <t>Delete: A client can delete itself (stops receiving push) either explicitly or 
+            implicitly.</t>
+
+          <ul spacing="normal">
+            <li>Explicit delete: A client deletes itself using the HTTP DELETE method:  
+              DELETE transport-queue/rs/self.</li>
+            <li>Implicit delete: Transport queue is connection ephemeral: the close of connection or stream for the transport queue deletes the transport queue (from the view) for 
+              the client.</li>
+          </ul>
+
+        </section>
+
+        <section anchor="altoh2rsexample" numbered="true" toc="default">
+          <name>Examples</name>
+
+          <t>The first example is a client creating a transport queue and starting server push.</t>
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+    Client -> server request
+
+    HEADERS
+      - END_STREAM
+      + END_HEADERS
+        :method = POST
+        :scheme = https
+        :path = /tqs
+        host = alto.example.com
+        accept = application/alto-error+json,
+                      application/alto-transport+json
+        content-type = application/alto-transport+json
+        content-length = 69
+
+    DATA
+      - END_STREAM
+      {
+        "resource-id": "my-routingcost-map",
+        ["incremental-push": true]
+      }
+            
+          ]]></artwork>
+
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+
+    Server -> client response:
+
+    HEADERS
+      - END_STREAM
+      + END_HEADERS
+        :status = 200
+        content-type = application/alto-transport+json
+        content-length = 28
+    
+    DATA
+      - END_STREAM
+        {"tq": "/tqs/2718281828459"}
+
+            
+          ]]></artwork>
+
+          <t>If the client reads the status of the transport queue created above using the read operation (GET) 
+          in the same HTTP connection, the client should see itself in the receiver set:</t>
+
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+    Client -> server request
+
+    HEADERS
+      - END_STREAM
+      + END_HEADERS
+        :method = GET
+        :scheme = https
+        :path = /tqs/2718281828459
+        host = alto.example.com
+        accept = application/alto-error+json,
+                      application/alto-transport+json
+
+    Server -> client response:
+
+    HEADERS
+      - END_STREAM
+      + END_HEADERS
+        :status = 200
+        content-type = application/alto-transport+json
+        content-length = 519
+    
+    DATA
+      - END_STREAM
+      { "uq":
+        [ 
+          {"seq":        101, 
+            "media-type": "application/alto-costmap+json",
+            "tag":        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe"}, 
+          {"seq":        102, 
+            "media-type": "application/merge-patch+json",
+            "tag":        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe"},
+          {"seq":        103, 
+            "media-type": "application/merge-patch+json",
+            "tag":        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
+            "link":       "/tqs/2718281828459/snapshot/2e3f"} 
+  
+        ],
+      "rs": ["self"]
+      }
+
+            ]]></artwork>
+
+          <t>A client can stop incremental push updates from the server to itself by sending the request:</t>
+
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+    DELETE /tqs/2718281828459/rs/self HTTP/2
+    Accept: application/alto-transport+json
+
+
+    HTTP/2 200 OK
+            ]]></artwork>
+
+        </section>
+        <!-- rs examples -->
+
+      </section>
+      <!-- receiver set -->
+
+      <section anchor="altoh2push" numbered="true" toc="default">
+        <name>Server Push of Incremental Updates</name>
+
+        <section anchor="altoh2pushops" numbered="true" toc="default">
+          <name>Server Push</name>
+          <t>The work flow of server push of individual updates is the following:</t>
+          <ul spacing="normal">
+            <li>Initialization: the first update pushed from the server to the client MUST be the 
+              later of the following two: (1) the last independent update in the incremental updates queue; and (2) the following entry of the entry that matches the tag when the client creates the transport queue. The client MUST set SETTINGS_ENABLE_PUSH to be 
+              consistent.</li>
+            <li>Push state: the server MUST maintain the last entry pushed to the client (and hence per client, per connection state) and schedule next update push accordingly.</li>
+            <li>Push management: The client MUST NOT cancel (RST_STREAM) a PUSH_PROMISE to avoid complex server state management.</li>
+          </ul>
+        </section>
+
+        <section anchor="altoh2pushexamples" numbered="true" toc="default">
+          <name>Examples</name>
+
+          <t>A client can wait for the server for incremental push, where the server first sends PUSH_PROMISE, for the first example in Sec. 2.2: </t>
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+    Server -> client PUSH_PROMISE in current stream:
+
+    PUSH_PROMISE     
+      - END_STREAM
+        Promised Stream 4
+        HEADER BLOCK
+        :method = GET
+        :scheme = https
+        :path = /tqs/2718281828459/uq/101
+        host = alto.example.com
+        accept = application/alto-error+json,
+                      application/alto-costmap+json
+
+    Server -> client content Stream 4:
+
+    HEADERS
+      + END_STREAM
+      + END_HEADERS
+        :status = 200
+        content-type = application/alto-costmap+json
+        content-length = 539
+    
+    DATA
+      + END_STREAM
+      {
+        "meta" : {
+          "dependent-vtags" : [{
+              "resource-id": "my-network-map",
+              "tag": "da65eca2eb7a10ce8b059740b0b2e3f8eb1d4785"
+            }],
+          "cost-type" : {
+            "cost-mode"  : "numerical",
+            "cost-metric": "routingcost"
+          },
+          "vtag": {
+            "resource-id" : "my-routingcost-map",
+            "tag" : "3ee2cb7e8d63d9fab71b9b34cbf764436315542e"
+          }
+        },
+        "cost-map" : {
+          "PID1": { "PID1": 1,  "PID2": 5,  "PID3": 10 },
+          "PID2": { "PID1": 5,  "PID2": 1,  "PID3": 15 },
+          "PID3": { "PID1": 20, "PID2": 15  }
+        }
+    }
+
+    Server -> client PUSH_PROMISE in current stream:
+
+    PUSH_PROMISE     
+      - END_STREAM
+        Promised Stream 6
+        HEADER BLOCK
+        :method = GET
+        :scheme = https
+        :path = /tqs/2718281828459/uq/102
+        host = alto.example.com
+        accept = application/alto-error+json,
+                      application/merge-patch+json
+
+    Server -> client content Stream 6
+
+    HEADERS
+      + END_STREAM
+      + END_HEADERS
+        :status = 200
+        content-type = application/merge-patch+json
+        content-length = 7
+    
+    DATA
+      + END_STREAM
+      { ... }
+
+            ]]></artwork>
+        </section>
+      </section>
+
+      <section anchor="altoh2streams" numbered="true" toc="default">
+        <name>Server Push Stream Management</name>
+
+        <section anchor="altoh2streampush" numbered="true" toc="default">
+          <name>Server -&gt; Client [PUSH_PROMISE for Transport Queue on Stream SID_tq]</name>
+          <t>The server push MUST satisfy the following requirements:</t>
+          <ul spacing="normal">
+            <li>PUSH_PROMISE MUST be sent in stream SID_tq to serialize to allow the client to know the push order;</li>
+            <li>Each PUSH_PROMISE chooses a new server-selected stream ID, and the stream is closed after push.</li>
+          </ul>
+        </section>
+
+      </section>
+    </section>
+
+    <section anchor="ops" numbered="true" toc="default">
+      <name>Operation and Processing Considerations</name>
+
+      <!--TODO: Uncomment and flesh out this section if we decide not to 
+                locate R1, R2, and R3 on the same machine.
+
+      <section anchor="ops-choosestateuri" numbered="true" toc="default">
+         <name>Considerations for Choosing Transport State Location (URI)</name>
+         <t>TODO</t>
+      </section>
+
+      -->
+
+      <section anchor="ops-chooseupdates" numbered="true" toc="default">
+         <name>Considerations for Choosing Updates</name>
+
+         <t>TIPS should be cognizant of the effects of its update schedule, which
+            includes both the choice of timing (i.e., when/what to trigger an 
+            update on the updates queue) and the choice of message format
+            (i.e., given an update, send a full replacement or an incremental
+            change).  In particular, the update schedule can have effects on both
+            the overhead and the freshness of information.  To minimize overhead,
+            TIPS may choose to batch a sequence of updates for resources
+            that frequently change by cumulative updates or a full
+            replacement after a while.  TIPS should be
+            cognizant that batching reduces the freshness of information.  The
+            server should also consider the effect of such delays on client
+            behaviors.
+          </t>
+
+          <t>For incremental updates, this design allows both JSON patch and JSON
+             merge patch for incremental changes.  JSON merge patch is clearly
+             superior to JSON patch for describing incremental changes to cost
+             maps, endpoint costs, and endpoint properties.  For these data
+             structures, JSON merge patch is more space efficient, as well as
+             simpler to apply.  There is no advantage allowing a server to use
+            JSON patch for those resources.</t>
+
+           <t>The case is not as clear for incremental changes to network maps.</t>
+
+          <t>First, consider small changes, such as moving a prefix from one PID
+   to another.  JSON patch could encode that as a simple insertion and
+   deletion, while JSON merge patch would have to replace the entire
+   array of prefixes for both PIDs.  On the other hand, to process a
+   JSON patch update, the ALTO client would have to retain the indexes
+   of the prefixes for each PID.  Logically, the prefixes in a PID are
+   an unordered set, not an array; aside from handling updates, a client
+   has no need to retain the array indexes of the prefixes.  Hence, to
+   take advantage of JSON patch for network maps, ALTO clients would
+   have to retain additional, otherwise unnecessary, data.</t>
+
+          <t>Second, consider more involved changes, such as removing half of the
+   prefixes from a PID.  JSON merge patch would send a new array for
+   that PID, while JSON patch would have to send a list of remove
+   operations and delete the prefix one by one.</t>
+
+          <t>Therefore, each TIPS may decide on its own whether to
+   use JSON merge patch or JSON patch according to the changes in
+   network maps.</t>
+         </section>
+
+        <section anchor="ops-clientproc" numbered="true" toc="default">
+          <name>Considerations for Client Processing Updates</name>
+
+          <t>In general, when an ALTO client receives a full replacement for a
+   resource, the ALTO client should replace the current version with the
+   new version.  When an ALTO client receives an incremental change for
+   a resource, the ALTO client should apply those patches to the current
+   version of the resource.</t>
+
+          <t>However, because resources can depend on other resources (e.g., cost
+   maps depend on network maps), an ALTO client MUST NOT use a dependent
+   resource if the resource on which it depends has changed.  There are
+   at least two ways an ALTO client can do that.  The following
+   paragraphs illustrate these techniques by referring to network and
+   cost map messages, although these techniques apply to any dependent
+   resources.</t>
+
+          <t>Note that when a network map changes, the update stream server MUST
+   send the network map update message before sending the updates for
+   the dependent cost maps.</t>
+
+          <t>One approach is for the ALTO client to save the network map update
+   message in a buffer and continue to use the previous network map and
+   the associated cost maps until the ALTO client receives the update
+   messages for all dependent cost maps.  The ALTO client then applies
+   all network and cost map updates atomically.</t>
+
+          <t>Alternatively, the ALTO client MAY update the network map
+   immediately.  In this case, the cost maps using the network map
+   become invalid because they are inconsistent with the current network
+   map; hence, the ALTO client MUST mark each such dependent cost map as
+   temporarily invalid and MUST NOT use each such cost map until the
+   ALTO client receives a cost map update indicating that it is
+   based on the new network map version tag.</t>
+
+          <t>When implementing server push, the server SHOULD send updates for dependent resource 
+   (i.e., the cost maps in the preceding example) in a timely fashion.
+   However, if the ALTO client does not receive the expected updates, a
+   simple recovery method is that the ALTO client uses client pull to
+   request the missing update.  The ALTO client MAY retain the
+   version tag of the last version of any tagged resources and search
+   those version tags when identifying the new updates to pull. 
+   Although not as efficient as possible, this recovery method is simple
+   and reliable.</t>
+        </section>
+
+        <section anchor="ops-filtered" numbered="true" toc="default">
+          <name>Considerations for Updates to Filtered Cost Maps</name>
+
+          <!-- TODO: Clarify section: Adrian Farrel was confused about the line:
+                If it did not, the updates queue SHOULD NOT have an update.
+                He said "You mean it MAY have an update? Why? How?"
+          -->
+          <t>If TIPS provides updates to a Filtered Cost Map that
+   allows constraint tests, then an ALTO client MAY request updates to a
+   Filtered Cost Map request with a constraint test.  In this case, when
+   a cost changes, the updates queue MUST have an update if the
+   new value satisfies the test.  If the new value does not, whether 
+   there is an update depends on whether the previous
+   value satisfied the test.  If it did not, the updates queue
+   SHOULD NOT have an update.  But if the previous
+   value did, then the updates queue MUST add an update with a
+   "null" value to inform the ALTO client that this cost no longer
+   satisfies the criteria.</t>
+
+          <t>TIPS can avoid having to handle such a complicated
+   behavior by offering TIPS only for Filtered Cost Maps that
+   do not allow constraint tests.</t>
+         </section>
+
+         <section anchor="ops-ordinal" numbered="true" toc="default">
+          <name>Considerations for Updates to Ordinal Mode Costs</name>
+
+           <t>For an ordinal mode cost map, a change to a single cost point may
+   require updating many other costs.  As an extreme example, suppose
+   the lowest cost changes to the highest cost.  For a numerical mode
+   cost map, only that one cost changes.  But for an ordinal mode cost
+   map, every cost might change.  While this document allows TIPS to 
+   offer incremental updates for ordinal mode cost
+   maps, TIPS implementors should be aware that
+   incremental updates for ordinal costs are more complicated than for
+   numerical costs, and ALTO clients should be aware that small changes
+   may result in large updates.</t>
+
+            <t>A TIPS can avoid this complication by only offering
+   full replacements as updates in the updates queue for ordinal cost maps.</t>
+        </section>
+
+    </section> <!-- OPS -->
+
+
+    <section anchor="sec-sec" numbered="true" toc="default">
+       <name>Security Considerations</name>
+
+       <t>The security considerations (Section 15 of <xref target="RFC7285" format="default"/>) of the base
+   protocol fully apply to this extension.  For example, the same
+   authenticity and integrity considerations (Section 15.1 of <xref target="RFC7285" format="default"/>)
+   still fully apply; the same considerations for the privacy of ALTO
+   users (Section 15.4 of <xref target="RFC7285" format="default"/>) also still fully apply.</t>
+
+       <t>The additional services (addition of update read service and update
+   push service) provided by this extension extend the attack surface
+   described in Section 15.1.1 of <xref target="RFC7285" format="default"/>.  Below, we discuss the
+   additional risks and their remedies.</t>
+
+       <section anchor="sec-ddos" numbered="true" toc="default">
+          <name>TIPS: Denial-of-Service Attacks</name>
+
+          <t>Allowing persistent TIPS states enables a new class of
+   Denial-of-Service attacks. In particular, For the TIPS server, 
+   an ALTO client might create an unreasonable number of transport states.</t>
+
+          <t>To avoid these attacks on the TIPS server, the server SHOULD
+   choose to limit the number of active states and reject new requests
+   when that threshold is reached.  The Update Read Service allows 
+   predictive fetching and the server SHOULD also choose to limit the 
+   number of pending requests.  In these cases, the update stream server
+   SHOULD return the HTTP status "503 Service Unavailable".</t>
+
+          <t>It is important to note that the preceding approaches are not the
+   only possibilities.  For example, it may be possible for TIPS to 
+   use somewhat more clever logic involving IP reputation, rate-limiting, 
+   and compartmentalization of the overall threshold into smaller thresholds 
+   that apply to subsets of potential clients.</t>
+       </section>
+
+       <section anchor="sec-overload" numbered="true" toc="default">
+          <name>ALTO Client: Update Overloading or Instability</name>
+
+          <t>The availability of continuous updates, when the client indicates 
+   receiving server push, can also cause overload for an
+   ALTO client, in particular, an ALTO client with limited processing
+   capabilities.  The current design does not include any flow control
+   mechanisms for the client to reduce the update rates from the server.
+   Under overloading, the client MAY choose to remove the information
+   resources with high update rates.</t>
+
+           <t>Also, under overloading, the client may no longer be able to detect
+   whether information is still fresh or has become stale.  In such a
+   case, the client should be careful in how it uses the information to
+   avoid stability or efficiency issues.</t>
+      </section>
+
+      <section anchor="sec-spoof" numbered="true" toc="default">
+          <name>Spoofed URI</name>
+
+          <t>An outside party that can read the TIPS response or that can
+   observe TIPS requests can obtain the transport state URI and use
+   that to send fraudulent "DELETE" requests, thus disabling the service
+   for the valid ALTO client.  This can be avoided by encrypting the
+   requests and responses (see Section 15 of
+   <xref target="RFC7285" format="default"/>).  </t>
+
+          <t>In general, as the architecture allows the possibility for TIPS, 
+   URS and UPS to be different entities,
+   the additional risks should be evaluated and remedied.  For example,
+   the private communication path between the servers may be attacked,
+   resulting in a risk of communications breakdown between them, as well
+   as invalid or spoofed messages claiming to be on that private
+   communications path.  Proper security mechanisms, including
+   confidentiality, authenticity, and integrity mechanisms, should be
+   considered.</t>
+         </section>
+
+    </section>
+
+
+    <section anchor="ianaconsider" numbered="true" toc="default">
+      <name>IANA Considerations</name>
+      <t>IANA is requested to register the following media type under ALTO registry as defined in <xref target="RFC7285" format="default"/>:
+      </t>
+      <ul spacing="normal">
+        <li>application/alto-tips+json: as described in <xref target="tips-createresp" format="default"/>;</li>
+        <li>application/alto-tipsparams+json: as described in <xref target="tips-createreq" format="default"/>;</li>
+        <li>application/alto-tipsqueue+json: as described in <xref target="qss-resp" format="default"/></li>
+      </ul>
+      <section numbered="true" toc="default">
+        <name>application/alto-tips+json Media Type</name>
+        <dl>
+          <dt>Type name:</dt>
+          <dd>application</dd>
+          <dt>Subtype name:</dt>
+          <dd>alto-tips+json</dd>
+          <dt>Required parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Optional parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Encoding considerations:</dt>
+          <dd>Encoding considerations are identical to those specified for the
+          "application/json" media type. See <xref target="RFC8259" format="default"/>.
+          </dd>
+          <dt>Security considerations:</dt>
+          <dd>Security considerations relating to the generation and consumption
+          of ALTO Protocol messages are discussed in Section 10 of
+          <xref target="RFC8895"/> and Section 15 of <xref target="RFC7285"/>.
+          </dd>
+          <dt>Interoperability considerations:</dt>
+          <dd>This document specifies format of conforming messages and the
+          interpretation thereof.
+          </dd>
+          <dt>Published specification:</dt>
+          <dd><xref target="tips-createresp"/> of this document.</dd>
+          <dt>Applications that use this media type:</dt>
+          <dd>ALTO servers and ALTO clients either stand alone or are embedded
+          within other applications.</dd>
+          <dt>Fragment identifier considerations:</dt>
+          <dd>N/A</dd>
+          <dt>Additional information:</dt>
+          <dd>
+            <t><br/></t>
+            <dl>
+              <dt>Deprecated alias names for this type:</dt>
+              <dd>N/A</dd>
+              <dt>Magic number(s):</dt>
+              <dd>N/A</dd>
+              <dt>File extension(s):</dt>
+              <dd>This document uses the media type to refer to protocol messages
+              and thus does not require a file extension.</dd>
+              <dt>Macintosh file type code(s):</dt>
+              <dd>N/A</dd>
+            </dl>
+          </dd>
+          <dt>Person and email address to contact for further information:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Intended usage:</dt>
+          <dd>COMMON</dd>
+          <dt>Restrictions on usage:</dt>
+          <dd>N/A</dd>
+          <dt>Author:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Change controller:</dt>
+          <dd>Internet Engineering Task Force (mailto:iesg@ietf.org).</dd>
+        </dl>
+      </section>
+      <section numbered="true" toc="default">
+        <name>application/alto-tipsparams+json Media Type</name>
+        <dl>
+          <dt>Type name:</dt>
+          <dd>application</dd>
+          <dt>Subtype name:</dt>
+          <dd>alto-tipsparams+json</dd>
+          <dt>Required parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Optional parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Encoding considerations:</dt>
+          <dd>Encoding considerations are identical to those specified for the
+          "application/json" media type. See <xref target="RFC8259" format="default"/>.
+          </dd>
+          <dt>Security considerations:</dt>
+          <dd>Security considerations relating to the generation and consumption
+          of ALTO Protocol messages are discussed in Section 10 of
+          <xref target="RFC8895"/> and Section 15 of <xref target="RFC7285"/>.
+          </dd>
+          <dt>Interoperability considerations:</dt>
+          <dd>This document specifies format of conforming messages and the
+          interpretation thereof.
+          </dd>
+          <dt>Published specification:</dt>
+          <dd><xref target="tips-createreq"/> of this document.</dd>
+          <dt>Applications that use this media type:</dt>
+          <dd>ALTO servers and ALTO clients either stand alone or are embedded
+          within other applications.</dd>
+          <dt>Fragment identifier considerations:</dt>
+          <dd>N/A</dd>
+          <dt>Additional information:</dt>
+          <dd>
+            <t><br/></t>
+            <dl>
+              <dt>Deprecated alias names for this type:</dt>
+              <dd>N/A</dd>
+              <dt>Magic number(s):</dt>
+              <dd>N/A</dd>
+              <dt>File extension(s):</dt>
+              <dd>This document uses the media type to refer to protocol messages
+              and thus does not require a file extension.</dd>
+              <dt>Macintosh file type code(s):</dt>
+              <dd>N/A</dd>
+            </dl>
+          </dd>
+          <dt>Person and email address to contact for further information:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Intended usage:</dt>
+          <dd>COMMON</dd>
+          <dt>Restrictions on usage:</dt>
+          <dd>N/A</dd>
+          <dt>Author:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Change controller:</dt>
+          <dd>Internet Engineering Task Force (mailto:iesg@ietf.org).</dd>
+        </dl>
+      </section>
+      <section numbered="true" toc="default">
+        <name>application/alto-tipsqueue+json Media Type</name>
+        <dl>
+          <dt>Type name:</dt>
+          <dd>application</dd>
+          <dt>Subtype name:</dt>
+          <dd>alto-tipsqueue+json</dd>
+          <dt>Required parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Optional parameters:</dt>
+          <dd>N/A</dd>
+          <dt>Encoding considerations:</dt>
+          <dd>Encoding considerations are identical to those specified for the
+          "application/json" media type. See <xref target="RFC8259" format="default"/>.
+          </dd>
+          <dt>Security considerations:</dt>
+          <dd>Security considerations relating to the generation and consumption
+          of ALTO Protocol messages are discussed in Section 10 of
+          <xref target="RFC8895"/> and Section 15 of <xref target="RFC7285"/>.
+          </dd>
+          <dt>Interoperability considerations:</dt>
+          <dd>This document specifies format of conforming messages and the
+          interpretation thereof.
+          </dd>
+          <dt>Published specification:</dt>
+          <dd><xref target="qss-resp"/> of this document.</dd>
+          <dt>Applications that use this media type:</dt>
+          <dd>ALTO servers and ALTO clients either stand alone or are embedded
+          within other applications.</dd>
+          <dt>Fragment identifier considerations:</dt>
+          <dd>N/A</dd>
+          <dt>Additional information:</dt>
+          <dd>
+            <t><br/></t>
+            <dl>
+              <dt>Deprecated alias names for this type:</dt>
+              <dd>N/A</dd>
+              <dt>Magic number(s):</dt>
+              <dd>N/A</dd>
+              <dt>File extension(s):</dt>
+              <dd>This document uses the media type to refer to protocol messages
+              and thus does not require a file extension.</dd>
+              <dt>Macintosh file type code(s):</dt>
+              <dd>N/A</dd>
+            </dl>
+          </dd>
+          <dt>Person and email address to contact for further information:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Intended usage:</dt>
+          <dd>COMMON</dd>
+          <dt>Restrictions on usage:</dt>
+          <dd>N/A</dd>
+          <dt>Author:</dt>
+          <dd>See Authors' Addresses section.</dd>
+          <dt>Change controller:</dt>
+          <dd>Internet Engineering Task Force (mailto:iesg@ietf.org).</dd>
+        </dl>
+      </section>
+    </section>
+
+    <section numbered="true" toc="default">
+      <name>Acknowledgments</name>
+      <t>The authors of this document would also like to thank Adrian Farrel, Qin Wu, 
+      Jordi Ros Giralt, and the many others who reviewed and commented on previous
+      drafts of this document.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references>
+      <name>References</name>
+      <references>
+        <name>Normative References</name>
+        <reference anchor="RFC2119" target="https://www.rfc-editor.org/info/rfc2119" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml">
+          <front>
+            <title>Key words for use in RFCs to Indicate Requirement Levels</title>
+            <author initials="S." surname="Bradner" fullname="S. Bradner">
+              <organization/>
+            </author>
+            <date year="1997" month="March"/>
+            <abstract>
+              <t>In many standards track documents several words are used to signify the requirements in the specification.  These words are often capitalized. This document defines these words as they should be interpreted in IETF documents.  This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="BCP" value="14"/>
+          <seriesInfo name="RFC" value="2119"/>
+          <seriesInfo name="DOI" value="10.17487/RFC2119"/>
+        </reference>
+        <!-- requirements words -->
+    <reference anchor='RFC3986' target='https://www.rfc-editor.org/info/rfc3986'>
+      <front>
+        <title>Uniform Resource Identifier (URI): Generic Syntax</title>
+        <author fullname='T. Berners-Lee' initials='T.' surname='Berners-Lee'><organization/></author>
+        <author fullname='R. Fielding' initials='R.' surname='Fielding'><organization/></author>
+        <author fullname='L. Masinter' initials='L.' surname='Masinter'><organization/></author>
+        <date month='January' year='2005'/>
+        <abstract><t>A Uniform Resource Identifier (URI) is a compact sequence of characters that identifies an abstract or physical resource.  This specification defines the generic URI syntax and a process for resolving URI references that might be in relative form, along with guidelines and security considerations for the use of URIs on the Internet.  The URI syntax defines a grammar that is a superset of all valid URIs, allowing an implementation to parse the common components of a URI reference without knowing the scheme-specific requirements of every possible identifier.  This specification does not define a generative grammar for URIs; that task is performed by the individual specifications of each URI scheme.  [STANDARDS-TRACK]</t></abstract>
+        </front>
+      <seriesInfo name='STD' value='66'/>
+      <seriesInfo name='RFC' value='3986'/>
+      <seriesInfo name='DOI' value='10.17487/RFC3986'/>
+      </reference>
+      <!-- url resolution -->
+    <reference anchor="RFC7285" target="https://www.rfc-editor.org/info/rfc7285" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7285.xml">
+          <front>
+            <title>Application-Layer Traffic Optimization (ALTO) Protocol</title>
+            <author initials="R." surname="Alimi" fullname="R. Alimi" role="editor">
+              <organization/>
+            </author>
+            <author initials="R." surname="Penno" fullname="R. Penno" role="editor">
+              <organization/>
+            </author>
+            <author initials="Y." surname="Yang" fullname="Y. Yang" role="editor">
+              <organization/>
+            </author>
+            <author initials="S." surname="Kiesel" fullname="S. Kiesel">
+              <organization/>
+            </author>
+            <author initials="S." surname="Previdi" fullname="S. Previdi">
+              <organization/>
+            </author>
+            <author initials="W." surname="Roome" fullname="W. Roome">
+              <organization/>
+            </author>
+            <author initials="S." surname="Shalunov" fullname="S. Shalunov">
+              <organization/>
+            </author>
+            <author initials="R." surname="Woundy" fullname="R. Woundy">
+              <organization/>
+            </author>
+            <date year="2014" month="September"/>
+            <abstract>
+              <t>Applications using the Internet already have access to some topology information of Internet Service Provider (ISP) networks.  For example, views to Internet routing tables at Looking Glass servers are available and can be practically downloaded to many network application clients.  What is missing is knowledge of the underlying network topologies from the point of view of ISPs.  In other words, what an ISP prefers in terms of traffic optimization -- and a way to distribute it.</t>
+              <t>The Application-Layer Traffic Optimization (ALTO) services defined in this document provide network information (e.g., basic network location structure and preferences of network paths) with the goal of modifying network resource consumption patterns while maintaining or improving application performance.  The basic information of ALTO is based on abstract maps of a network.  These maps provide a simplified view, yet enough information about a network for applications to effectively utilize them.  Additional services are built on top of the maps.</t>
+              <t>This document describes a protocol implementing the ALTO services. Although the ALTO services would primarily be provided by ISPs, other entities, such as content service providers, could also provide ALTO services.  Applications that could use the ALTO services are those that have a choice to which end points to connect.  Examples of such applications are peer-to-peer (P2P) and content delivery networks.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="RFC" value="7285"/>
+          <seriesInfo name="DOI" value="10.17487/RFC7285"/>
+        </reference>
+        <!-- alto base -->
+        <reference anchor="RFC8259" target="https://www.rfc-editor.org/info/rfc8259">
+          <front>
+            <title>The JavaScript Object Notation (JSON) Data Interchange Format</title>
+            <author fullname="T. Bray" initials="T." role="editor" surname="Bray"/>
+            <date month="December" year="2017"/>
+            <abstract>
+              <t>JavaScript Object Notation (JSON) is a lightweight, text-based, language-independent data interchange format. It was derived from the ECMAScript Programming Language Standard. JSON defines a small set of formatting rules for the portable representation of structured data.</t>
+              <t>This document removes inconsistencies with other specifications of JSON, repairs specification errors, and offers experience-based interoperability guidance.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="STD" value="90"/>
+          <seriesInfo name="RFC" value="8259"/>
+          <seriesInfo name="DOI" value="10.17487/RFC8259"/>
+          <format target="https://www.rfc-editor.org/info/rfc8259" type="TXT"/>
+        </reference>
+    <reference anchor="RFC8174" target="https://www.rfc-editor.org/info/rfc8174" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml">
+          <front>
+            <title>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</title>
+            <author initials="B." surname="Leiba" fullname="B. Leiba">
+              <organization/>
+            </author>
+            <date year="2017" month="May"/>
+            <abstract>
+              <t>RFC 2119 specifies common key words that may be used in protocol  specifications.  This document aims to reduce the ambiguity by clarifying that only UPPERCASE usage of the key words have the  defined special meanings.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="BCP" value="14"/>
+          <seriesInfo name="RFC" value="8174"/>
+          <seriesInfo name="DOI" value="10.17487/RFC8174"/>
+        </reference>
+        <!-- requirements words -->
+    <reference anchor="RFC8895" target="https://www.rfc-editor.org/info/rfc8895" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8895.xml">
+          <front>
+            <title>Application-Layer Traffic Optimization (ALTO) Incremental Updates Using Server-Sent Events (SSE)</title>
+            <author initials="W." surname="Roome" fullname="W. Roome">
+              <organization/>
+            </author>
+            <author initials="Y." surname="Yang" fullname="Y. Yang">
+              <organization/>
+            </author>
+            <date year="2020" month="November"/>
+            <abstract>
+              <t>The Application-Layer Traffic Optimization (ALTO) protocol (RFC 7285) provides network-related information, called network information resources, to client applications so that clients can make informed decisions in utilizing network resources. This document presents a mechanism to allow an ALTO server to push updates to ALTO clients to achieve two benefits: (1) updates can be incremental, in that if only a small section of an information resource changes, the ALTO server can send just the changes and (2) updates can be immediate, in that the ALTO server can send updates as soon as they are available.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="RFC" value="8895"/>
+          <seriesInfo name="DOI" value="10.17487/RFC8895"/>
+        </reference>
+        <!-- ALTO SSE -->
+        <reference anchor="RFC9112" target="https://www.rfc-editor.org/info/rfc9112" quoteTitle="true" derivedAnchor="HTTP/1.1">
+          <front>
+            <title>HTTP/1.1</title>
+            <author fullname="Roy T. Fielding" initials="R." role="editor" surname="Fielding">
+              <organization showOnFrontPage="true">Adobe</organization>
+            </author>
+            <author fullname="Mark Nottingham" initials="M." role="editor" surname="Nottingham">
+              <organization showOnFrontPage="true">Fastly</organization>
+            </author>
+            <author fullname="Julian Reschke" initials="J." role="editor" surname="Reschke">
+              <organization showOnFrontPage="true">greenbytes</organization>
+            </author>
+            <date month="June" year="2022"/>
+          </front>
+          <seriesInfo name="STD" value="99"/>
+          <seriesInfo name="RFC" value="9112"/>
+          <seriesInfo name="DOI" value="10.17487/RFC9112"/>
+        </reference>
+        <!-- HTTP/1.1 -->
+        <reference anchor="RFC9113">
+          <front>
+            <title>HTTP/2</title>
+            <author fullname="M. Thomson" initials="M." role="editor" surname="Thomson">
+              <organization/>
+            </author>
+            <author fullname="C. Benfield" initials="C." role="editor" surname="Benfield">
+              <organization/>
+            </author>
+            <date month="June" year="2022"/>
+            <abstract>
+              <t>This specification describes an optimized expression of the semantics of the Hypertext Transfer Protocol (HTTP), referred to as HTTP version 2 (HTTP/2). HTTP/2 enables a more efficient use of network resources and a reduced latency by introducing field compression and allowing multiple concurrent exchanges on the same connection.</t>
+              <t>This document obsoletes RFCs 7540 and 8740.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="RFC" value="9113"/>
+          <seriesInfo name="DOI" value="10.17487/RFC9113"/>
+        </reference>
+        <!-- HTTP/2 -->
+      <reference anchor="RFC9114" target="https://www.rfc-editor.org/info/rfc9114" quoteTitle="true" derivedAnchor="RFC9114">
+          <front>
+            <title>HTTP/3</title>
+            <author fullname="M. Bishop" initials="M." role="editor" surname="Bishop"/>
+            <date month="June" year="2022"/>
+            <abstract>
+              <t indent="0">The QUIC transport protocol has several features that are desirable in a transport for HTTP, such as stream multiplexing, per-stream flow control, and low-latency connection establishment.  This document describes a mapping of HTTP semantics over QUIC.  This document also identifies HTTP/2 features that are subsumed by QUIC and describes how HTTP/2 extensions can be ported to HTTP/3.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="RFC" value="9114"/>
+          <seriesInfo name="DOI" value="10.17487/RFC9114"/>
+          <format target="https://www.rfc-editor.org/info/rfc9114" type="TXT"/>
+        </reference>
+        <!-- HTTP/3 -->
+      </references>
+      <references>
+        <name>Informative References</name>
+
+          <reference anchor="draft-schott-alto-new-transport-push" target="https://datatracker.ietf.org/doc/draft-schott-alto-new-transport-push/">
+          <front>
+            <title>ALTO New Transport: Server Push</title>
+            <author initials="R." surname="Schott" fullname="R. Schott">
+              <organization/>
+            </author>
+            <author initials="Y." surname="Yang" fullname="Y. Yang">
+              <organization/>
+            </author>
+            <date year="2022" month="October"/>
+          </front>
+          <seriesInfo name="Internet Draft" value="ID"/>
+        </reference>
+
+        <reference anchor="RFC7971" target="https://www.rfc-editor.org/info/rfc7971" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7971.xml">
+          <front>
+            <title>Application-Layer Traffic Optimization (ALTO) Deployment Considerations</title>
+            <author initials="M." surname="Stiemerling" fullname="M. Stiemerling">
+              <organization/>
+            </author>
+            <author initials="S." surname="Kiesel" fullname="S. Kiesel">
+              <organization/>
+            </author>
+            <author initials="M." surname="Scharf" fullname="M. Scharf">
+              <organization/>
+            </author>
+            <author initials="H." surname="Seidel" fullname="H. Seidel">
+              <organization/>
+            </author>
+            <author initials="S." surname="Previdi" fullname="S. Previdi">
+              <organization/>
+            </author>
+            <date year="2016" month="October"/>
+            <abstract>
+              <t>Many Internet applications are used to access resources such as pieces of information or server processes that are available in several equivalent replicas on different hosts.  This includes, but is not limited to, peer-to-peer file sharing applications.  The goal of Application-Layer Traffic Optimization (ALTO) is to provide guidance to applications that have to select one or several hosts from a set of candidates capable of providing a desired resource. This memo discusses deployment-related issues of ALTO.  It addresses different use cases of ALTO such as peer-to-peer file sharing and Content Delivery Networks (CDNs) and presents corresponding examples. The document also includes recommendations for network administrators and application designers planning to deploy ALTO, such as recommendations on how to generate ALTO map information.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="RFC" value="7971"/>
+          <seriesInfo name="DOI" value="10.17487/RFC7971"/>
+        </reference>
+        <!-- requirements -->
+      </references>
+    </references>
+  </back>
+</rfc>
