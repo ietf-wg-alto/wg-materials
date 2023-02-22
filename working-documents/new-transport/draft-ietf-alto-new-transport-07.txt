@@ -89,23 +89,23 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   5
      1.2.  Understanding TIPS  . . . . . . . . . . . . . . . . . . .   5
-   2.  TIPS Overview . . . . . . . . . . . . . . . . . . . . . . . .   6
-     2.1.  Component Terminology . . . . . . . . . . . . . . . . . .   6
-     2.2.  TIPS Workflow . . . . . . . . . . . . . . . . . . . . . .   9
-     2.3.  TIPS With HTTP/1.x  . . . . . . . . . . . . . . . . . . .  11
-   3.  TIPS Information Resources  . . . . . . . . . . . . . . . . .  11
-     3.1.  Notations . . . . . . . . . . . . . . . . . . . . . . . .  12
-   4.  Transport Information Publication Service . . . . . . . . . .  12
-     4.1.  TIPS Information Resource Directory . . . . . . . . . . .  12
-       4.1.1.  Media Type  . . . . . . . . . . . . . . . . . . . . .  12
-       4.1.2.  Capabilities  . . . . . . . . . . . . . . . . . . . .  12
-       4.1.3.  Uses  . . . . . . . . . . . . . . . . . . . . . . . .  13
-       4.1.4.  Example . . . . . . . . . . . . . . . . . . . . . . .  13
-     4.2.  Create Transport State using TIPS . . . . . . . . . . . .  16
-       4.2.1.  Request . . . . . . . . . . . . . . . . . . . . . . .  17
-       4.2.2.  Response  . . . . . . . . . . . . . . . . . . . . . .  17
-     4.3.  Read Transport State using TIPS . . . . . . . . . . . . .  20
-     4.4.  Delete Transport State using TIPS . . . . . . . . . . . .  20
+   2.  TIPS Overview . . . . . . . . . . . . . . . . . . . . . . . .   7
+     2.1.  Component Terminology . . . . . . . . . . . . . . . . . .   7
+     2.2.  TIPS Workflow . . . . . . . . . . . . . . . . . . . . . .  10
+     2.3.  TIPS With HTTP/1.x  . . . . . . . . . . . . . . . . . . .  12
+   3.  TIPS Information Resources  . . . . . . . . . . . . . . . . .  12
+     3.1.  Notations . . . . . . . . . . . . . . . . . . . . . . . .  13
+   4.  Transport Information Publication Service . . . . . . . . . .  13
+     4.1.  TIPS Information Resource Directory . . . . . . . . . . .  13
+       4.1.1.  Media Type  . . . . . . . . . . . . . . . . . . . . .  13
+       4.1.2.  Capabilities  . . . . . . . . . . . . . . . . . . . .  13
+       4.1.3.  Uses  . . . . . . . . . . . . . . . . . . . . . . . .  14
+       4.1.4.  Example . . . . . . . . . . . . . . . . . . . . . . .  14
+     4.2.  Create Transport State using TIPS . . . . . . . . . . . .  17
+       4.2.1.  Request . . . . . . . . . . . . . . . . . . . . . . .  18
+       4.2.2.  Response  . . . . . . . . . . . . . . . . . . . . . .  18
+     4.3.  Read Transport State using TIPS . . . . . . . . . . . . .  21
+     4.4.  Delete Transport State using TIPS . . . . . . . . . . . .  21
 
 
 
@@ -114,51 +114,51 @@ Schott, et al.           Expires 24 August 2023                 [Page 2]
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-     4.5.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  20
-   5.  TIPS Queue State Service (QSS)  . . . . . . . . . . . . . . .  21
-     5.1.  Media Type  . . . . . . . . . . . . . . . . . . . . . . .  21
-     5.2.  HTTP Method . . . . . . . . . . . . . . . . . . . . . . .  21
-     5.3.  IRD Capabilities and Uses . . . . . . . . . . . . . . . .  22
-     5.4.  Request . . . . . . . . . . . . . . . . . . . . . . . . .  22
-     5.5.  Response  . . . . . . . . . . . . . . . . . . . . . . . .  22
-     5.6.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  23
-   6.  TIPS Update Read Service (URS)  . . . . . . . . . . . . . . .  23
-     6.1.  Path  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
-     6.2.  Media Type  . . . . . . . . . . . . . . . . . . . . . . .  24
-     6.3.  HTTP Method . . . . . . . . . . . . . . . . . . . . . . .  24
-     6.4.  Capabilities and Uses . . . . . . . . . . . . . . . . . .  24
-     6.5.  Response  . . . . . . . . . . . . . . . . . . . . . . . .  24
-     6.6.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  25
-   7.  TIPS Update Push Service (UPS)  . . . . . . . . . . . . . . .  25
-     7.1.  Manage Server Push: Receiver Set  . . . . . . . . . . . .  25
-       7.1.1.  Receiver Set Operations . . . . . . . . . . . . . . .  25
-       7.1.2.  Examples  . . . . . . . . . . . . . . . . . . . . . .  26
-     7.2.  Server Push of Incremental Updates  . . . . . . . . . . .  29
-       7.2.1.  Server Push . . . . . . . . . . . . . . . . . . . . .  29
-       7.2.2.  Examples  . . . . . . . . . . . . . . . . . . . . . .  29
-     7.3.  Server Push Stream Management . . . . . . . . . . . . . .  31
+     4.5.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  21
+   5.  TIPS Queue State Service (QSS)  . . . . . . . . . . . . . . .  22
+     5.1.  Media Type  . . . . . . . . . . . . . . . . . . . . . . .  22
+     5.2.  HTTP Method . . . . . . . . . . . . . . . . . . . . . . .  22
+     5.3.  IRD Capabilities and Uses . . . . . . . . . . . . . . . .  23
+     5.4.  Request . . . . . . . . . . . . . . . . . . . . . . . . .  23
+     5.5.  Response  . . . . . . . . . . . . . . . . . . . . . . . .  23
+     5.6.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  24
+   6.  TIPS Update Read Service (URS)  . . . . . . . . . . . . . . .  24
+     6.1.  Path  . . . . . . . . . . . . . . . . . . . . . . . . . .  24
+     6.2.  Media Type  . . . . . . . . . . . . . . . . . . . . . . .  25
+     6.3.  HTTP Method . . . . . . . . . . . . . . . . . . . . . . .  25
+     6.4.  Capabilities and Uses . . . . . . . . . . . . . . . . . .  25
+     6.5.  Response  . . . . . . . . . . . . . . . . . . . . . . . .  25
+     6.6.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  26
+   7.  TIPS Update Push Service (UPS)  . . . . . . . . . . . . . . .  26
+     7.1.  Manage Server Push: Receiver Set  . . . . . . . . . . . .  26
+       7.1.1.  Receiver Set Operations . . . . . . . . . . . . . . .  26
+       7.1.2.  Examples  . . . . . . . . . . . . . . . . . . . . . .  27
+     7.2.  Server Push of Incremental Updates  . . . . . . . . . . .  30
+       7.2.1.  Server Push . . . . . . . . . . . . . . . . . . . . .  30
+       7.2.2.  Examples  . . . . . . . . . . . . . . . . . . . . . .  30
+     7.3.  Server Push Stream Management . . . . . . . . . . . . . .  32
        7.3.1.  Server -> Client [PUSH_PROMISE for Transport Queue on
-               Stream SID_tq]  . . . . . . . . . . . . . . . . . . .  31
-   8.  Operation and Processing Considerations . . . . . . . . . . .  31
-     8.1.  Considerations for Choosing Updates . . . . . . . . . . .  31
-     8.2.  Considerations for Client Processing Updates  . . . . . .  32
-     8.3.  Considerations for Updates to Filtered Cost Maps  . . . .  33
-     8.4.  Considerations for Updates to Ordinal Mode Costs  . . . .  33
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  34
-     9.1.  TIPS: Denial-of-Service Attacks . . . . . . . . . . . . .  34
-     9.2.  ALTO Client: Update Overloading or Instability  . . . . .  34
-     9.3.  Spoofed URI . . . . . . . . . . . . . . . . . . . . . . .  35
-   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  35
-     10.1.  application/alto-tips+json Media Type  . . . . . . . . .  35
-     10.2.  application/alto-tipsparams+json Media Type  . . . . . .  36
-     10.3.  application/alto-tipsqueue+json Media Type . . . . . . .  37
-   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  38
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  38
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  38
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  39
-   Appendix A.  Changes since -06  . . . . . . . . . . . . . . . . .  40
-   Appendix B.  Changes since -05  . . . . . . . . . . . . . . . . .  40
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  41
+               Stream SID_tq]  . . . . . . . . . . . . . . . . . . .  32
+   8.  Operation and Processing Considerations . . . . . . . . . . .  32
+     8.1.  Considerations for Choosing Updates . . . . . . . . . . .  32
+     8.2.  Considerations for Client Processing Updates  . . . . . .  33
+     8.3.  Considerations for Updates to Filtered Cost Maps  . . . .  34
+     8.4.  Considerations for Updates to Ordinal Mode Costs  . . . .  34
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  35
+     9.1.  TIPS: Denial-of-Service Attacks . . . . . . . . . . . . .  35
+     9.2.  ALTO Client: Update Overloading or Instability  . . . . .  35
+     9.3.  Spoofed URI . . . . . . . . . . . . . . . . . . . . . . .  36
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  36
+     10.1.  application/alto-tips+json Media Type  . . . . . . . . .  36
+     10.2.  application/alto-tipsparams+json Media Type  . . . . . .  37
+     10.3.  application/alto-tipsqueue+json Media Type . . . . . . .  38
+   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  39
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  39
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  39
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  40
+   Appendix A.  Changes since -06  . . . . . . . . . . . . . . . . .  41
+   Appendix B.  Changes since -05  . . . . . . . . . . . . . . . . .  41
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  42
 
 
 
@@ -314,6 +314,56 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
    *  URI patterns to fetch the snapshots or incremental updates.
 
+   Conceptually, the system consists of 3 types of resources:
+
+   *  (R1) tips, which is a frontend to manage (create/delete) transport
+      states.
+
+   *  (R2) transport state directory, which provides metadata (e.g.,
+      references) about the network data.
+
+   *  (R3) the actual network data, encoded as alto resources (e.g.,
+      cost map, network map) or incremental updates.
+
+   One key high-level design decision is the flexibility in locating the
+   3 types of resources: at one extreme, they are all located on the
+   same server, and the other extreme (flexible servers) is that they
+   can be located on separate servers.  The advantage of the first
+   "extreme" is that the first request (R1) can already set up the
+
+
+
+Schott, et al.           Expires 24 August 2023                 [Page 6]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+   connection, and hence, there is a single connection to manage.
+   Hence, it is a simple, clean design.  The advantage of the second
+   "extreme" (flexible servers) is, flexibility, but the complexity is
+   that it then requires additional connections.  In the current
+   document, it takes a middle ground, R1 can create individual R2 at
+   different locations, but R2 and its corresponding R3 must be co-
+   located.  Hence, the fetching of R2 opens the connection for R3 as
+   well.  One benefit of this design is that the backend synchronization
+   between R2 and R3 can be easier.
+
+   Another key issue is the relationship between the server state and
+   the clients' views.  In the current design, the specification is that
+   this relationship is implementation specific, and hence not
+   specified.
+
+   The third main issue is whether we allow direct links.  From a
+   structural's point of view, we can consider the view of a client of a
+   network resource as a directed, acyclic graph, where each node in the
+   graph is a version of the network resource.  Each R3 resource is a
+   link in the graph.  Introducing a virtual root, the client
+   essentially traverses the links to obtain the resources.  An absolute
+   (direct, not incremental) resource of a version is a direct link from
+   the virtual root directly to the version, and an incremental resource
+   traverses just one link, from the previous version to the next
+   version.  The current document allows direct links.
+
 2.  TIPS Overview
 
 2.1.  Component Terminology
@@ -331,18 +381,19 @@ Internet-Draft                  ALTO TIPS                  February 2023
       information, it has two basic components: updates queue (uq) and
       receiver set (rs).
 
-
-
-Schott, et al.           Expires 24 August 2023                 [Page 6]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
    Updates queue (uq):
       Contains a sequence of incremental updates about a network
       information resource.  Each incremental update is assigned a
       sequence number, and a URI can be constructed using the sequence
       number.  A static network information resource (e.g., Cost Map,
+
+
+
+Schott, et al.           Expires 24 August 2023                 [Page 7]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
       Network Map) may need only a single updates queue.  A dynamic
       network information resource (e.g., Filtered Cost Map) may create
       an updates queue within the transport state for each unique filter
@@ -382,18 +433,6 @@ Internet-Draft                  ALTO TIPS                  February 2023
    ALTO client (Client 1, Client 2, or Client 3) maintains a single HTTP
    connection with the ALTO server.
 
-
-
-
-
-
-
-
-Schott, et al.           Expires 24 August 2023                 [Page 7]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
 Network Information Resource:
 
 a) Static resource (#1) such as NetworkMap
@@ -403,6 +442,14 @@ b) Filterable resource (#3) such as FilteredCostMap
                                    +-------------+
     +-----------+ +--------------+ |  Dynamic    | +-----------+
     |  Routing  | | Provisioning | |  Network    | | External  |
+
+
+
+Schott, et al.           Expires 24 August 2023                 [Page 8]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
     | Protocols | |    Policy    | | Information | | Interface |
     +-----------+ +--------------+ +-------------+ +-----------+
           |              |                |              |
@@ -442,20 +489,22 @@ b) Filterable resource (#3) such as FilteredCostMap
    | Client 1 |       | Client 2 |                 | Client 3 |
    +----------+       +----------+                 +----------+
 
-
-
-
-Schott, et al.           Expires 24 August 2023                 [Page 8]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
 tsi   = transport state information i
 tsi/uq = incremental updates queue associated with tsi
 tqi/rs = receiver set of transport queue i (for server push)
 
 
                 Figure 2: ALTO Transport Information.
+
+
+
+
+
+
+Schott, et al.           Expires 24 August 2023                 [Page 9]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
 
 2.2.  TIPS Workflow
 
@@ -501,7 +550,14 @@ tqi/rs = receiver set of transport queue i (for server push)
 
 
 
-Schott, et al.           Expires 24 August 2023                 [Page 9]
+
+
+
+
+
+
+
+Schott, et al.           Expires 24 August 2023                [Page 10]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -557,7 +613,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 10]
+Schott, et al.           Expires 24 August 2023                [Page 11]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -613,7 +669,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 11]
+Schott, et al.           Expires 24 August 2023                [Page 12]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -669,7 +725,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 12]
+Schott, et al.           Expires 24 August 2023                [Page 13]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -725,7 +781,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 13]
+Schott, et al.           Expires 24 August 2023                [Page 14]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -781,7 +837,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 14]
+Schott, et al.           Expires 24 August 2023                [Page 15]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -837,7 +893,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 15]
+Schott, et al.           Expires 24 August 2023                [Page 16]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -893,7 +949,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 16]
+Schott, et al.           Expires 24 August 2023                [Page 17]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -949,7 +1005,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 17]
+Schott, et al.           Expires 24 August 2023                [Page 18]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1005,7 +1061,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 18]
+Schott, et al.           Expires 24 August 2023                [Page 19]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1061,7 +1117,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 19]
+Schott, et al.           Expires 24 August 2023                [Page 20]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1117,7 +1173,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 20]
+Schott, et al.           Expires 24 August 2023                [Page 21]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1173,7 +1229,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 21]
+Schott, et al.           Expires 24 August 2023                [Page 22]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1229,7 +1285,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 22]
+Schott, et al.           Expires 24 August 2023                [Page 23]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1285,7 +1341,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 23]
+Schott, et al.           Expires 24 August 2023                [Page 24]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1341,7 +1397,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 24]
+Schott, et al.           Expires 24 August 2023                [Page 25]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1397,7 +1453,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 25]
+Schott, et al.           Expires 24 August 2023                [Page 26]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1453,7 +1509,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 26]
+Schott, et al.           Expires 24 August 2023                [Page 27]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1509,7 +1565,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 27]
+Schott, et al.           Expires 24 August 2023                [Page 28]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1565,7 +1621,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 28]
+Schott, et al.           Expires 24 August 2023                [Page 29]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1621,7 +1677,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 29]
+Schott, et al.           Expires 24 August 2023                [Page 30]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1677,7 +1733,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 30]
+Schott, et al.           Expires 24 August 2023                [Page 31]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1733,7 +1789,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 31]
+Schott, et al.           Expires 24 August 2023                [Page 32]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1789,7 +1845,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 32]
+Schott, et al.           Expires 24 August 2023                [Page 33]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1845,7 +1901,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 33]
+Schott, et al.           Expires 24 August 2023                [Page 34]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1901,7 +1957,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 34]
+Schott, et al.           Expires 24 August 2023                [Page 35]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1957,7 +2013,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 35]
+Schott, et al.           Expires 24 August 2023                [Page 36]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -2013,7 +2069,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 36]
+Schott, et al.           Expires 24 August 2023                [Page 37]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -2069,7 +2125,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 37]
+Schott, et al.           Expires 24 August 2023                [Page 38]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -2125,7 +2181,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 38]
+Schott, et al.           Expires 24 August 2023                [Page 39]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -2181,7 +2237,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 39]
+Schott, et al.           Expires 24 August 2023                [Page 40]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -2237,7 +2293,7 @@ Appendix B.  Changes since -05
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 40]
+Schott, et al.           Expires 24 August 2023                [Page 41]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -2293,4 +2349,4 @@ Authors' Addresses
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 41]
+Schott, et al.           Expires 24 August 2023                [Page 42]

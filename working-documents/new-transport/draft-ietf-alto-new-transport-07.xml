@@ -222,6 +222,18 @@
           <li>a new resource type that specifies the iREST graph model for a resource;</li>
           <li>URI patterns to fetch the snapshots or incremental updates.</li>
         </ul>
+        <t>Conceptually, the system consists of 3 types of resources:</t>
+        <ul>
+	  <li>(R1) tips, which is a frontend to manage (create/delete) transport states.</li>
+  	  <li>(R2) transport state directory, which provides metadata (e.g., references) about the network data.</li>
+  	  <li>(R3) the actual network data, encoded as alto resources (e.g., cost map, network map) or incremental updates.</li>
+	</ul>
+	<t>One key high-level design decision is the flexibility in locating the 3 types of resources: at one extreme, they are all located on the same server, and the other extreme (flexible servers) is that they can be located on separate servers. The advantage of the first "extreme" is that the first request (R1) can already set up the connection, and hence, there is a single connection to manage. Hence, it is a simple, clean design. The advantage of the second "extreme" (flexible servers) is, flexibility, but the complexity is that it then requires additional connections. In the current document, it takes a middle ground, R1 can create individual R2 at different locations, but R2 and its corresponding R3 must be co-located. Hence, the fetching of R2 opens the connection for R3 as well. One benefit of this design is that the backend synchronization between R2 and R3 can be easier.</t>
+	<t> Another key issue is the relationship between the server state and
+the clients' views. In the current design, the specification is that this
+relationship is implementation specific, and hence not specified. </t>
+	<t>
+The third main issue is whether we allow direct links. From a structural's point of view, we can consider the view of a client of a network resource as a directed, acyclic graph, where each node in the graph is a version of the network resource. Each R3 resource is a link in the graph. Introducing a virtual root, the client essentially traverses the links to obtain the resources. An absolute (direct, not incremental) resource of a version is a direct link from the virtual root directly to the version, and an incremental resource traverses just one link, from the previous version to the next version. The current document allows direct links. </t>
       </section>
 
     </section>
