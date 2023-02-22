@@ -7,13 +7,13 @@
 ]>
 <!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
      by Daniel M Kohn (private) -->
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-06" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-07" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
   <!-- xml2rfc v2v3 conversion 3.12.10 -->
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
   <front>
     <title abbrev="ALTO TIPS">ALTO Transport Information Publication Service</title>
-    <seriesInfo name="Internet-Draft" value="draft-ietf-alto-new-transport-06"/>
+    <seriesInfo name="Internet-Draft" value="draft-ietf-alto-new-transport-07"/>
     <author fullname="Roland Schott" initials="R." surname="Schott">
       <organization>Deutsche Telekom</organization>
       <address>
@@ -42,9 +42,10 @@
       <organization>Sichuan University</organization>
       <address>
         <postal>
-          <street/>
+	  <street>No.24 South Section 1, Yihuan Road</street>
           <city>Chengdu</city>
-          <code>201804</code>
+	  <region>Sichuan</region>
+          <code>610065</code>
           <country>China</country>
         </postal>
         <email>kgao@scu.edu.cn</email>
@@ -174,6 +175,53 @@
               in BCP 14 <xref target="RFC2119" format="default"/><xref target="RFC8174" format="default"/> 
               when, and only when, they appear in all capitals, as shown here.
           </t>
+      </section>
+
+      <section anchor="understanding" numbered="true" toc="default">
+        <name>Understanding TIPS</name>
+	<t>This section gives an informal description of the transport
+	information publication service (TIPS) to help build the understanding.</t>
+	<t>For each resource (e.g., a cost map, network map), the incremental
+	updates and snapshots can be represented using the following graph model:</t>
+        <ul>
+          <li>Each node in the graph is a version of the resource. Version 0 is reserved as the initial state (empty/null).</li>
+	  <li>Each edge is transport data. In particular, edge from i to j is
+	  the (op, data) to transition version from version i to version j.</li>
+        </ul>
+        <t>A concrete example is as shown in <xref target="FigUnderstanding" format="default"/>. There are 5 versions (numbered from 0 to 4). Dashed lines represent snapshots and dotted lines represent incremental updates. Version 1 and version 3 can be obtained as snapshots, and the server offers 3 incremental changes: from version 1 to version 2, version 2 to version 3, and version 3 to version 4. Note that node content is path independent: the content can be obtained by applying the updates from different paths. For example, assume the client already has version 2, version 3 can either be directly fetched as a snapshot or computed incrementally by applying the incremental updates between 2 to 3.</t>
+        <figure anchor="FigUnderstanding">
+          <name>Incremental RSpresentation State Transfer Example.</name>
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+     +-----+
+     |  0  |--------------
+     +-----+              \ snapshot
+        | snapshot         \
+         \                  \
+          v                  v
+       +-----+    +-----+    +-----+    +-----+
+       |  1  |...>|  2  |...>|  3  |...>|  4  |
+       +-----+ .  +-----+ .  +-----+ .  +-----+
+               .          .         .
+                .         .        .
+                 incremental updates
+      
+      ]]></artwork>
+        </figure>
+        <t>At any time, the server maintains a set of versions (denoted as V) that satisfy the following invariants:</t>
+        <ul>
+	  <li>Continuity: for any v1 &lt; v2 such that v1 is in V and v2 is in V,
+	  for all  v1 &lt; v &lt; v2, v is also in V.</li>
+          <li>Feasibility: let v0 denote the smallest version in V, the server can provide a snapshot of v0.</li>
+          <li>"Right shift" only: if a server provides [n1, n2] at time t and [n1', n2'] at time t'. If t' &gt; t, then n1' &gt; n1 and n2' &gt; n2.</li>
+        </ul>
+	<t>For example, assume at time 0, the server provides the valid set [1,
+	2, 3]. At time 1, both [1, 2, 3, 4] and [3, 4] are valid sets. However, [2, 3, 4] is not a valid set as there is no snapshot of version 2. Thus, there is a risk that the right content of version 2 cannot be obtained by a client that does not have the previous version 1.</t>
+        <t>This document is based on the incremental representation state transfer model presented above, and specifies the following:</t>
+        <ul>
+          <li>ALTO protocol extensions to create/update/remove an incremental representation state transfer of a resource (iREST);</li> 
+          <li>a new resource type that specifies the iREST graph model for a resource;</li>
+          <li>URI patterns to fetch the snapshots or incremental updates.</li>
+        </ul>
       </section>
 
     </section>
@@ -2109,5 +2157,40 @@ Client                                  TIPS         UPS
         <!-- requirements -->
       </references>
     </references>
+
+    <section numbered="true" toc="default">
+      <name>Changes since -06</name>
+      <t>NOTE: To be removed upon publication</t>
+      <t>Revision -07 </t>
+      <ul spacing="normal">
+	<li>Added a new subsection to give the high-level ideas of TIPS</li>
+        <li>Added the change log</li>
+      </ul>
+    </section>
+    <section numbered="true" toc="default">
+      <name>Changes since -05</name>
+      <t>NOTE: To be removed upon publication</t>
+      <t>Revision -06 </t>
+      <ul spacing="normal">
+	<li>Restructured the Abstract (based on Adrian's feedback) and Section
+	2 (based on Jordi's feedback) to be more clear on the abstractions we are
+	proposing</li>
+	<li> Moved Requirements Language into Section 1 per RFC guidelines</li>
+	<li>Added a Section 2.3 to clarify TIPS with HTTP/1.x, because Qin
+	noted the draft was unclear on how TIPS related to HTTP versions</li>
+	<li>Merged in the TIPS server push draft
+	[draft-schott-alto-new-transport-push] into Section 7 (all but 3 sections of
+        that draft were shared by this transport draft so they were copy/pasted into
+	Section 7 - there are now 3 subsections of it) </li>
+	<li>Moved Section 8 on IRDs into Section 4.1 as an example of an IRD
+	because Jordi noted that the definition of an IRD was unclear</li>
+	<li>Deleted the Appendix describing HTTP/3 outlook because it no longer
+	applies since TIPS should be version independent</li>
+	<li>Updated the draft with small clarifications/grammar tweaks based on
+	feedback from Qin, Adrian, and Jordi (including small changes to the
+	Figures)</li>
+	<li>Cleaned up all the idnits validation errors</li>
+      </ul>
+    </section>
   </back>
 </rfc>
