@@ -8,6 +8,66 @@
 - **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
 
 
+**IETF, ALTO Meeting: February 21th, 2023**
+
+**Agenda:**
+
+- Chartered items
+- Review of 'In Progress/Discussion' tasks: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+
+
+**Minutes:**
+
+Note Taker: Kai Gao
+
+
+Logistics:
+
+- Interim meeting:
+  - Goal: complete the new round of feedback
+  - Qin: move the deployment item to face-to-face meeting. Introduce alto deployment to demonstrate the valid use cases
+  - Luis & Richard will update the wiki page of ALTO deployment
+- Yokohama IETF:
+  - Qin asked whether there the Fujitsu teams have plans on Trust-driven networking during IETF 116
+  - Ayoub mentioned to have a slot in the ALTO session and his collegues are preparing for the bits and bytes session. Two demos are being prepared including one using ATLAS probing platform to show location correlated trust.
+  - Qin suggested to have a hybrid meeting in the next IETF.
+  - Motoyoshi said once the ALTO meeting is decided, the Fujitsu team will book some time for the side meeting.
+  - For the time of the TDN side meeting, Qin suggested scheduling the meeting before ALTO and Motoyoshi mentioned potential slots on Tuesday afternoon or evening.
+  - Once the IETF agenda is fixed, Fujitsu team will post the meeting schedule to the mailing list.
+- Charter items 
+  - new transport:
+    - remaining issues:
+      - what is the mental model?
+      - incremental representational state transfer
+      - Network resource data represented as a DAG
+        - node - version (tag)
+        - edge - transport data/transition from one version to another
+	- node content is path-independent
+	- invariants maintained by server:
+	  - continuity: n1->n2
+	  - always a direct link to n1
+	  - right-shift only
+      - Data representation: a virtual "directory" system
+      - Node/edge encoded in URI
+    - Jordi: does continuity imply feasibility?
+    - Richard: If removed 101, but 102 is dangling. Then there is no feasibility.
+    - Jordi: What if there are multiple paths? Which one will be returned?
+    - Richard: The meta will return the graph indicating all the paths. Client can decide how to download.
+    - Kai: Do we enable IREST for IREST?
+    - Richard: We do not enable server push for the meta data
+    - Jordi: Do we consider performance, e.g., getting the data for 106?
+    - Richard:  Recommended is to use the shortest path. 
+    - Qin: Maybe too complex. Post the version to the mailing list and get feedback.
+    - Qin: Add a change log to summarize the changes in the new draft.
+    - Jensen: https://author-tools.ietf.org/iddiff?url1=draft-ietf-alto-new-transport-05&url2=https://github.com/ietf-wg-alto/wg-materials/raw/main/working-documents/new-transport/draft-ietf-alto-new-transport-05%20Lachlan%20Edit.txt&difftype=--html
+  - OAM:	
+    - Add role to do the role-based
+  - Richard: Is the purpose of the Interim meeting to finalize both documents?
+  - Qin: Request review after the interim meeting. Issue WGLC.
+  - Sabine will provide feedback on Wednesday.
+  - Roland: Provide the feedback over the mailing list.
+  - Qin: Need volunteer for the interim meeting.
+  
 ------------------------------
 
 **IETF, ALTO Meeting: February 14th, 2023**
