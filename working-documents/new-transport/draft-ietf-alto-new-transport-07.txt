@@ -5,13 +5,13 @@
 ALTO Working Group                                             R. Schott
 Internet-Draft                                          Deutsche Telekom
 Intended status: Standards Track                                 Y. Yang
-Expires: 24 August 2023                                  Yale University
+Expires: 29 August 2023                                  Yale University
                                                                   K. Gao
                                                       Sichuan University
                                                              L. Delwiche
                                                                L. Keller
                                                          Yale University
-                                                        20 February 2023
+                                                        25 February 2023
 
 
              ALTO Transport Information Publication Service
@@ -33,42 +33,37 @@ Abstract
    connection.
 
    To take advantage of newer HTTP features, this document introduces
-   the ALTO Transport Information Publication Service (TIPS).  TIPS
-   allows the naming of (i.e., assigning resource identifiers to)
-   individual incremental updates to multiple ALTO information
-   resources, and the distribution of those names.  It gives an ALTO
-   client the capability to explicitly request (pull) a specific
-   incremental update.  It also provides an ALTO server the capability
-   to push a specific incremental update.  This document defines TIPS as
-   a service, with client pull and server push.
+   the ALTO Transport Information Publication Service (TIPS).  TIPS uses
+   an incremental RESTful design to give an ALTO client the new
+   capability to explicitly, concurrently (non-blocking) request (pull)
+   specific incremental updates using native HTTP/2 or HTTP/3, while
+   still functioning for HTTP/1.x.  It also provides an ALTO server the
+   new capability to concurrently push specific incremental updates
+   using native HTTP/2 or HTTP/3 server push.
 
 Status of This Memo
 
    This Internet-Draft is submitted in full conformance with the
    provisions of BCP 78 and BCP 79.
 
-
-
-
-
-
-
-Schott, et al.           Expires 24 August 2023                 [Page 1]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
    Internet-Drafts are working documents of the Internet Engineering
    Task Force (IETF).  Note that other groups may also distribute
    working documents as Internet-Drafts.  The list of current Internet-
    Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+
+
+Schott, et al.           Expires 29 August 2023                 [Page 1]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
 
    Internet-Drafts are draft documents valid for a maximum of six months
    and may be updated, replaced, or obsoleted by other documents at any
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 August 2023.
+   This Internet-Draft will expire on 29 August 2023.
 
 Copyright Notice
 
@@ -88,84 +83,89 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
      1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   5
-     1.2.  Understanding TIPS  . . . . . . . . . . . . . . . . . . .   5
-   2.  TIPS Overview . . . . . . . . . . . . . . . . . . . . . . . .   7
-     2.1.  Component Terminology . . . . . . . . . . . . . . . . . .   7
-     2.2.  TIPS Workflow . . . . . . . . . . . . . . . . . . . . . .  10
-     2.3.  TIPS With HTTP/1.x  . . . . . . . . . . . . . . . . . . .  12
-   3.  TIPS Information Resources  . . . . . . . . . . . . . . . . .  12
-     3.1.  Notations . . . . . . . . . . . . . . . . . . . . . . . .  13
-   4.  Transport Information Publication Service . . . . . . . . . .  13
-     4.1.  TIPS Information Resource Directory . . . . . . . . . . .  13
-       4.1.1.  Media Type  . . . . . . . . . . . . . . . . . . . . .  13
-       4.1.2.  Capabilities  . . . . . . . . . . . . . . . . . . . .  13
-       4.1.3.  Uses  . . . . . . . . . . . . . . . . . . . . . . . .  14
-       4.1.4.  Example . . . . . . . . . . . . . . . . . . . . . . .  14
-     4.2.  Create Transport State using TIPS . . . . . . . . . . . .  17
-       4.2.1.  Request . . . . . . . . . . . . . . . . . . . . . . .  18
-       4.2.2.  Response  . . . . . . . . . . . . . . . . . . . . . .  18
-     4.3.  Read Transport State using TIPS . . . . . . . . . . . . .  21
-     4.4.  Delete Transport State using TIPS . . . . . . . . . . . .  21
+     1.2.  Notations . . . . . . . . . . . . . . . . . . . . . . . .   5
+   2.  TIPS Overview . . . . . . . . . . . . . . . . . . . . . . . .   5
+     2.1.  Basic Data Model: Incremental Representation State Transfer
+           (iREST) . . . . . . . . . . . . . . . . . . . . . . . . .   5
+       2.1.1.  iREST Resource Location Schema  . . . . . . . . . . .   8
+     2.2.  High-level Service Model  . . . . . . . . . . . . . . . .   8
+     2.3.  TIPS Terminology  . . . . . . . . . . . . . . . . . . . .  10
+     2.4.  TIPS Workflow . . . . . . . . . . . . . . . . . . . . . .  12
+     2.5.  TIPS With HTTP/1.x  . . . . . . . . . . . . . . . . . . .  14
+   3.  TIPS Information Resource Directory (IRD) Announcement  . . .  14
+     3.1.  Media Type  . . . . . . . . . . . . . . . . . . . . . . .  15
+     3.2.  Capabilities  . . . . . . . . . . . . . . . . . . . . . .  15
+     3.3.  Uses  . . . . . . . . . . . . . . . . . . . . . . . . . .  16
+     3.4.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  16
+   4.  TIPS Open/Close . . . . . . . . . . . . . . . . . . . . . . .  19
+     4.1.  Open Request  . . . . . . . . . . . . . . . . . . . . . .  19
+     4.2.  Open Response . . . . . . . . . . . . . . . . . . . . . .  20
+     4.3.  Open Example  . . . . . . . . . . . . . . . . . . . . . .  22
+     4.4.  Close Request . . . . . . . . . . . . . . . . . . . . . .  23
+   5.  TIPS View Metadata Directory  . . . . . . . . . . . . . . . .  24
+     5.1.  Request . . . . . . . . . . . . . . . . . . . . . . . . .  24
+     5.2.  Response  . . . . . . . . . . . . . . . . . . . . . . . .  24
+     5.3.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  25
 
 
 
-Schott, et al.           Expires 24 August 2023                 [Page 2]
+Schott, et al.           Expires 29 August 2023                 [Page 2]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-     4.5.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  21
-   5.  TIPS Queue State Service (QSS)  . . . . . . . . . . . . . . .  22
-     5.1.  Media Type  . . . . . . . . . . . . . . . . . . . . . . .  22
-     5.2.  HTTP Method . . . . . . . . . . . . . . . . . . . . . . .  22
-     5.3.  IRD Capabilities and Uses . . . . . . . . . . . . . . . .  23
-     5.4.  Request . . . . . . . . . . . . . . . . . . . . . . . . .  23
-     5.5.  Response  . . . . . . . . . . . . . . . . . . . . . . . .  23
-     5.6.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  24
-   6.  TIPS Update Read Service (URS)  . . . . . . . . . . . . . . .  24
-     6.1.  Path  . . . . . . . . . . . . . . . . . . . . . . . . . .  24
-     6.2.  Media Type  . . . . . . . . . . . . . . . . . . . . . . .  25
-     6.3.  HTTP Method . . . . . . . . . . . . . . . . . . . . . . .  25
-     6.4.  Capabilities and Uses . . . . . . . . . . . . . . . . . .  25
-     6.5.  Response  . . . . . . . . . . . . . . . . . . . . . . . .  25
-     6.6.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  26
-   7.  TIPS Update Push Service (UPS)  . . . . . . . . . . . . . . .  26
-     7.1.  Manage Server Push: Receiver Set  . . . . . . . . . . . .  26
-       7.1.1.  Receiver Set Operations . . . . . . . . . . . . . . .  26
-       7.1.2.  Examples  . . . . . . . . . . . . . . . . . . . . . .  27
-     7.2.  Server Push of Incremental Updates  . . . . . . . . . . .  30
-       7.2.1.  Server Push . . . . . . . . . . . . . . . . . . . . .  30
-       7.2.2.  Examples  . . . . . . . . . . . . . . . . . . . . . .  30
-     7.3.  Server Push Stream Management . . . . . . . . . . . . . .  32
-       7.3.1.  Server -> Client [PUSH_PROMISE for Transport Queue on
-               Stream SID_tq]  . . . . . . . . . . . . . . . . . . .  32
-   8.  Operation and Processing Considerations . . . . . . . . . . .  32
-     8.1.  Considerations for Choosing Updates . . . . . . . . . . .  32
-     8.2.  Considerations for Client Processing Updates  . . . . . .  33
-     8.3.  Considerations for Updates to Filtered Cost Maps  . . . .  34
-     8.4.  Considerations for Updates to Ordinal Mode Costs  . . . .  34
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  35
-     9.1.  TIPS: Denial-of-Service Attacks . . . . . . . . . . . . .  35
-     9.2.  ALTO Client: Update Overloading or Instability  . . . . .  35
-     9.3.  Spoofed URI . . . . . . . . . . . . . . . . . . . . . . .  36
-   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  36
-     10.1.  application/alto-tips+json Media Type  . . . . . . . . .  36
-     10.2.  application/alto-tipsparams+json Media Type  . . . . . .  37
-     10.3.  application/alto-tipsqueue+json Media Type . . . . . . .  38
-   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  39
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  39
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  39
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  40
-   Appendix A.  Changes since -06  . . . . . . . . . . . . . . . . .  41
-   Appendix B.  Changes since -05  . . . . . . . . . . . . . . . . .  41
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  42
+     5.4.  Refresh Directory . . . . . . . . . . . . . . . . . . . .  26
+       5.4.1.  Request . . . . . . . . . . . . . . . . . . . . . . .  27
+       5.4.2.  Response  . . . . . . . . . . . . . . . . . . . . . .  27
+     5.5.  Server Updates Directory Invariants . . . . . . . . . . .  27
+   6.  TIPS Data Transfers - Client Pull . . . . . . . . . . . . . .  28
+     6.1.  Request . . . . . . . . . . . . . . . . . . . . . . . . .  28
+     6.2.  Response  . . . . . . . . . . . . . . . . . . . . . . . .  29
+       6.2.1.  Server Processing "Error" Conditions  . . . . . . . .  29
+     6.3.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  29
+   7.  TIPS Data Transfer - Server Push  . . . . . . . . . . . . . .  30
+     7.1.  Manage Server Push  . . . . . . . . . . . . . . . . . . .  30
+       7.1.1.  Start Server Push . . . . . . . . . . . . . . . . . .  30
+       7.1.2.  Read Push State . . . . . . . . . . . . . . . . . . .  33
+       7.1.3.  Stop Push . . . . . . . . . . . . . . . . . . . . . .  33
+     7.2.  Server Push of Incremental Updates  . . . . . . . . . . .  34
+       7.2.1.  Server Push . . . . . . . . . . . . . . . . . . . . .  35
+       7.2.2.  Examples  . . . . . . . . . . . . . . . . . . . . . .  35
+     7.3.  Server Push Stream Management . . . . . . . . . . . . . .  37
+       7.3.1.  Server -> Client [PUSH_PROMISE for updates graph on
+               Stream SID_tq]  . . . . . . . . . . . . . . . . . . .  37
+   8.  Operation and Processing Considerations . . . . . . . . . . .  37
+     8.1.  Considerations for Load Balancing . . . . . . . . . . . .  37
+     8.2.  Considerations for Choosing Updates . . . . . . . . . . .  38
+     8.3.  Considerations for Cross-Resource Dependency
+           Scheduling  . . . . . . . . . . . . . . . . . . . . . . .  38
+     8.4.  Considerations for Client Processing Updates  . . . . . .  39
+     8.5.  Considerations for Updates to Filtered Cost Maps  . . . .  40
+     8.6.  Considerations for Updates to Ordinal Mode Costs  . . . .  41
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  41
+     9.1.  TIPS: Denial-of-Service Attacks . . . . . . . . . . . . .  41
+     9.2.  ALTO Client: Update Overloading or Instability  . . . . .  42
+     9.3.  Spoofed URI . . . . . . . . . . . . . . . . . . . . . . .  42
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  42
+     10.1.  application/alto-tips+json Media Type  . . . . . . . . .  42
+     10.2.  application/alto-tipsparams+json Media Type  . . . . . .  43
+     10.3.  application/alto-tipsgraph+json Media Type . . . . . . .  44
+     10.4.  application/alto-tipspush+json Media Type  . . . . . . .  46
+   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  47
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  47
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  47
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  48
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  48
 
 
 
 
 
 
-Schott, et al.           Expires 24 August 2023                 [Page 3]
+
+
+
+Schott, et al.           Expires 29 August 2023                 [Page 3]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -209,22 +209,30 @@ Internet-Draft                  ALTO TIPS                  February 2023
    how and when it receives updates.
 
    This document introduces a new ALTO service called the transport
-   information publication service (TIPS), which allows an ALTO server
-   to publish the naming of individual incremental updates to multiple
-   ALTO information resources.  TIPS gives an ALTO client the new
-   capability to explicitly, concurrently (non-blocking) request (pull)
-   specific incremental updates using native HTTP/2 or HTTP/3, while
-   still functioning for HTTP/1.x.  It also provides an ALTO server the
-   new capability to concurrently push specific incremental updates
-   using native HTTP/2 or HTTP/3 server push.
+   information publication service (TIPS).  TIPS uses an incremental
+   RESTful design to give an ALTO client the new capability to
+   explicitly, concurrently (non-blocking) request (pull) specific
+   incremental updates using native HTTP/2 or HTTP/3, while still
+   functioning for HTTP/1.x.  It also provides an ALTO server the new
+   capability to concurrently push specific incremental updates using
+   native HTTP/2 or HTTP/3 server push.  This document specifies the
+   following:
 
 
 
 
-Schott, et al.           Expires 24 August 2023                 [Page 4]
+Schott, et al.           Expires 29 August 2023                 [Page 4]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
+
+   *  ALTO protocol extensions to create/update/remove an incremental
+      representational state transfer resource (iREST);
+
+   *  A new resource type that specifies the iREST graph model for a
+      resource;
+
+   *  URI patterns to fetch the snapshots or incremental updates.
 
 1.1.  Requirements Language
 
@@ -234,139 +242,271 @@ Internet-Draft                  ALTO TIPS                  February 2023
    14 [RFC2119][RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-1.2.  Understanding TIPS
+1.2.  Notations
 
-   This section gives an informal description of the transport
-   information publication service (TIPS) to help build the
-   understanding.
-
-   For each resource (e.g., a cost map, network map), the incremental
-   updates and snapshots can be represented using the following graph
-   model:
-
-   *  Each node in the graph is a version of the resource.  Version 0 is
-      reserved as the initial state (empty/null).
-
-   *  Each edge is transport data.  In particular, edge from i to j is
-      the (op, data) to transition version from version i to version j.
-
-   A concrete example is as shown in Figure 1.  There are 5 versions
-   (numbered from 0 to 4).  Dashed lines represent snapshots and dotted
-   lines represent incremental updates.  Version 1 and version 3 can be
-   obtained as snapshots, and the server offers 3 incremental changes:
-   from version 1 to version 2, version 2 to version 3, and version 3 to
-   version 4.  Note that node content is path independent: the content
-   can be obtained by applying the updates from different paths.  For
-   example, assume the client already has version 2, version 3 can
-   either be directly fetched as a snapshot or computed incrementally by
-   applying the incremental updates between 2 to 3.
-
-        +-----+
-        |  0  |--------------
-        +-----+              \ snapshot
-           | snapshot         \
-            \                  \
-             v                  v
-          +-----+    +-----+    +-----+    +-----+
-          |  1  |...>|  2  |...>|  3  |...>|  4  |
-          +-----+ .  +-----+ .  +-----+ .  +-----+
-                  .          .         .
-                   .         .        .
-                    incremental updates
-
-
-
-
-Schott, et al.           Expires 24 August 2023                 [Page 5]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
-        Figure 1: Incremental RSpresentation State Transfer Example.
-
-   At any time, the server maintains a set of versions (denoted as V)
-   that satisfy the following invariants:
-
-   *  Continuity: for any v1 < v2 such that v1 is in V and v2 is in V,
-      for all v1 < v < v2, v is also in V.
-
-   *  Feasibility: let v0 denote the smallest version in V, the server
-      can provide a snapshot of v0.
-
-   *  "Right shift" only: if a server provides [n1, n2] at time t and
-      [n1', n2'] at time t'.  If t' > t, then n1' > n1 and n2' > n2.
-
-   For example, assume at time 0, the server provides the valid set [1,
-   2, 3].  At time 1, both [1, 2, 3, 4] and [3, 4] are valid sets.
-   However, [2, 3, 4] is not a valid set as there is no snapshot of
-   version 2.  Thus, there is a risk that the right content of version 2
-   cannot be obtained by a client that does not have the previous
-   version 1.
-
-   This document is based on the incremental representation state
-   transfer model presented above, and specifies the following:
-
-   *  ALTO protocol extensions to create/update/remove an incremental
-      representation state transfer of a resource (iREST);
-
-   *  a new resource type that specifies the iREST graph model for a
-      resource;
-
-   *  URI patterns to fetch the snapshots or incremental updates.
-
-   Conceptually, the system consists of 3 types of resources:
-
-   *  (R1) tips, which is a frontend to manage (create/delete) transport
-      states.
-
-   *  (R2) transport state directory, which provides metadata (e.g.,
-      references) about the network data.
-
-   *  (R3) the actual network data, encoded as alto resources (e.g.,
-      cost map, network map) or incremental updates.
-
-   One key high-level design decision is the flexibility in locating the
-   3 types of resources: at one extreme, they are all located on the
-   same server, and the other extreme (flexible servers) is that they
-   can be located on separate servers.  The advantage of the first
-   "extreme" is that the first request (R1) can already set up the
-
-
-
-Schott, et al.           Expires 24 August 2023                 [Page 6]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
-   connection, and hence, there is a single connection to manage.
-   Hence, it is a simple, clean design.  The advantage of the second
-   "extreme" (flexible servers) is, flexibility, but the complexity is
-   that it then requires additional connections.  In the current
-   document, it takes a middle ground, R1 can create individual R2 at
-   different locations, but R2 and its corresponding R3 must be co-
-   located.  Hence, the fetching of R2 opens the connection for R3 as
-   well.  One benefit of this design is that the backend synchronization
-   between R2 and R3 can be easier.
-
-   Another key issue is the relationship between the server state and
-   the clients' views.  In the current design, the specification is that
-   this relationship is implementation specific, and hence not
-   specified.
-
-   The third main issue is whether we allow direct links.  From a
-   structural's point of view, we can consider the view of a client of a
-   network resource as a directed, acyclic graph, where each node in the
-   graph is a version of the network resource.  Each R3 resource is a
-   link in the graph.  Introducing a virtual root, the client
-   essentially traverses the links to obtain the resources.  An absolute
-   (direct, not incremental) resource of a version is a direct link from
-   the virtual root directly to the version, and an incremental resource
-   traverses just one link, from the previous version to the next
-   version.  The current document allows direct links.
+   This document uses the same syntax and notations as introduced in
+   Section 8.2 of RFC 7285 [RFC7285] to specify the extensions to
+   existing ALTO resources and services.
 
 2.  TIPS Overview
 
-2.1.  Component Terminology
+2.1.  Basic Data Model: Incremental Representation State Transfer
+      (iREST)
+
+   For each resource (e.g., a cost map, network map), the incremental
+   updates and snapshots can be represented using the following directed
+   acyclic graph model, where the server maps base resource IDs to
+   incremental update IDs that are assigned sequentially:
+
+   *  Each node in the graph is a version of the resource, where a tag
+      identifies content of version (tag is valid only within the scope
+      of resource).  Version 0 is reserved as the initial state (empty/
+      null).
+
+   *  Each edge is transport data (update item).  In particular, edge
+      from i to j is the (op, data) to transition version from version i
+      to version j.
+
+   *  Node content is path independent (different paths arrive at the
+      same content)
+
+   A concrete example is as shown in Figure 1.  Thick lines represent
+   incremental updates and thin lines represent snapshots.  Note that
+   node content is path independent: the content can be obtained by
+   applying the updates from different paths.  For example, assume the
+
+
+
+Schott, et al.           Expires 29 August 2023                 [Page 5]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+   client already has version at 103: the version at 105 can either be
+   directly fetched as a snapshot or computed incrementally by applying
+   the incremental updates between 103 and 104, then 104 and 105.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                 [Page 6]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+                                            +======+
+                                            |  0   |
+                                            +======+
+                                            /   |  \
+                                  ID0-101  /    |   |
+                                          /     |   |
+                                        |/__    |   |
+                                  +======+      |   |
+                      tag: 1.1 -> | 101  |      |   |
+                                  +======+      |   |
+                                     ||         |   |
+                          ID101-102  ||         |   |
+                                     \/         |   |
+                                  +======+      |   |
+                      tag: 1.5 -> | 102  |      |   |
+                                  +======+      |   |
+                                     ||         |   |
+                          ID102-103  ||  ID0-103|   |
+                                     \/         |   |
+                                  +======+      /   |
+  +---------------+   tag: 2.0 -> | 103  |<----/    |
+  | Base Resource |  =====>       +======+          |
+  +---------------+                  ||             |
+                          ID103-104  ||             |
+                                     \/             |
+                                  +======+          |
+                      tag: 3.0 -> | 104  |          |
+                                  +======+          |
+                                     ||             | ID0-105
+                          ID104-105  ||             |
+                                     \/             /
+                                  +======+         /
+                      tag: 3.3 -> | 105  |<-------/
+                                  +======+
+                                     ||
+                          ID105-106  ||
+                                     \/
+                                  +======+
+                      tag: 3.7 -> | 106  |
+                                  +======+
+
+            tag: denotes the version of the resource at node i
+            ID###-###: denotes update item (op, data) to transition from
+                       version at node i to version at node j
+
+
+                      Figure 1: iREST Model Example
+
+
+
+
+Schott, et al.           Expires 29 August 2023                 [Page 7]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+2.1.1.  iREST Resource Location Schema
+
+   To access each individual update, consider the model represented as a
+   "virtual" file system (adjacency list).
+
+
+         <tips-view-uri>
+             ug    // updates graph
+                 0
+                     101    // full 101 content
+                     103
+                     105
+                 101
+                     102    // 101 -> 102 patch
+                 102
+                     103
+                 103
+                     104
+                 104
+                     105
+                 105
+                     106
+
+
+         Location -> resource naming (ID assignment)
+           - <tips-view-uri>/ug/<i>/<j>
+
+         Client Pull:
+           GET /<tips-view-uri>/ug/0/105
+           GET /<tips-view-uri>/ug/105/106
+
+         Server Push:
+           Use the URI as above
+
+
+                  Figure 2: Location Schema for Figure 1.
+
+   Due to the sequential nature of the update patch IDs, a client can
+   long pull a future update that does not yet exist (e.g., the patch
+   from 106 to 107) by constructing the URI:
+
+       GET /<tips-view-uri>/ug/<end-seq>/<end-seq + 1>
+
+2.2.  High-level Service Model
+
+   Conceptually, the TIPS system consists of 3 types of resources:
+
+   *  (R1) TIPS frontend to manage (create/delete) TIPS views.
+
+
+
+Schott, et al.           Expires 29 August 2023                 [Page 8]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+   *  (R2) TIPS view directory, which provides metadata (e.g.,
+      references) about the network resource data.
+
+   *  (R3) The actual network resource data, encoded as complete ALTO
+      network resources (e.g., cost map, network map) or incremental
+      updates.
+
+                      +------------------------------------------------+
+                      |                                                |
+ +------+             |R1: Frontend/Open  R2: Directory/Meta  R3: Data |
+ |      | "iget" base |     +-----+           +-----+         +-----+  |
+ |      | resource 1  |     |     |           |     |         |     |  |
+ |      |-------------|---->|     |           |     |         |     |  |
+ |      | incremental |     |     |           |     |-------->|     |  |
+ |      | transfer    |     |     |           |     |         |     |  |
+ |      | resource    |     |     |           |     |         |     |  |
+ |      |<------------|-----|     |           +-----+         +-----+  |
+ |Client|             |     |     |                                    |
+ |      | "iget" base |     |     |                                    |
+ |      | resource 2  |     |     |           +-----+         +-----+  |
+ |      |-------------|---->|     |           |     |         |     |  |
+ |      | incremental |     |     |           |     |         |     |  |
+ |      | transfer    |     |     |           |     | ------->|     |  |
+ |      | resource    |     |     |           |     |         |     |  |
+ |      |<------------|-----|     |           |     |         |     |  |
+ +------+             |     +-----+           +-----+         +-----+  |
+                      |                                                |
+                      +------------------------------------------------+
+
+
+                        Figure 3: Service Model
+
+   Design Point: Component Resource Location
+
+   *  Design 1 (Single): all 3 types at the same, single server
+      (accessed via relative reference)
+
+   *  Design 2 (Flexible): all 3 types can be at their own server
+      (accessed via absolute reference)
+
+   *  Design 3 (Dir + Data): R2 and R3 must remain together, though R1
+      might not be on the same server
+
+   This document specifies Design 1 (keeping R1, R2, and R3 on the same
+   server) in order to simplify session management, though at the
+   expense of maximum load balancing flexibility (see Section 8.1 for a
+   discussion on load balancing considerations).  A future companion
+   document may extend the protocol to support Design 2 or Design 3.
+
+
+
+Schott, et al.           Expires 29 August 2023                 [Page 9]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+2.3.  TIPS Terminology
 
    This document uses the following components:
 
@@ -374,29 +514,22 @@ Internet-Draft                  ALTO TIPS                  February 2023
       A piece of retrievable information about network state, per
       [RFC7285].
 
-   Transport state (ts):
-      Defined in this document to be the container of transport
-      information that is information about the network information
-      resource.  Though the transport state may include other transport
-      information, it has two basic components: updates queue (uq) and
-      receiver set (rs).
+   TIPS view (ts):
+      Defined in this document to be the container of incremental
+      transport information about the network information resource.
+      Though the TIPS view may include other transport information, it
+      has two basic components: updates graph (ug) and receiver set
+      (rs).
 
-   Updates queue (uq):
-      Contains a sequence of incremental updates about a network
-      information resource.  Each incremental update is assigned a
+   Updates graph (ug):
+      Contains a sequence of incremental updates and snapshots (called
+      update items) of a network information resource, based on the
+      iREST model defined above.  Each incremental update is assigned a
       sequence number, and a URI can be constructed using the sequence
-      number.  A static network information resource (e.g., Cost Map,
-
-
-
-Schott, et al.           Expires 24 August 2023                 [Page 7]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
-      Network Map) may need only a single updates queue.  A dynamic
+      numbers.  A static network information resource (e.g., Cost Map,
+      Network Map) may need only a single updates graph.  A dynamic
       network information resource (e.g., Filtered Cost Map) may create
-      an updates queue within the transport state for each unique filter
+      an updates graph (within a new TIPS view) for each unique filter
       request.
 
    Receiver set (rs):
@@ -413,25 +546,21 @@ Internet-Draft                  ALTO TIPS                  February 2023
       more transport information publication services, which ALTO
       clients use to request new TIPS instances.
 
-   Transport Information Publication Service (TIPS):
-      Allows an ALTO client to create transport state, read transport
-      state, and delete the transport state (from client's view) for an
-      ALTO information resource.
-
-   TIPS Queue State Service (QSS):
-      Allows an ALTO client to read the updates queue.
-
-   TIPS Update Read Service (URS):
-      Allows an ALTO client to read the content of a an update item from
-      the updates queue
-
-   TIPS Update Push Service (UPS):
-      Allows an ALTO client to receive an element pushed by the ALTO
-      server.
-
    Figure 1 shows an example illustrating the TIPS abstraction.  Each
    ALTO client (Client 1, Client 2, or Client 3) maintains a single HTTP
    connection with the ALTO server.
+
+
+
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 10]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
 
 Network Information Resource:
 
@@ -442,14 +571,6 @@ b) Filterable resource (#3) such as FilteredCostMap
                                    +-------------+
     +-----------+ +--------------+ |  Dynamic    | +-----------+
     |  Routing  | | Provisioning | |  Network    | | External  |
-
-
-
-Schott, et al.           Expires 24 August 2023                 [Page 8]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
     | Protocols | |    Policy    | | Information | | Interface |
     +-----------+ +--------------+ +-------------+ +-----------+
           |              |                |              |
@@ -471,11 +592,11 @@ Internet-Draft                  ALTO TIPS                  February 2023
 | |     |       Transport Information       /             \          | |
 | |     |                                  /               \         | |
 | | +--------+                     +--------+        +--------+      | |
-| | |  ts1   |----+          +-----|  ts2   |        |  ts3   |---+  | |
+| | |  tv1   |----+          +-----|  tv2   |        |  tv3   |---+  | |
 | | +--------+    |          |     +--------+        +--------+   |  | |
 | |     |         |          |           |             |          |  | |
 | | +--------+ +--------+ +--------+ +--------+ +--------+ +--------+| |
-| | | ts1/uq | | ts1/rs | | ts2/uq | | ts2/rs | | ts3/uq | | ts3/rs || |
+| | | tv1/ug | | tv1/rs | | tv2/ug | | tv2/rs | | tv3/ug | | tv3/rs || |
 | | +--------+ +--------+ +--------+ +--------+ +--------+ +--------+| |
 | +----|\---------/\---------|---------/---------------|-------------+ |
 |      | \       /  \        |        /                |               |
@@ -489,38 +610,34 @@ Internet-Draft                  ALTO TIPS                  February 2023
    | Client 1 |       | Client 2 |                 | Client 3 |
    +----------+       +----------+                 +----------+
 
-tsi   = transport state information i
-tsi/uq = incremental updates queue associated with tsi
-tqi/rs = receiver set of transport queue i (for server push)
-
-
-                Figure 2: ALTO Transport Information.
 
 
 
-
-
-
-Schott, et al.           Expires 24 August 2023                 [Page 9]
+Schott, et al.           Expires 29 August 2023                [Page 11]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-2.2.  TIPS Workflow
+tvi   = TIPS view i
+tvi/ug = incremental updates graph associated with tsi
+tvi/rs = receiver set of tvi (for server push)
+
+
+                 Figure 4: ALTO Transport Information
+
+2.4.  TIPS Workflow
 
    The intended use case of TIPS is to run it as a service inside an
    HTTP/2 or HTTP/3 connection (though it can run inside an HTTP/1.x
    connection, without server push functionality).  Specifically, an
-   ALTO client opens an HTTP connection with an ALTO server, and uses
-   TIPS to create (or at least receive a view of) a transport state at
-   the server for each network information resource that the client
-   wants to monitor.  The transport state provides (1) the base URI that
-   the server will host incremental updates for the information resource
-   and (2) the start sequence number that the server will order the
-   updates.  The server will assign each additional update with a
-   consecutive sequence number.
+   ALTO client opens an HTTP connection with an ALTO server and uses
+   TIPS to retrieve a JSON object that contains a URI to a TIPS view of
+   each network information resource that the client wants to monitor,
+   along with a summary of each TIPS view (which provides, at minimum,
+   the start and end sequence number of the updates graph and a server-
+   recommended edge to consume first).
 
-   In the simplest use case, the transport state provides enough
+   In the simplest use case, the TIPS view summary provides enough
    information for the client to continuously pull each additional
    update, resulting in the following workflow:
 
@@ -552,49 +669,43 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 10]
+Schott, et al.           Expires 29 August 2023                [Page 12]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-   Client                                  TIPS         URS
-     o                                       .           .
-     | Open HTTP connection                  .           .
-     |-------------------------------------->|           .
-     |                                       .           .
-     | POST to create/receive transport      .           .
-     |    state for resource 1               .           .
-     | ------------------------------------> |           .
-     | <updates-queue-uri1>, <start-seq>     .           .
-     |<------------------------------------- |           .
-     |                                       .           .
-     | GET <updates-queue-uri1>/content/<start-seq>      .
-     | ------------------------------------------------->|
-     | update <start-seq> content            .           .
-     |<------------------------------------------------->|
-     |                                       .           .
-     | GET <updates-queue-uri1>/content/<start-seq+1>    .
-     | ------------------------------------------------->|
-     | update <start-seq+1> content          .           .
-     |<------------------------------------------------->|
-     |
-     | DELETE transport state for resource 1 .
+   Client                                  TIPS
+     o                                       .
+     | Open HTTP connection                  .
+     |-------------------------------------->|
+     |                                       .
+     | POST to create/receive a TIPS view    .
+     |           for resource 1              .
+     | ------------------------------------> |
+     | <tips-view-uri1>, <tips-view-summary> .
+     |<------------------------------------- |
+     |                                       .
+     | GET /<tips-view-uri1>/ug/<i>/<j>      .
+     | --------------------------------------|
+     | content on edge i to j                .
+     |<--------------------------------------|
+     |                                       .
+     | GET /<tips-view-uri1>/ug/<j>/<j+1>    .
+     | --------------------------------------|
+     | content on edge j to j+1              .
+     |<--------------------------------------|
+     |                                       .
+     | DELETE TIPS view for resource 1       .
      |-------------------------------------> |
-     |
+     |                                       .
      | Close HTTP connection                 .
      |-------------------------------------->|
      o
 
      TIPS: Transport Information Publication Service
-     URS : Update Read Service
 
 
-            Figure 3: ALTO TIPS Workflow Supporting Client Pull.
+            Figure 5: ALTO TIPS Workflow Supporting Client Pull.
 
    A client that prefers server push can use the following workflow:
 
@@ -613,80 +724,51 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 11]
+
+Schott, et al.           Expires 29 August 2023                [Page 13]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-   Client                                  TIPS         UPS
-     o                                       .           .
-     | Open HTTP connection                  .           .
-     |-------------------------------------->|           .
-     |                                       .           .
-     | POST to create/receive transport      .           .
-     |   state for resource 1 and add        .           .
-     |   self to receiver set                .           .
-     | ------------------------------------> |           .
-     | <updates-queue-uri1>, <start-seq>     .           .
-     |<------------------------------------- |           .
-     |                                       .           .
-     | PUSH <updates-queue-uri1>/content/<start-seq>     .
-     | <------------------------------------------------ |
-     |                                       .           .
-     | PUSH <updates-queue-uri1>/content/<start-seq+1>   .
-     | <------------------------------------------------ |
-     |
-     | DELETE self from receiver set of      .
-     |   resource 1                          .
+   Client                                  TIPS
+     o                                       .
+     | Open HTTP connection                  .
+     |-------------------------------------->|
+     |                                       .
+     | POST to create/receive a TIPS view    .
+     |      for resource 1 and add           .
+     |      self to receiver set             .
+     | ------------------------------------> |
+     | <tips-view-uri1>, <tips-view-summary> .
+     |<------------------------------------- |
+     |                                       .
+     | PUSH <tips-view-uri1>/ug/<i>/<j>      .
+     | <-------------------------------------|
+     |                                       .
+     | PUSH <tips-view-uri1>/ug/<j>/<j+1>    .
+     | <-------------------------------------|
+     |                                       .
+     | PUT to remove self from receiver      .
+     |      set of resource 1                .
      |-------------------------------------> |
-     |
+     |                                       .
      | Close HTTP connection                 .
      |-------------------------------------->|
      o
 
      TIPS: Transport Information Publication Service
-     UPS : Update Push Service
 
 
-            Figure 4: ALTO TIPS Workflow Supporting Server Push.
+            Figure 6: ALTO TIPS Workflow Supporting Server Push.
 
-2.3.  TIPS With HTTP/1.x
+2.5.  TIPS With HTTP/1.x
 
    While TIPS is designed to take advantage of newer HTTP features, TIPS
    still functions with HTTP/1.x for client pull functionality only,
-   with the limitation that to cancel a long pull request for a resource
-   update, it cannot send a DELETE request.  Additionally, only one
-   request can be outstanding at a time due to the blocking nature of
-   HTTP/1.x.
+   with the limitation that it cannot cancel any outstanding requests or
+   fetch resources concurrently over the same connection.
 
-3.  TIPS Information Resources
-
-   The TIPS framework defines 4 types of service: Transport Information
-   Publication Service (TIPS), the TIPS Queue State Service (QSS), the
-   TIPS Update Read Service (URS), and the TIPS Update Push Service
-   (UPS).  This document defines TIPS (Section 4), the QSS (Section 5),
-   the URS (Section 6), and the UPS (Section 7).
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 12]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
-3.1.  Notations
-
-   This document uses the same syntax and notations as introduced in
-   Section 8.2 of RFC 7285 [RFC7285] to specify the extensions to
-   existing ALTO resources and services.
-
-4.  Transport Information Publication Service
-
-   A TIPS service allows an ALTO client to create transport state, read
-   transport state and delete the transport state for an ALTO
-   information resource.
-
-4.1.  TIPS Information Resource Directory
+3.  TIPS Information Resource Directory (IRD) Announcement
 
    An ALTO server's IRD (Information Resource Directory) MAY define one
    or more transport information publication services, which ALTO
@@ -694,12 +776,22 @@ Internet-Draft                  ALTO TIPS                  February 2023
    TIPS MUST declare the "media-type", and specify "capabilities" and
    "uses" as follows.
 
-4.1.1.  Media Type
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 14]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+3.1.  Media Type
 
    The media type of the Transport Information Publication Service
    resource is "application/alto-tips+json".
 
-4.1.2.  Capabilities
+3.2.  Capabilities
 
    The capabilities declaration of TIPS is modelled on that defined in
    Section 6.3 of [RFC8895].
@@ -722,14 +814,6 @@ Internet-Draft                  ALTO TIPS                  February 2023
       incremental changes for a resource, the "incremental-change-media-
       types" field has an entry for that resource-id, and the value is
       the supported media types of the incremental change separated by
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 13]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
       commas.  For the implementation of this specification, this will
       be "application/merge-patch+json", "application/json-patch+json",
       or "application/merge-patch+json,application/json-patch+json".
@@ -749,11 +833,20 @@ Internet-Draft                  ALTO TIPS                  February 2023
       replacement.
 
    support-server-push:  The "support-server-push" field specifies
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 15]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
       whether the given TIPS supports server push.  If the "support-
       server-push" field is "true", this TIPS will allow a client to
       start or stop server push.
 
-4.1.3.  Uses
+3.3.  Uses
 
    The "uses" attribute MUST be an array with the resource-ids of every
    network information resource for which this TIPS can provide service.
@@ -764,174 +857,168 @@ Internet-Draft                  ALTO TIPS                  February 2023
    under the resource dependency relationship.  That is, if a TIPS'
    "uses" set includes resource R1 and resource R1 depends on ("uses")
    resource R0, then the TIPS' "uses" set SHOULD include R0 as well as
-   R1.  For example, a TIPS for a cost map SHOULD also provide transport
-   state for the network map upon which that cost map depends.
+   R1.  For example, a TIPS for a cost map SHOULD also provide a TIPS
+   view for the network map upon which that cost map depends.
 
-4.1.4.  Example
+3.4.  Example
 
    Extending the IRD example in Section 8.1 of [RFC8895], below is the
    IRD of an ALTO server supporting ALTO base protocol, ALTO/SSE, and
    ALTO TIPS.
 
+     "my-network-map": {
+       "uri": "https://alto.example.com/networkmap",
+       "media-type": "application/alto-networkmap+json",
+     },
+     "my-routingcost-map": {
+       "uri": "https://alto.example.com/costmap/routingcost",
+       "media-type": "application/alto-costmap+json",
+       "uses": ["my-networkmap"],
+       "capabilities": {
+         "cost-type-names": ["num-routingcost"]
+       }
+     },
+     "my-hopcount-map": {
+       "uri": "https://alto.example.com/costmap/hopcount",
+       "media-type": "application/alto-costmap+json",
+       "uses": ["my-networkmap"],
+       "capabilities": {
+         "cost-type-names": ["num-hopcount"]
+       }
+     },
+
+     "my-filtered-cost-map": {
+       "uri":
+         "https://alto.example.com/costmap/filtered/constraints",
 
 
 
-
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 14]
+Schott, et al.           Expires 29 August 2023                [Page 16]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-            "my-network-map": {
-              "uri": "https://alto.example.com/networkmap",
-              "media-type": "application/alto-networkmap+json",
-            },
-            "my-routingcost-map": {
-              "uri": "https://alto.example.com/costmap/routingcost",
-              "media-type": "application/alto-costmap+json",
-              "uses": ["my-networkmap"],
-              "capabilities": {
-                "cost-type-names": ["num-routingcost"]
-              }
-            },
-            "my-hopcount-map": {
-              "uri": "https://alto.example.com/costmap/hopcount",
-              "media-type": "application/alto-costmap+json",
-              "uses": ["my-networkmap"],
-              "capabilities": {
-                "cost-type-names": ["num-hopcount"]
-              }
-            },
+       "media-type": "application/alto-costmap+json",
+       "accepts": "application/alto-costmapfilter+json",
+       "uses": ["my-networkmap"],
+       "capabilities": {
+         "cost-type-names": ["num-routingcost", "num-hopcount"],
+         "cost-constraints": true
+       }
+     },
 
-            "my-filtered-cost-map": {
-              "uri":
-                "https://alto.example.com/costmap/filtered/constraints",
-              "media-type": "application/alto-costmap+json",
-              "accepts": "application/alto-costmapfilter+json",
-              "uses": ["my-networkmap"],
-              "capabilities": {
-                "cost-type-names": ["num-routingcost", "num-hopcount"],
-                "cost-constraints": true
-              }
-            },
+     "my-simple-filtered-cost-map": {
+       "uri": "https://alto.example.com/costmap/filtered/simple",
+       "media-type": "application/alto-costmap+json",
+       "accepts": "application/alto-costmapfilter+json",
+       "uses": ["my-networkmap"],
+       "capabilities": {
+         "cost-type-names": ["num-routingcost", "num-hopcount"],
+         "cost-constraints": false
+       }
+     },
 
-            "my-simple-filtered-cost-map": {
-              "uri": "https://alto.example.com/costmap/filtered/simple",
-              "media-type": "application/alto-costmap+json",
-              "accepts": "application/alto-costmapfilter+json",
-              "uses": ["my-networkmap"],
-              "capabilities": {
-                "cost-type-names": ["num-routingcost", "num-hopcount"],
-                "cost-constraints": false
-              }
-            },
+     "my-props": {
+       "uri": "https://alto.example.com/properties",
+       "media-type": "application/alto-endpointprops+json",
+       "accepts": "application/alto-endpointpropparams+json",
+       "capabilities": {
+         "prop-types": ["priv:ietf-bandwidth"]
+       }
+     },
 
-            "my-props": {
-              "uri": "https://alto.example.com/properties",
-              "media-type": "application/alto-endpointprops+json",
-              "accepts": "application/alto-endpointpropparams+json",
+     "my-pv": {
+       "uri": "https://alto.example.com/endpointcost/pv",
+       "media-type": "multipart/related;
+                       type=application/alto-endpointcost+json",
+       "accepts": "application/alto-endpointcostparams+json",
+       "capabilities": {
+         "cost-type-names": [ "path-vector" ],
+         "ane-properties": [ "maxresbw", "persistent-entities" ]
+       }
+     },
+
+     "update-my-costs": {
+       "uri": "https://alto.example.com/updates/costs",
+       "media-type": "text/event-stream",
+       "accepts": "application/alto-updatestreamparams+json",
+       "uses": [
+           "my-network-map",
+           "my-routingcost-map",
+           "my-hopcount-map",
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 15]
+Schott, et al.           Expires 29 August 2023                [Page 17]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-              "capabilities": {
-                "prop-types": ["priv:ietf-bandwidth"]
-              }
-            },
+           "my-simple-filtered-cost-map"
+       ],
+       "capabilities": {
+         "incremental-change-media-types": {
+           "my-network-map": "application/json-patch+json",
+           "my-routingcost-map": "application/merge-patch+json",
+           "my-hopcount-map": "application/merge-patch+json"
+         },
+         "support-stream-control": true
+       }
+     },
 
-            "my-pv": {
-              "uri": "https://alto.example.com/endpointcost/pv",
-              "media-type": "multipart/related;
-                              type=application/alto-endpointcost+json",
-              "accepts": "application/alto-endpointcostparams+json",
-              "capabilities": {
-                "cost-type-names": [ "path-vector" ],
-                "ane-properties": [ "maxresbw", "persistent-entities" ]
-              }
-            },
+     "update-my-costs-tips": {
+       "uri": "https://alto.example.com/updates-new/costs",
+       "media-type": "application/alto-tips+json",
+       "accepts": "application/alto-tipsparams+json",
+       "uses": [
+           "my-network-map",
+           "my-routingcost-map",
+           "my-hopcount-map",
+           "my-simple-filtered-cost-map"
+       ],
+       "capabilities": {
+         "incremental-change-media-types": {
+           "my-network-map": "application/json-patch+json",
+           "my-routingcost-map": "application/merge-patch+json",
+           "my-hopcount-map": "application/merge-patch+json",
+           "my-simple-filtered-cost-map": "application/merge-patch+json"
+         },
+         "support-server-push": true
+       }
+     },
 
-            "update-my-costs": {
-              "uri": "https://alto.example.com/updates/costs",
-              "media-type": "text/event-stream",
-              "accepts": "application/alto-updatestreamparams+json",
-              "uses": [
-                  "my-network-map",
-                  "my-routingcost-map",
-                  "my-hopcount-map",
-                  "my-simple-filtered-cost-map"
-              ],
-              "capabilities": {
-                "incremental-change-media-types": {
-                  "my-network-map": "application/json-patch+json",
-                  "my-routingcost-map": "application/merge-patch+json",
-                  "my-hopcount-map": "application/merge-patch+json"
-                },
-                "support-stream-control": true
-              }
-            },
-
-            "update-my-costs-tips": {
-              "uri": "https://alto.example.com/updates-new/costs",
-              "media-type": "application/alto-tips+json",
-              "accepts": "application/alto-tipsparams+json",
-              "uses": [
-                  "my-network-map",
-                  "my-routingcost-map",
-                  "my-hopcount-map",
-                  "my-simple-filtered-cost-map"
-              ],
-              "capabilities": {
-                "incremental-change-media-types": {
+     "update-my-props": {
+       "uri": "https://alto.example.com/updates/properties",
+       "media-type": "text/event-stream",
+       "uses": [ "my-props" ],
+       "accepts": "application/alto-updatestreamparams+json",
+       "capabilities": {
+         "incremental-change-media-types": {
+           "my-props": "application/merge-patch+json"
+         },
+         "support-stream-control": true
+       }
+     },
+     "update-my-pv": {
+       "uri": "https://alto.example.com/updates/pv",
+       "media-type": "text/event-stream",
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 16]
+Schott, et al.           Expires 29 August 2023                [Page 18]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-                  "my-network-map": "application/json-patch+json",
-                  "my-routingcost-map": "application/merge-patch+json",
-                  "my-hopcount-map": "application/merge-patch+json",
-                  "my-simple-filtered-cost-map":
-                                      "application/merge-patch+json"
-                },
-                "support-server-push": true
-              }
-            },
-
-            "update-my-props": {
-              "uri": "https://alto.example.com/updates/properties",
-              "media-type": "text/event-stream",
-              "uses": [ "my-props" ],
-              "accepts": "application/alto-updatestreamparams+json",
-              "capabilities": {
-                "incremental-change-media-types": {
-                  "my-props": "application/merge-patch+json"
-                },
-                "support-stream-control": true
-              }
-            },
-            "update-my-pv": {
-              "uri": "https://alto.example.com/updates/pv",
-              "media-type": "text/event-stream",
-              "uses": [ "my-pv" ],
-              "accepts": "application/alto-updatestreamparams+json",
-              "capabilities": {
-                "incremental-change-media-types": {
-                  "my-pv": "application/merge-patch+json"
-                },
-                "support-stream-control": true
-              }
-            }
+       "uses": [ "my-pv" ],
+       "accepts": "application/alto-updatestreamparams+json",
+       "capabilities": {
+         "incremental-change-media-types": {
+           "my-pv": "application/merge-patch+json"
+         },
+         "support-stream-control": true
+       }
+     }
 
    Note that it is straightforward for an ALTO sever to run HTTP/2 and
    support concurrent retrieval of multiple resources such as "my-
@@ -941,22 +1028,20 @@ Internet-Draft                  ALTO TIPS                  February 2023
    connection, and this is indicated by the media-type "application/
    alto-tips+json".
 
-4.2.  Create Transport State using TIPS
+4.  TIPS Open/Close
 
+   Upon request, a server sends a TIPS view to a client.  This TIPS view
+   may be created at the time of the request or may already exist
+   (either because another client has an active connection to a TIPS
+   view for the same requested network resource or because the server
+   perpetually maintains a TIPS view for an often requested resource).
+   The server MAY keep track of which clients have an active connection
+   to each TIPS view to determine whether or not it should delete a TIPS
+   view and its corresponding updates graph and associated data.
 
+4.1.  Open Request
 
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 17]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
-4.2.1.  Request
-
-   An ALTO client requests that the server sets up transport state for a
+   An ALTO client requests that the server provide a TIPS view for a
    given resource by sending an HTTP POST body with the media type
    "application/alto-tipsparams+json".  That body contains a JSON object
    of type TIPSReq, where:
@@ -965,29 +1050,108 @@ Internet-Draft                  ALTO TIPS                  February 2023
            ResourceID   resource-id;
            [JSONString  tag;]
            [Object      input;]
+           [Boolean     server-push;]
         } TIPSReq;
 
 
    with the following fields:
 
-   resource-id/tag:  The resource-id of an ALTO resource and MUST be in
-      the TIPS' "uses" list (Section 4.1).  If the resource-id is a GET-
-      mode resource with a version tag (or "vtag"), as defined in
-      Sections 6.3 and 10.3 of [RFC7285], and the ALTO client has
-      previously retrieved a version of that resource from ALTO, the
-      ALTO client MAY set the "tag" field to the tag part of the
-      client's version of that resource.  The server MAY use the tag
-      when creating the updates queue.  Note that the client MUST
-      support all incremental methods from the set announced in the
-      server's capabilities for this resource.  If a client does not
-      support all incremental methods from the set announced in the
-      server's capabilities, the client MUST NOT use the TIPS service.
+   resource-id:  The resource-id of an ALTO resource and MUST be in the
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 19]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+      TIPS' "uses" list (Section 3).  If a client does not support all
+      incremental methods from the set announced in the server's
+      capabilities, the client MUST NOT use the TIPS service.
+
+   tag:  If the resource-id is a GET-mode resource with a version tag
+      (or "vtag"), as defined in Sections 6.3 and 10.3 of [RFC7285], and
+      the ALTO client has previously retrieved a version of that
+      resource from ALTO, the ALTO client MAY set the "tag" field to the
+      tag part of the client's version of that resource.  The server MAY
+      use the tag when calculating a recommended starting edge for the
+      client to consume.  Note that the client MUST support all
+      incremental methods from the set announced in the server's
+      capabilities for this resource.
 
    input:  If the resource is a POST-mode service that requires input,
       the ALTO client MUST set the "input" field to a JSON object with
       the parameters that the resource expects.
 
-4.2.2.  Response
+   server-push:  Set to TRUE if a client desires to receive updates via
+      server push.
+
+4.2.  Open Response
+
+   The response to a valid request MUST be a JSON object of type
+   AddTIPSResponse, denoted as media type "application/alto-tips+json":
+
+         object {
+           JSONString        tips-view-uri;
+           TIPSViewSummary   tips-view-summary;
+         } AddTIPSResponse;
+
+         object {
+           UpdatesGraphSummary   updates-graph-summary;
+           [Boolean              server-push;]
+         } TIPSViewSummary;
+
+         object {
+           JSONNumber       start-seq;
+           JSONNumber       end-seq;
+           StartEdgeRec     start-edge-rec;
+         } UpdatesGraphSummary;
+
+         object {
+           JSONNumber       seq-i;
+           JSONNumber       seq-j;
+         } StartEdgeRec;
+
+   with the following fields:
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 20]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+   tips-view-uri:  Relative URI to the TIPS view of a network resource.
+
+      When creating the URI for the TIPS view, TIPS MUST NOT use other
+      properties of an HTTP request, such as cookies or the client's IP
+      address, to determine the TIPS view.  Furthermore, TIPS MUST NOT
+      reuse a URI for a different object in the same connection.
+
+      It is expected that there is an internal mechanism to map a tips-
+      view-uri to the TIPS view to be accessed.  For example, TIPS may
+      assign a unique, internal state id to each TIPS view instance.
+      However, the exact mechanism is left to the TIPS provider.
+
+   tips-view-summary:  Contains both an updates-graph-summary and an
+      optional server-push boolean value which is set to TRUE if the
+      client indicated server push
+
+      updates-graph-summary provides the starting sequence number of the
+      updates graph and the last sequence number (current available),
+      along with a recommended edge to consume.  How the server
+      calculates the recommended edge depends on the implementation.
+      Ideally, if the client does not provide a version tag, the server
+      should recommend the edge of the latest snapshot available.  If
+      the client does provide a version tag, the server should calculate
+      the cumulative size of the patch updates availabe from that
+      version onward and compare it to the size of the complete resource
+      snapshot.  If the snapshot is bigger, the server should recommend
+      the first patch update edge starting from client's tagged version.
+      Else, the server should recommend the latest snapshot edge.  If
+      the client indicated server push, the recommended edge will be the
+      first content pushed.
 
    If the request has any errors, the TIPS service MUST return an HTTP
    "400 Bad Request" to the ALTO client; the body of the response
@@ -1005,7 +1169,11 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 18]
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 21]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1019,7 +1187,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
                  "meta":{
                      "code":  "E_INVALID_FIELD_VALUE",
                      "field": "resource-id",
-                     "value": "my-networkmap/#"
+                     "value": "my-network-map/#"
                  }
              }
 
@@ -1030,7 +1198,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
    *  If the TIPS request does not have a "resource-id" field, the error
       code of the error message MUST be E_MISSING_FIELD and the "field"
       field SHOULD be "resource-id".  The TIPS service MUST NOT create
-      any transport state.
+      any TIPS view.
 
    *  If the "resource-id" field is invalid or is not associated with
       the TIPS, the error code of the error message MUST be
@@ -1045,449 +1213,480 @@ Internet-Draft                  ALTO TIPS                  February 2023
       resource would return for missing or invalid input (see
       [RFC7285]).
 
-   The response to a valid request MUST be a JSON object of type
-   AddTIPSResponse, denoted as media type "application/alto-tips+json":
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 19]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
-         object {
-           JSONString        transport-state-uri;
-           TransportState    transport-state;
-         } AddTIPSResponse;
-
-         object {
-           UpdatesQueueMeta  updates-queue-meta;
-          [PushUpdatesMeta   push-updates-meta;]
-         } TransportState;
-
-         object {
-           JSONString         uri;
-           UpdatesQueueStateSummary state-summary;
-         } UpdatesQueueMeta;
-
-         object {
-           JSONNumber         start-seq;
-         } UpdatesQueueStateSummary;
-
-         object {
-           JSONString       uri;
-           PushUpdatesState state;
-         } PushUpdatesMeta;
-
-         object {
-            Boolean          push-enabled;
-           [JSONNumber       next-seq;]
-         } PushUpdatesState;
-
-   with field:
-
-   transport-state-uri:  The ALTO client MUST evaluate the URI according
-      to [RFC3986].  Hence, the transport state may be located at the
-      same host as the invoking TIPS or on a different host.  Let
-      absolute-transport-state-uri be the absolute URI after resolution.
-
-      When creating the URI for the transport state, the TIPS service
-      MUST NOT use other properties of an HTTP request, such as cookies
-      or the client's IP address, to determine the transport state.
-      Furthermore, TIPS MUST NOT reuse a URI for a different object in
-      the same connection.
-
-      It is expected that there is an internal mechanism to map a
-      transport-state-uri to the transport state to be accessed.  For
-      example, TIPS may assign a unique, internal state id to each
-      transport state instance.  However, the exact mechanism is left to
-      the TIPS provider.
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 20]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
-   transport-state/updates-queue-meta/uri:  This must be a relative URI
-      segment.  Specifically, let uq-uri denote transport-state/updates-
-      queue-meta/uri and define absolute-transport-state-uri/uq-uri
-      absolute-transport-state-uri/uq-uri/number absolute-transport-
-      state-uri/uq-uri/content/number.  Each of them MUST be a valid
-      URI.
-
-   transport-state/updates-queue-meta/state-summary/start-seq:  This
-      MUST be a valid non-negative integer.  The start-seq tells the
-      client where to start reading from the updates queue.
-
-4.3.  Read Transport State using TIPS
-
-   An ALTO client can read the transport state using the returned
-   absolute-transport-state-uri (see Section 4.2.2) using the HTTP GET
-   method.  For example, if it is on the same connection as that of the
-   invoking TIPS, it is
-
-       GET <transport-state-uri>
-
-   The response to a valid request MUST be a JSON object of type
-   TransportState defined in Section 4.2, denoted as media type
-   "application/alto-tips+json".
-
-4.4.  Delete Transport State using TIPS
-
-   An ALTO client can delete the transport state (from its view) using
-   the returned absolute-transport-state-uri using the HTTP DELETE
-   method.  Whether or not the server actually deletes the transport is
-   implementation dependent.  A server will not want to delete a
-   transport state if another client is using it.  If the transport
-   state is on the same connection as that of the invoking TIPS, the
-   DELETE request looks like:
-
-       DELETE <transport-state-uri>
-
-   The response to a valid request MUST be 200 if success, and the
-   corresponding error code if there is any error.
-
-4.5.  Example
+4.3.  Open Example
 
    For simplicity, assume that the ALTO server is using the Basic
    authentication.  If a client with username "client1" and password
-   "helloalto" wants to create a transport state of an ALTO Cost Map
-   resource with resource ID "my-routingcost-map", it can send the
-   following request:
+   "helloalto" wants to create a TIPS view of an ALTO Cost Map resource
+   with resource ID "my-routingcost-map", it can send the following
+   request:
 
 
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 21]
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 22]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-      POST /tips HTTP/1.1
-      Host: alto.example.com
-      Accept: application/alto-tips+json, application/alto-error+json
-      Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
-      Content-Type: application/alto-tipsparams+json
-      Content-Length: 41
+       POST /tips HTTP/1.1
+       Host: alto.example.com
+       Accept: application/alto-tips+json, application/alto-error+json
+       Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
+       Content-Type: application/alto-tipsparams+json
+       Content-Length: 41
 
-      {
-        "resource-id": "my-routingcost-map"
-      }
+       {
+         "resource-id": "my-routingcost-map"
+       }
 
    If the operation is successful, the ALTO server returns the following
    message:
 
-      HTTP/1.1 200 OK
-      Content-Type: application/alto-tips+json
-      Content-Length: 291
+       HTTP/1.1 200 OK
+       Content-Type: application/alto-tips+json
+       Content-Length: 291
 
-      {
-         "transport-state-uri": "/tips/2718281828459",
-         "transport-state": {
-           "updates-queue-meta" : {
-              "uri": "uq",
-              "state-summary": {
-                "start-seq": 101
-              }
-           },
-           "push-updates-meta" : {
-              "uri": "rs",
-              "state-summary": ["self"],
-           },
+       {
+           "tips-view-uri": "/tips/2718281828459",
+           "tips-view-summary": {
+             "updates-graph-summary": {
+               "start-seq": 101,
+               "end-seq": 106,
+               "start-edge-rec" : {
+                 "seq-i": 0,
+                 "seq-j": 105
+               }
+             },
+             "server-push": false
+           }
+       }
 
-         }
-      }
+4.4.  Close Request
 
-5.  TIPS Queue State Service (QSS)
+   An ALTO client can indicate it no longer desires to pull/receive
+   updates for a specific network resource by "deleting" the TIPS view
+   using the returned tips-view-uri and the HTTP DELETE method.  Whether
+   or not the server actually deletes the TIPS view is implementation
+   dependent.  Likely, a server will remove the client from a dependency
+   set associated with the TIPS view.  A server will not want to delete
+   a TIPS view if another client is using it.  The DELETE request looks
+   like:
 
-   The TIPS QSS service allows an ALTO client to read the updates queue.
-   It uses the URI returned in Section 4.
+       DELETE /<tips-view-uri>
 
-5.1.  Media Type
-
-   A QSS response uses "application/alto-tipsqueue+json" media type.
-
-5.2.  HTTP Method
-
-   An ALTO QSS resource is requested using the HTTP GET method.
-
-
+   The response to a valid request MUST be 200 if success, and the
+   corresponding error code if there is any error.
 
 
-Schott, et al.           Expires 24 August 2023                [Page 22]
+
+Schott, et al.           Expires 29 August 2023                [Page 23]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-5.3.  IRD Capabilities and Uses
+   If the connection between the client and TIPS provider is severed
+   without a DELETE request having been sent, the server MUST treat it
+   as if the client had sent a DELETE request because the TIPS view is,
+   at least from the client view, per-session based.
 
-   None (QSS does not appear in the IRD).
+5.  TIPS View Metadata Directory
 
-5.4.  Request
+   An ALTO client can read the metadata directory of the updates graph
+   to understand its full contents beyond the intial summary provided
+   (perhaps to calculate a new shortest path to the end of the graph
+   after not having fetched for a period of time).
 
-   An ALTO client reads the queue state using an HTTP GET method, with
-   the path constructed as:
+5.1.  Request
 
-         <updates-queue-complete-uri> :=
-               <transport-state-uri>/<updates-queue-meta.uri>
-               specified in Section 4.
+   An ALTO client requests the updates graph's metadata directory by
+   sending an HTTP GET request with the media type "application/alto-
+   tipsgraph+json".  The GET request looks like:
 
-5.5.  Response
+       GET /<tips-view-uri>/ug
 
-   If the transport state is closed, the ALTO server MUST return an
-   error HTTP message with status code 404 (Not Found) and media type
-   "application/alto-error+json".
+   An ALTO client can also read the metadata of an individual edge in
+   the updates graph.  The HTTP method is a GET, and looks like:
 
-   The response from the server, if no error, is the UpdatesQueue object
-   indicated as "application/alto-tipsqueue+json" media type:
+       GET /<tips-view-uri>/ug/meta/<i>/<j>
 
-       object-map {
-           Seq -> UpdateItem;
-       } UpdatesQueue;
+5.2.  Response
 
-       object-map {
-           JSONString     media-type;
-           JSONString     tag;
-          [JSONString     link;]
-       } UpdateItem;
+   If the TIPS view is closed, the ALTO server MUST return an error HTTP
+   message with status code 404 (Not Found) and media type "application/
+   alto-error+json".
 
-   with field:
-
-   Seq:  A required, positive JSON integer indicating the sequence
-      number of the incremental update.  As JSON allows a large integer
-      space, when the server reaches the largest integer, the server
-      SHOULD close the incremental updates queue.
-
-   media-type:  A required JSON string giving the type of the
-      incremental update (see [RFC8895]).
-
-   tag:  A required JSON string which is defined the same way as the
-      "tag" field of VersionTag (see Section 10.3 of [RFC7285]).
-
-   link:  An optional JSON string giving an optional link for a client
-      to directly request a resource as a complete snapshot (not through
-      incremental updates).
+   The response from the server, if no error, is the UpdatesGraph object
+   indicated as "application/alto-tipsgraph+json" media type:
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 23]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 24]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-5.6.  Example
+       object {
+         GraphDirMeta   meta;
+         UpdatesGraph   updates-graph;
+       } UpdatesDirectory : ResponseEntityBase;
 
-    GET /tips/2718281828459/uq HTTP/1.1
+       object {
+         ResourceID     resource-id;
+         Tag            tag;
+       } GraphDirMeta
+
+       object-map {
+         StartSeq -> EndSeqUpdates;
+       } UpdatesGraph;
+
+       object-map {
+         EndSeq -> UpdateItemMeta;
+       } EndSeqUpdates;
+
+       object {
+         JSONString    media-type;
+         JSONString    tag;
+         JSONNumber    size;
+       } UpdateItemMeta;
+
+
+   with the following fields:
+
+   meta:  Specifies the network resource-id TIPS view to which the
+      directory corresponds and the version tag of the directory itself.
+
+   updates-graph:  Contains a map of edges in the updates graph (start-
+      seq to end-seq).  Each edge has a corresponding update-item-meta
+      which includes the edge's media type, resource version tag, and
+      size of the content in kilobytes.
+
+5.3.  Example
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 25]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+    GET /tips/2718281828459/ug HTTP/1.1
     Host: alto.example.com
-    Accept: application/alto-tipsqueue+json, application/alto-error+json
+    Accept: application/alto-tipsgraph+json, application/alto-error+json
     Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
 
 
     HTTP/1.1 200 OK
-    Content-Type: application/alto-tipsqueue+json
+    Content-Type: application/alto-tipsgraph+json
     Content-Length: 488
 
     {
-
-         101 : {
-             "media-type": "application/alto-costmap+json",
-             "tag":        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe"
+       "meta": {
+         "resource-id": "2718281828459"
+         "tag": 125351264356
+       },
+       "updates-graph": {
+         0: {
+           101: {alto-costmap+json, 10978342, 1000000},
+           103: {alto-costmap+json, 12340088, 1004000},
+           105: {alto-costmap+json, 12356783, 1008033}
          },
-         102 : {
-             "media-type": "application/merge-patch+json",
-             "tag":        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe"
+         101: {
+           102: {application/merge-patch+json, 12356643, 4040}
          },
-         103 : {
-             "media-type": "application/merge-patch+json",
-             "tag":        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
-             "link":       "/tips/2718281828459/snapshot/2e3f"
+         102: {
+           103: {application/merge-patch+json, 12356644, 3000}
+         },
+         103: {
+           104: {application/merge-patch+json, 12356645, 8000}
+         },
+         104: {
+           105: {application/merge-patch+json, 12356646, 10000}
+         },
+         105: {
+           106: {application/merge-patch+json, 12356647, 4040}
          }
+       }
     }
 
-   An ALTO client can also read the (meta data) of an individual element
-   in the updates queue.  The HTTP method is a GET, and the URI is
-   constructed by appending the corresponding seq to preceding URI:
+5.4.  Refresh Directory
 
-         <uq-elem-seq-meta> := <updates-queue-complete-uri>/<seq>
-
-
-6.  TIPS Update Read Service (URS)
-
-   The TIPS URS service allows an ALTO client to read the content of an
-   update item from the updates queue.
-
-6.1.  Path
-
-   The path to the content of an update item resource has the following
-   format:
-
-         <uq-elem-seq> := <updates-queue-complete-uri>/content/<seq>
+   An ALTO client can refresh the updates graph directory without re-
+   fetching the whole updates graph object.
 
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 24]
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 26]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-   where updates-queue-complete-uri is specified in Section 5.4.
+5.4.1.  Request
 
-   For example, if the client wants to query the content of the first
-   update item (with sequence number 101), it can send a request to
-   "/tips/2718281828459/uq/content/101".
+   An ALTO client requests the updates graph's metadata directory by
+   sending an HTTP GET request with the media type "application/alto-
+   tipsgraph+json".  The GET request looks like:
 
-6.2.  Media Type
+       POST /tips/2718281828459/ug HTTP/1.1
+       Host: alto.example.com
+       Accept: application/alto-tipsgraph+json,
+               application/merge-patch+json,
+               application/alto-error+json
+       Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
+       Content-Type: application/alto-tipsparams+json
+       Content-Length: 41
 
-   The media type of an Update Item resource MUST be the same as the
-   "media-type" field of the update item with sequence number seq in the
-   updates queue.
+       {
+         "tag": 125351264356
+       }
 
-   For example, if the client wants to query the content of the first
-   update item (with sequence number 101) whose media type is
-   "application/alto-costmap+json", it must set the "Accept" header to
-   "application/alto-costmap+json, application/alto-error+json" in the
-   request.
+5.4.2.  Response
 
-6.3.  HTTP Method
+   The server may return the whole directory or the incremental changes,
+   using merge-patch.  A patch response looks like:
 
-   The Update Read Service resource is requested using the HTTP GET
-   method.
+       HTTP/1.1 200 OK
+       Content-Type: application/merge-patch+json
+       Content-Length: 200
 
-6.4.  Capabilities and Uses
+       {
+         "meta": {
+           "tag": 543353364839
+         },
+         "updates-map": {
+           0: {
+             101: null,
+             107: {...}
+           },
+           101: null,
+           102: null
+         }
+       }
 
-   None
+5.5.  Server Updates Directory Invariants
 
-6.5.  Response
-
-   If the transport state is closed, the ALTO server MUST return an
-   error HTTP message with status code 404 (Not Found) and media type
-   "application/alto-error+json".
-
-   Otherwise, let LOW_SEQ and HIGH_SEQ represent the smallest and
-   largest sequence number in the updates queue of the transport state
-   respectively.  If seq is smaller than LOW_SEQ, the ALTO server MUST
-   return an error HTTP message with status code 410 (Gone) and media
-   type "application/alto-error+json".  If seq is greater than HIGH_SEQ,
-   the ALTO server MAY either treat the request as a long polling
-   request and save it as a pending request; if the server wants to
-   conduct resource control, the server can return an error code and
-   indicate the "Re-Try After" headers.
-
-   If the request is valid, the response is encoded as a JSON object
-   whose data format is indicated by the media type.
-
-
-
+   A server may change its updates graph (to compact, etc.), but it must
+   satisfy the following invariants:
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 25]
+
+
+Schott, et al.           Expires 29 August 2023                [Page 27]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-   When a client reads an entry from the updates queue, that entry is
-   not removed from the queue.  This is particularly important if two
-   clients have access to the same updates queue, as they may be reading
-   from different places in the queue (depending on the frequency of
-   client pull and the starting seq the server determined for each
-   client).
+   *  Continuity: ns -> ne, anything in between ns and ne also exists
+      (implies ni -> ni + 1 patch exists), where ns is start-seq and ne
+      is end-seq
 
-6.6.  Example
+   *  Feasibility: let n0 denote the smallest version in N (where N is
+      the complete set of nodes in the updates graph), the server can
+      provide a snapshot of n0.  In other words, there is always a
+      direct link to ns
 
-   Assume the client wants to get the contents of updates item 101, the
-   request is:
+   *  "Right shift" only: if a server provides [n1, n2] at time t and
+      [n1', n2'] at time t'.  If t' > t and get [n1', n2'], then n1' >=
+      n1 and n2' >= n2.
 
-      GET /tips/2718281828459/uq/content/101 HTTP/1.1
+   For example, using the example model in Section 2.1, assume at time
+   0, the server provides the valid set [101, 102, 103, 104, 105, 106].
+   At time 1, both [103, 104, 105, 106] and [105, 106] are valid sets.
+   However, [102, 103, 104, 105, 106] is not a valid set as there is no
+   snapshot of the version at 102 and [104, 105, 106] is not a valid set
+   as there is no snapshot of the version at 104.  Thus, there is a risk
+   that the right content of the version at 102, in the first example,
+   and 104, in the second example, cannot be obtained by a client that
+   does not have the previous version at 101 or 103, respectively.
+
+6.  TIPS Data Transfers - Client Pull
+
+   TIPS allows an ALTO client to retrieve the content of an update item
+   from the updates graph, with an update item defined as the content
+   (patch or snapshot) on an edge in the updates graph.
+
+6.1.  Request
+
+   The client sends an HTTP GET request, where the media type of an
+   update item resource MUST be the same as the "media-type" field of
+   the update item on the specified edge in the updates graph.
+
+   For example, if the client wants to query the content of the first
+   update item (0 -> 101) whose media type is "application/alto-
+   costmap+json", it must set the "Accept" header to "application/alto-
+   costmap+json, application/alto-error+json" in the request.
+
+   The GET request looks like
+
+       GET /<tips-view-uri>/ug/<i>/<j>
+
+   For example, if the client wants to query the content of the first
+   update item (0 -> 101), it can send a request to
+   "/tips/2718281828459/ug/0/101".
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 28]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+6.2.  Response
+
+   If the request is valid (ug/<i>/<j> exists), the response is encoded
+   as a JSON object whose data format is indicated by the media type.
+
+   It is possible that a client conducts proactive fetching of future
+   updates, by long pulling updates that have not been listed in the
+   directory yet.  For long-pull prefetch, the client must have
+   indicated the media type which may appear.  It is RECOMMENDED that
+   the server allows for at least the prefetch of <end-seq> -> <end-seq
+   + 1>
+
+   Hence, the server processing logic SHOULD be:
+
+   *  If ug/<i>/<j> exists: return content using encoding.
+
+   *  Else if ug/<i>/<j> pre-fetch is acceptable: put request in a
+      backlog queue.
+
+   *  Else: return error.
+
+6.2.1.  Server Processing "Error" Conditions
+
+   It is RECOMMENDED that the server uses the following HTTP codes to
+   indicate errors, with the media type "application/alto-error+json",
+   regarding update item requests.
+
+   *  404 (Not Found): if the requested TIPS view does not exist or is
+      closed.
+
+   *  410 (Gone): if an update has a seq that is smaller than the start-
+      seq.
+
+   *  415 (Unsupported Media Type): if the media type(s) accepted by the
+      client does not include the media type of the update chosen by the
+      server.
+
+   *  425 (Too Early): if the seq exceeds the server prefetch window
+
+   *  429 (Too Many Requests): when the number of pending (long-pull)
+      requests exceeds server threshold.  Server may indicate when to
+      re-try the request in the "Re-Try After" headers.
+
+6.3.  Example
+
+   Assume the client wants to get the contents of the update item on
+   edge 0 to 101.  The request is:
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 29]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+      GET /tips/2718281828459/ug/0/101 HTTP/1.1
       Host: alto.example.com
       Accept: application/alto-costmap+json, application/alto-error+json
 
    And the response will be
 
-      HTTP/1.1 200 OK
-      Content-Type: application/alto-costmap+json
-      Content-Length: 50
+       HTTP/1.1 200 OK
+       Content-Type: application/alto-costmap+json
+       Content-Length: 50
 
-      { ... full replacement of my-routingcost-map ... }
+       { ... full replacement of my-routingcost-map ... }
 
-7.  TIPS Update Push Service (UPS)
+7.  TIPS Data Transfer - Server Push
 
-   The TIPS UPS service allows an ALTO client to receive an element
-   pushed by the ALTO server.
+   TIPS allows an ALTO client to receive an update item pushed by the
+   ALTO server.
 
-   If a client registers for UPS, it should not request updates via URS
-   to avoid receiving the same information twice, unless the client does
-   not receive the expected updates (see Section 9.2).
+   If a client registers for server push, it should not request updates
+   via pull to avoid receiving the same information twice, unless the
+   client does not receive the expected updates (see Section 8.4).
 
-7.1.  Manage Server Push: Receiver Set
-
-7.1.1.  Receiver Set Operations
+7.1.  Manage Server Push
 
    A client starts to receive server push when it is added to the
-   receiver set.  A client can add itself to the receiver set when
-   creating the transport queue, or add itself explicitly to the
-   receiver set.  A client can read the status of the receiver set and
-   delete itself from the receiver set to stop server push.
+   receiver set.  A client can read the status of the push state and
+   remove itself from the receiver set to stop server push.
 
-   Implicit Create: As a short cut, when creating a transport queue, an
-   ALTO client can start server push by setting the "incremental-
-   changes" field to be true when creating a transport queue using the
-   HTTP POST method with ALTO SSE AddUpdateReq ([RFC8895] Sec. 6.5) as
-   the parameter:
+7.1.1.  Start Server Push
+
+   A client can add itself explicitly to the receiver set or add itself
+   to the receiver set when requesting the TIPS view.
+
+   Explicit add: A client can explicitly add itself in the receiver set
+   by using the HTTP PUT method with media type "application/alto-
+   tipspush+json", where the client may optionally specify a starting
+   edge (next-edge) from which it would like to receive updates:
+
+       PUT /<tips-view-uri>/push
+
+       object {
+         Boolean     server-push;
+         [NextEdge    next-edge;]
+       } PushState
+
+       object {
+         JSONNumber       seq-i;
+         JSONNumber       seq-j;
+       } NextEdge
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 26]
+Schott, et al.           Expires 29 August 2023                [Page 30]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-         object {
-             ResourceID   resource-id;
-             [JSONString  tag;]
-             [Boolean     incremental-changes;]
-             [Object      input;]
-         } AddUpdateReq;
+   Short cut add: When requesting a TIPS view, an ALTO client can start
+   server push by setting the option "server-push" field to be true
+   using the HTTP POST method defined in Section 4.1.
 
-
-
-   PUT Create: A client can add itself in the receiver set by using the
-   HTTP PUT method: PUT transport-queue/rs/self
-
-   Read: A client can see only itself in the receiver set.  The
-   appearance of self in the receiver set (read does not return "not
-   exists" error) is an indication that push starts.
-
-   Delete: A client can delete itself (stops receiving push) either
-   explicitly or implicitly.
-
-   *  Explicit delete: A client deletes itself using the HTTP DELETE
-      method: DELETE transport-queue/rs/self.
-
-   *  Implicit delete: Transport queue is connection ephemeral: the
-      close of connection or stream for the transport queue deletes the
-      transport queue (from the view) for the client.
-
-7.1.2.  Examples
-
-   The first example is a client creating a transport queue and starting
-   server push.
+   Example of a client requesting a TIPS view and starting server push:
 
 
 
@@ -1509,7 +1708,32 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 27]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 31]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
@@ -1521,20 +1745,19 @@ Internet-Draft                  ALTO TIPS                  February 2023
          + END_HEADERS
            :method = POST
            :scheme = https
-           :path = /tqs
+           :path = /tips
            host = alto.example.com
            accept = application/alto-error+json,
-                         application/alto-transport+json
-           content-type = application/alto-transport+json
+                         application/alto-tips+json
+           content-type = application/alto-tips+json
            content-length = 69
 
        DATA
          - END_STREAM
          {
            "resource-id": "my-routingcost-map",
-           ["incremental-push": true]
+           ["server-push": true]
          }
-
 
        Server -> client response:
 
@@ -1542,108 +1765,171 @@ Internet-Draft                  ALTO TIPS                  February 2023
          - END_STREAM
          + END_HEADERS
            :status = 200
-           content-type = application/alto-transport+json
-           content-length = 28
+           content-type = application/alto-tips+json
+           content-length = 196
 
        DATA
          - END_STREAM
-           {"tq": "/tqs/2718281828459"}
+         {
+           "tips-view-uri": "/tips/2718281828459",
+           "tips-view-summary": {
+             "updates-graph-summary": {
+               "start-seq": 101,
+               "end-seq": 106,
+               "start-edge-rec" : {
+                 "seq-i": 0,
+                 "seq-j": 105
+               }
+             },
+             "server-push": true
+           }
+         }
 
 
 
-   If the client reads the status of the transport queue created above
-   using the read operation (GET) in the same HTTP connection, the
-   client should see itself in the receiver set:
 
 
-
-
-
-
-
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 28]
+Schott, et al.           Expires 29 August 2023                [Page 32]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-      Client -> server request
+7.1.2.  Read Push State
 
-      HEADERS
-        - END_STREAM
-        + END_HEADERS
-          :method = GET
-          :scheme = https
-          :path = /tqs/2718281828459
-          host = alto.example.com
-          accept = application/alto-error+json,
-                        application/alto-transport+json
+   A client can use the HTTP GET method, with accept header set to
+   "application/alto-tipspush+json" (defined in Section 7.1.1) to check
+   the status of server push.  Note that a server SHOULD send next-edge
+   to inform the client which item will be pushed next.
 
-      Server -> client response:
+       GET /<tips-view-uri>/push
 
-      HEADERS
-        - END_STREAM
-        + END_HEADERS
-          :status = 200
-          content-type = application/alto-transport+json
-          content-length = 519
+   Example:
 
-      DATA
-        - END_STREAM
-        { "uq":
-          [
-            {"seq":        101,
-              "media-type": "application/alto-costmap+json",
-              "tag":        "a10ce8b059740b0b2e3f8eb1d4785acd42231bfe"},
-            {"seq":        102,
-              "media-type": "application/merge-patch+json",
-              "tag":        "cdf0222x59740b0b2e3f8eb1d4785acd42231bfe"},
-            {"seq":        103,
-              "media-type": "application/merge-patch+json",
-              "tag":        "8eb1d4785acd42231bfecdf0222x59740b0b2e3f",
-              "link":       "/tqs/2718281828459/snapshot/2e3f"}
+       Client -> server request
 
-          ],
-        "rs": ["self"]
-        }
+       HEADERS
+         - END_STREAM
+         + END_HEADERS
+           :method = GET
+           :scheme = https
+           :path = /tips/2718281828459/push
+           host = alto.example.com
+           accept = application/alto-error+json,
+                         application/alto-tipspush+json
 
+       Server -> client response:
 
-   A client can stop incremental push updates from the server to itself
-   by sending the request:
+       HEADERS
+         - END_STREAM
+         + END_HEADERS
+           :status = 200
+           content-type = application/alto-tipspush+json
+           content-length = 519
 
+       DATA
+         - END_STREAM
+         {
+           "server-push": true;
+           "next-edge": {
+             "seq-i": 0,
+             "seq-j": 105
+           }
+         }
 
+7.1.3.  Stop Push
 
-
-
+   A client can stop receiving server push updates either explicitly or
+   implicitly.
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 29]
+
+
+Schott, et al.           Expires 29 August 2023                [Page 33]
 
 Internet-Draft                  ALTO TIPS                  February 2023
 
 
-       DELETE /tqs/2718281828459/rs/self HTTP/2
-       Accept: application/alto-transport+json
+   Explicit stop: A client stops push by using the HTTP PUT method to
+   /<tips-view-uri>/push, with content type "application/alto-
+   tipspush+json" and setting server-push to FALSE:
 
+   Implicit stop: (1) TIPS view is connection ephemeral: the close of
+   connection or stream for the TIPS view deletes the TIPS view from the
+   view of the client. (2) The client sends a DELETE /<tips-view-uri>
+   request, indicating it no longer is interested in the resource, which
+   also deletes the client from the push receiver set if present.
 
-       HTTP/2 200 OK
+   Note that a client may choose to explicitly stop server push for a
+   resource, but may not delete the TIPS view so that it can switch
+   seemlessly from server push to client pull in the case that the
+   server push frequency is undesirable, without having to request a new
+   TIPS view.
+
+   Example of explicit stop:
+
+       Client -> server request
+
+       HEADERS
+         - END_STREAM
+         + END_HEADERS
+           :method = PUT
+           :scheme = https
+           :path = /tips/2718281828459/push
+           host = alto.example.com
+           accept = application/alto-error+json
+           content-type = application/alto-tipspush+json
+           content-length = 69
+
+       DATA
+         - END_STREAM
+         {
+           "server-push": false
+         }
+
+       Server-> client response
+
+       HEADERS
+         - END_STREAM
+         + END_HEADERS
+           :status = 200
 
 7.2.  Server Push of Incremental Updates
 
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 34]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
 7.2.1.  Server Push
 
-   The work flow of server push of individual updates is the following:
+   The objective of the server is to push the latest version to the
+   client using the lowest cost (sum of size) of the updates.  Hence, it
+   is recommended that the server computes the push path using the
+   following algorithm, upon each event computing a push:
 
-   *  Initialization: the first update pushed from the server to the
-      client MUST be the later of the following two: (1) the last
-      independent update in the incremental updates queue; and (2) the
-      following entry of the entry that matches the tag when the client
-      creates the transport queue.  The client MUST set
-      SETTINGS_ENABLE_PUSH to be consistent.
+   *  Compute client current version (n_c).  During initialization, if
+      the TIPS view request has a tag, find that version; otherwise n_c
+      = 0
+
+   *  Compute the shortest path from current version to latest version,
+      n_c, n1, ... n_e (latest version).  Note that the shortest path
+      may not involve the tagged version and instead follow the edge
+      from 0 to the latest snapshot.
+
+   *  push /<tips-view-uri>/ug/n_c/n1
+
+   Note
+
+   *  Initialization: the client MUST set SETTINGS_ENABLE_PUSH to be
+      consistent.  If the client specifically requests a starting edge
+      to be pushed, the server SHOULD start with that edge, even if it
+      is not the shortest path.
 
    *  Push state: the server MUST maintain the last entry pushed to the
       client (and hence per client, per connection state) and schedule
@@ -1654,8 +1940,9 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 7.2.2.  Examples
 
-   A client can wait for the server for incremental push, where the
-   server first sends PUSH_PROMISE, for the first example in Sec. 2.2:
+   Using the example updates graph in Section 2.1, a client can wait on
+   the server for incremental push, where the server first sends
+   PUSH_PROMISE:
 
        Server -> client PUSH_PROMISE in current stream:
 
@@ -1665,8 +1952,16 @@ Internet-Draft                  ALTO TIPS                  February 2023
            HEADER BLOCK
            :method = GET
            :scheme = https
-           :path = /tqs/2718281828459/uq/101
+           :path = /tips/2718281828459/ug/0/101
            host = alto.example.com
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 35]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
            accept = application/alto-error+json,
                          application/alto-costmap+json
 
@@ -1674,14 +1969,6 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
        HEADERS
          + END_STREAM
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 30]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
          + END_HEADERS
            :status = 200
            content-type = application/alto-costmap+json
@@ -1719,10 +2006,17 @@ Internet-Draft                  ALTO TIPS                  February 2023
            HEADER BLOCK
            :method = GET
            :scheme = https
-           :path = /tqs/2718281828459/uq/102
+           :path = /tips/2718281828459/ug/101/102
            host = alto.example.com
            accept = application/alto-error+json,
                          application/merge-patch+json
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 36]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
 
        Server -> client content Stream 6
 
@@ -1730,30 +2024,36 @@ Internet-Draft                  ALTO TIPS                  February 2023
          + END_STREAM
          + END_HEADERS
            :status = 200
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 31]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
            content-type = application/merge-patch+json
            content-length = 7
 
        DATA
          + END_STREAM
-         { ... }
-
+         {
+           "meta": {
+               "vtag": {
+                 "tag": "c0ce023b8678a7b9ec00324673b98e54656d1f6d"
+               }
+           },
+           "cost-map": {
+             "PID1": {
+               "PID2": 9
+             },
+             "PID3": {
+               "PID1": null,
+               "PID3": 1
+             }
+           }
+         }
 
 7.3.  Server Push Stream Management
 
-7.3.1.  Server -> Client [PUSH_PROMISE for Transport Queue on Stream
+7.3.1.  Server -> Client [PUSH_PROMISE for updates graph on Stream
         SID_tq]
 
    The server push MUST satisfy the following requirements:
 
-   *  PUSH_PROMISE MUST be sent in stream SID_tq to serialize to allow
+   *  PUSH_PROMISE MUST be sent in stream SID_tq to serialize and allow
       the client to know the push order;
 
    *  Each PUSH_PROMISE chooses a new server-selected stream ID, and the
@@ -1761,11 +2061,24 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 8.  Operation and Processing Considerations
 
-8.1.  Considerations for Choosing Updates
+8.1.  Considerations for Load Balancing
+
+   TODO
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 37]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+8.2.  Considerations for Choosing Updates
 
    TIPS should be cognizant of the effects of its update schedule, which
    includes both the choice of timing (i.e., when/what to trigger an
-   update on the updates queue) and the choice of message format (i.e.,
+   update on the updates graph) and the choice of message format (i.e.,
    given an update, send a full replacement or an incremental change).
    In particular, the update schedule can have effects on both the
    overhead and the freshness of information.  To minimize overhead,
@@ -1784,15 +2097,6 @@ Internet-Draft                  ALTO TIPS                  February 2023
    JSON patch for those resources.
 
    The case is not as clear for incremental changes to network maps.
-
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 32]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
 
    First, consider small changes, such as moving a prefix from one PID
    to another.  JSON patch could encode that as a simple insertion and
@@ -1813,7 +2117,50 @@ Internet-Draft                  ALTO TIPS                  February 2023
    Therefore, each TIPS may decide on its own whether to use JSON merge
    patch or JSON patch according to the changes in network maps.
 
-8.2.  Considerations for Client Processing Updates
+8.3.  Considerations for Cross-Resource Dependency Scheduling
+
+   Dependent ALTO resources result in cross-resource dependenies in
+   TIPS.  Consider the following pair of resources, where my-cost-map is
+   dependent on my-network-map:
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 38]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+                          +---+   +---+   +---+   +---+   +---+
+     my-network-map (N)   | 0 |-->|101|-->|102|-->|103|-->|104|
+                          +---+   +---+   +---+   +---+   +---+
+                                    |   \       \
+                                    |    \       \
+                          +---+   +---+   +---+   +---+   +---+
+     my-cost-map (C)      | 0 |-->|101|-->|102|-->|103|-->|104|
+                          +---+   +---+   +---+   +---+   +---+
+                           |_______________________|
+
+                     Figure 7: Example Dependency Model
+
+   In pull-mode, a client can decide the order in which to receive the
+   updates.
+
+   In push-mode, the server must decide.  Pushing order may affect how
+   fast the client can build a consistent view and how long the client
+   needs to buffer the update.
+
+   *  Example 1: The server pushes N101, N102, N103, C101, C102 in that
+      order.  The client either gets no consistent view of the resources
+      or it has to buffer N2 and N3
+
+   *  Example 2: The server pushes C1, C2, C3, N1.  The client either
+      gets no consistent view or it has to buffer C3.
+
+   Therefore, the server is RECOMMENDED to push updates in the ascending
+   order of the smallest dependent tag, e.g., {C1, C2, N1} before {C3,
+   N2}
+
+8.4.  Considerations for Client Processing Updates
 
    In general, when an ALTO client receives a full replacement for a
    resource, the ALTO client should replace the current version with the
@@ -1829,9 +2176,19 @@ Internet-Draft                  ALTO TIPS                  February 2023
    cost map messages, although these techniques apply to any dependent
    resources.
 
-   Note that when a network map changes, the update stream server MUST
-   send the network map update message before sending the updates for
-   the dependent cost maps.
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 39]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+   Note that when a network map changes, the server SHOULD send the
+   network map update message before sending the updates for the
+   dependent cost maps.
 
    One approach is for the ALTO client to save the network map update
    message in a buffer and continue to use the previous network map and
@@ -1842,14 +2199,6 @@ Internet-Draft                  ALTO TIPS                  February 2023
    Alternatively, the ALTO client MAY update the network map
    immediately.  In this case, the cost maps using the network map
    become invalid because they are inconsistent with the current network
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 33]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
    map; hence, the ALTO client MUST mark each such dependent cost map as
    temporarily invalid and MUST NOT use each such cost map until the
    ALTO client receives a cost map update indicating that it is based on
@@ -1865,16 +2214,16 @@ Internet-Draft                  ALTO TIPS                  February 2023
    pull.  Although not as efficient as possible, this recovery method is
    simple and reliable.
 
-8.3.  Considerations for Updates to Filtered Cost Maps
+8.5.  Considerations for Updates to Filtered Cost Maps
 
    If TIPS provides updates to a Filtered Cost Map that allows
    constraint tests, then an ALTO client MAY request updates to a
    Filtered Cost Map request with a constraint test.  In this case, when
-   a cost changes, the updates queue MUST have an update if the new
+   a cost changes, the updates graph MUST have an update if the new
    value satisfies the test.  If the new value does not, whether there
    is an update depends on whether the previous value satisfied the
-   test.  If it did not, the updates queue SHOULD NOT have an update.
-   But if the previous value did, then the updates queue MUST add an
+   test.  If it did not, the updates graph SHOULD NOT have an update.
+   But if the previous value did, then the updates graph MUST add an
    update with a "null" value to inform the ALTO client that this cost
    no longer satisfies the criteria.
 
@@ -1882,7 +2231,18 @@ Internet-Draft                  ALTO TIPS                  February 2023
    offering TIPS only for Filtered Cost Maps that do not allow
    constraint tests.
 
-8.4.  Considerations for Updates to Ordinal Mode Costs
+
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 40]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+8.6.  Considerations for Updates to Ordinal Mode Costs
 
    For an ordinal mode cost map, a change to a single cost point may
    require updating many other costs.  As an extreme example, suppose
@@ -1895,16 +2255,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
    should be aware that small changes may result in large updates.
 
    A TIPS can avoid this complication by only offering full replacements
-   as updates in the updates queue for ordinal cost maps.
-
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 34]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
+   as updates in the updates graph for ordinal cost maps.
 
 9.  Security Considerations
 
@@ -1921,22 +2272,31 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 9.1.  TIPS: Denial-of-Service Attacks
 
-   Allowing persistent TIPS states enables a new class of Denial-of-
-   Service attacks.  In particular, For the TIPS server, an ALTO client
-   might create an unreasonable number of transport states.
+   Allowing TIPS views enables a new class of Denial-of-Service attacks.
+   In particular, For the TIPS server, an ALTO client might create an
+   unreasonable number of TIPS views.
 
    To avoid these attacks on the TIPS server, the server SHOULD choose
-   to limit the number of active states and reject new requests when
-   that threshold is reached.  The Update Read Service allows predictive
-   fetching and the server SHOULD also choose to limit the number of
-   pending requests.  In these cases, the update stream server SHOULD
-   return the HTTP status "503 Service Unavailable".
+   to limit the number of active views and reject new requests when that
+   threshold is reached.  TIPS allows predictive fetching and the server
+   SHOULD also choose to limit the number of pending requests.  In these
+   cases, the server SHOULD return the HTTP status "429 Too many
+   requests".
 
    It is important to note that the preceding approaches are not the
    only possibilities.  For example, it may be possible for TIPS to use
    somewhat more clever logic involving IP reputation, rate-limiting,
    and compartmentalization of the overall threshold into smaller
    thresholds that apply to subsets of potential clients.
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 41]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
 
 9.2.  ALTO Client: Update Overloading or Instability
 
@@ -1953,42 +2313,26 @@ Internet-Draft                  ALTO TIPS                  February 2023
    case, the client should be careful in how it uses the information to
    avoid stability or efficiency issues.
 
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 35]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
 9.3.  Spoofed URI
 
    An outside party that can read the TIPS response or that can observe
-   TIPS requests can obtain the transport state URI and use that to send
+   TIPS requests can obtain the TIPS view URI and use that to send
    fraudulent "DELETE" requests, thus disabling the service for the
    valid ALTO client.  This can be avoided by encrypting the requests
    and responses (see Section 15 of [RFC7285]).
-
-   In general, as the architecture allows the possibility for TIPS, URS
-   and UPS to be different entities, the additional risks should be
-   evaluated and remedied.  For example, the private communication path
-   between the servers may be attacked, resulting in a risk of
-   communications breakdown between them, as well as invalid or spoofed
-   messages claiming to be on that private communications path.  Proper
-   security mechanisms, including confidentiality, authenticity, and
-   integrity mechanisms, should be considered.
 
 10.  IANA Considerations
 
    IANA is requested to register the following media type under ALTO
    registry as defined in [RFC7285]:
 
-   *  application/alto-tips+json: as described in Section 4.2.2;
+   *  application/alto-tips+json: as described in Section 4.2;
 
-   *  application/alto-tipsparams+json: as described in Section 4.2.1;
+   *  application/alto-tipsparams+json: as described in Section 4.1;
 
-   *  application/alto-tipsqueue+json: as described in Section 5.5
+   *  application/alto-tipsgraph+json: as described in Section 5.2
+
+   *  application/alto-tipspush+json: as described in Section 7.1.1
 
 10.1.  application/alto-tips+json Media Type
 
@@ -2001,6 +2345,15 @@ Internet-Draft                  ALTO TIPS                  February 2023
    Optional parameters:  N/A
 
    Encoding considerations:  Encoding considerations are identical to
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 42]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
       those specified for the "application/json" media type.  See
       [RFC8259].
 
@@ -2011,14 +2364,7 @@ Internet-Draft                  ALTO TIPS                  February 2023
    Interoperability considerations:  This document specifies format of
       conforming messages and the interpretation thereof.
 
-
-
-Schott, et al.           Expires 24 August 2023                [Page 36]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
-   Published specification:  Section 4.2.2 of this document.
+   Published specification:  Section 4.2 of this document.
 
    Applications that use this media type:  ALTO servers and ALTO clients
       either stand alone or are embedded within other applications.
@@ -2056,6 +2402,14 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
    Required parameters:  N/A
 
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 43]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
    Optional parameters:  N/A
 
    Encoding considerations:  Encoding considerations are identical to
@@ -2066,18 +2420,10 @@ Internet-Draft                  ALTO TIPS                  February 2023
       generation and consumption of ALTO Protocol messages are discussed
       in Section 10 of [RFC8895] and Section 15 of [RFC7285].
 
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 37]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
    Interoperability considerations:  This document specifies format of
       conforming messages and the interpretation thereof.
 
-   Published specification:  Section 4.2.1 of this document.
+   Published specification:  Section 4.1 of this document.
 
    Applications that use this media type:  ALTO servers and ALTO clients
       either stand alone or are embedded within other applications.
@@ -2107,11 +2453,18 @@ Internet-Draft                  ALTO TIPS                  February 2023
    Change controller:  Internet Engineering Task Force
       (mailto:iesg@ietf.org).
 
-10.3.  application/alto-tipsqueue+json Media Type
+10.3.  application/alto-tipsgraph+json Media Type
 
    Type name:  application
 
-   Subtype name:  alto-tipsqueue+json
+   Subtype name:  alto-tipsgraph+json
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 44]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
 
    Required parameters:  N/A
 
@@ -2122,21 +2475,13 @@ Internet-Draft                  ALTO TIPS                  February 2023
       [RFC8259].
 
    Security considerations:  Security considerations relating to the
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 38]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
       generation and consumption of ALTO Protocol messages are discussed
       in Section 10 of [RFC8895] and Section 15 of [RFC7285].
 
    Interoperability considerations:  This document specifies format of
       conforming messages and the interpretation thereof.
 
-   Published specification:  Section 5.5 of this document.
+   Published specification:  Section 5.2 of this document.
 
    Applications that use this media type:  ALTO servers and ALTO clients
       either stand alone or are embedded within other applications.
@@ -2162,6 +2507,76 @@ Internet-Draft                  ALTO TIPS                  February 2023
    Restrictions on usage:  N/A
 
    Author:  See Authors' Addresses section.
+
+   Change controller:  Internet Engineering Task Force
+      (mailto:iesg@ietf.org).
+
+
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 45]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
+10.4.  application/alto-tipspush+json Media Type
+
+   Type name:  application
+
+   Subtype name:  alto-tipspush+json
+
+   Required parameters:  N/A
+
+   Optional parameters:  N/A
+
+   Encoding considerations:  Encoding considerations are identical to
+      those specified for the "application/json" media type.  See
+      [RFC8259].
+
+   Security considerations:  Security considerations relating to the
+      generation and consumption of ALTO Protocol messages are discussed
+      in Section 10 of [RFC8895] and Section 15 of [RFC7285].
+
+   Interoperability considerations:  This document specifies format of
+      conforming messages and the interpretation thereof.
+
+   Published specification:  Section 7.1.1 of this document.
+
+   Applications that use this media type:  ALTO servers and ALTO clients
+      either stand alone or are embedded within other applications.
+
+   Fragment identifier considerations:  N/A
+
+   Additional information:
+
+      Deprecated alias names for this type:  N/A
+
+      Magic number(s):  N/A
+
+      File extension(s):  This document uses the media type to refer to
+         protocol messages and thus does not require a file extension.
+
+      Macintosh file type code(s):  N/A
+
+   Person and email address to contact for further information:  See Aut
+      hors' Addresses section.
+
+   Intended usage:  COMMON
+
+   Restrictions on usage:  N/A
+
+   Author:  See Authors' Addresses section.
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 46]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
 
    Change controller:  Internet Engineering Task Force
       (mailto:iesg@ietf.org).
@@ -2176,25 +2591,10 @@ Internet-Draft                  ALTO TIPS                  February 2023
 
 12.1.  Normative References
 
-
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 39]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
-
-   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
-              Resource Identifier (URI): Generic Syntax", STD 66,
-              RFC 3986, DOI 10.17487/RFC3986, January 2005,
-              <https://www.rfc-editor.org/info/rfc3986>.
 
    [RFC7285]  Alimi, R., Ed., Penno, R., Ed., Yang, Y., Ed., Kiesel, S.,
               Previdi, S., Roome, W., Shalunov, S., and R. Woundy,
@@ -2227,6 +2627,13 @@ Internet-Draft                  ALTO TIPS                  February 2023
    [RFC9114]  Bishop, M., Ed., "HTTP/3", RFC 9114, DOI 10.17487/RFC9114,
               June 2022, <https://www.rfc-editor.org/info/rfc9114>.
 
+
+
+Schott, et al.           Expires 29 August 2023                [Page 47]
+
+Internet-Draft                  ALTO TIPS                  February 2023
+
+
 12.2.  Informative References
 
    [draft-schott-alto-new-transport-push]
@@ -2235,68 +2642,11 @@ Internet-Draft                  ALTO TIPS                  February 2023
               <https://datatracker.ietf.org/doc/draft-schott-alto-new-
               transport-push/>.
 
-
-
-Schott, et al.           Expires 24 August 2023                [Page 40]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
-
    [RFC7971]  Stiemerling, M., Kiesel, S., Scharf, M., Seidel, H., and
               S. Previdi, "Application-Layer Traffic Optimization (ALTO)
               Deployment Considerations", RFC 7971,
               DOI 10.17487/RFC7971, October 2016,
               <https://www.rfc-editor.org/info/rfc7971>.
-
-Appendix A.  Changes since -06
-
-   NOTE: To be removed upon publication
-
-   Revision -07
-
-   *  Added a new subsection to give the high-level ideas of TIPS
-
-   *  Added the change log
-
-Appendix B.  Changes since -05
-
-   NOTE: To be removed upon publication
-
-   Revision -06
-
-   *  Restructured the Abstract (based on Adrian's feedback) and
-      Section 2 (based on Jordi's feedback) to be more clear on the
-      abstractions we are proposing
-
-   *  Moved Requirements Language into Section 1 per RFC guidelines
-
-   *  Added a Section 2.3 to clarify TIPS with HTTP/1.x, because Qin
-      noted the draft was unclear on how TIPS related to HTTP versions
-
-   *  Merged in the TIPS server push draft [draft-schott-alto-new-
-      transport-push] into Section 7 (all but 3 sections of that draft
-      were shared by this transport draft so they were copy/pasted into
-      Section 7 - there are now 3 subsections of it)
-
-   *  Moved Section 8 on IRDs into Section 4.1 as an example of an IRD
-      because Jordi noted that the definition of an IRD was unclear
-
-   *  Deleted the Appendix describing HTTP/3 outlook because it no
-      longer applies since TIPS should be version independent
-
-   *  Updated the draft with small clarifications/grammar tweaks based
-      on feedback from Qin, Adrian, and Jordi (including small changes
-      to the Figures)
-
-   *  Cleaned up all the idnits validation errors
-
-
-
-
-Schott, et al.           Expires 24 August 2023                [Page 41]
-
-Internet-Draft                  ALTO TIPS                  February 2023
-
 
 Authors' Addresses
 
@@ -2305,7 +2655,6 @@ Authors' Addresses
    Heinrich-Hertz-Strasse 3-7
    64295 Darmstadt
    Germany
-
    Email: Roland.Schott@telekom.de
 
 
@@ -2314,7 +2663,6 @@ Authors' Addresses
    51 Prospect St
    New Haven, CT 06520
    United States of America
-
    Email: yry@cs.yale.edu
 
 
@@ -2324,7 +2672,6 @@ Authors' Addresses
    Chengdu
    Sichuan, 610065
    China
-
    Email: kgao@scu.edu.cn
 
 
@@ -2333,8 +2680,14 @@ Authors' Addresses
    51 Prospect St
    New Haven, CT 06520
    United States of America
-
    Email: lauren.delwiche@yale.edu
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 48]
+
+Internet-Draft                  ALTO TIPS                  February 2023
 
 
    Lachlan Keller
@@ -2342,11 +2695,50 @@ Authors' Addresses
    51 Prospect Street
    New Haven,  06511
    United States of America
-
    Email: lachlan.keller@yale.edu
 
 
 
 
 
-Schott, et al.           Expires 24 August 2023                [Page 42]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.           Expires 29 August 2023                [Page 49]
