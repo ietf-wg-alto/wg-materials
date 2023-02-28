@@ -7,6 +7,66 @@
 
 - **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
 
+**IETF, ALTO Meeting: February 28th, 2023**
+
+**Agenda:**
+
+- Chartered items
+- Deployment
+- Recharter items for IETF 116
+  - Multi-domain use cases
+  - compute and network information exposure
+
+
+**Minutes:**
+
+Note Taker: Richard
+
+- Transport protocol
+  Use new repo to check in to the repo ttps://github.com/ietf-wg-alto/draft-ietf-alto-new-transport
+
+- OAM
+  Many editing to address comments
+
+  Q: How to handle fine-grained, dynamic access control
+     e.g., access control based on the usr who queries for an enpoint property
+
+       IP address -> associated w/ owner
+       binding: alto client IP address -> IP address that you can query (ecs)
+       POST URI
+       {input: client-ip}
+
+        assert: alto_client.ip == post.uri.input.client_ip
+
+  yang model:
+      design 1: specify in the yang model (embedded model) [enumerate yang data]
+      design 2: specify using external binding through an external database
+        assert: verified( ext-valid()  == true
+
+  access control using dynamic fields
+    alto client properties, resource_id, input fields of resource
+
+- Deployment
+   Telefonica update
+   Jordi summary
+   Richard updates openalto.org
+   Benocs deployment, Sabine
+
+- Multi-domain use case
+  Tong Meng (Huawei)
+  Wireless is last mile, immersive and interactive apps need better QoS
+  Multi-path
+  Network info to expose: differentiated QOS services
+
+  App traffic optimize
+    QoS-aware scheduling    
+    Combined QoS services
+
+  Two types of multi-domain use cases: Asymmetric and symmetric
+
+  Integrating trust in multi-domain use cases
+
+------------------------------
 
 **IETF, ALTO Meeting: February 21th, 2023**
 
