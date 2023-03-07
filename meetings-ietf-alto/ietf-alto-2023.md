@@ -7,6 +7,26 @@
 
 - **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
 
+------------------------------
+
+**IETF, ALTO Meeting: February 28th, 2023**
+
+**Agenda:**
+
+- Chartered items
+- Deployment
+- Recharter items for IETF 116
+  - Multi-domain use cases
+  - compute and network information exposure
+  - Trust
+
+
+**Minutes:**
+
+Note Taker: 
+
+------------------------------
+
 **IETF, ALTO Meeting: February 28th, 2023**
 
 **Agenda:**
