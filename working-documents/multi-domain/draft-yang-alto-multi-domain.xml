@@ -1,0 +1,268 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE rfc [
+  <!ENTITY nbsp    "&#160;">
+  <!ENTITY zwsp   "&#8203;">
+  <!ENTITY nbhy   "&#8209;">
+  <!ENTITY wj     "&#8288;">
+]>
+<!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
+     by Daniel M Kohn (private) -->
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-05" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
+  <!-- xml2rfc v2v3 conversion 3.12.10 -->
+  <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+
+  <front>
+    <title abbrev="ALTO TIPS">ALTO Multi-Domain Services</title>
+    <seriesInfo name="Internet-Draft" value="draft-yang-alto-multi-domain-00"/>
+    <author fullname="Y. Richard Yang" initials="Y." surname="Yang">
+      <organization>Yale University</organization>
+      <address>
+        <postal>
+          <street>51 Prospect St</street>
+          <city>New Haven</city>
+          <region>CT</region>
+          <code>06520</code>
+          <country>USA</country>
+        </postal>
+        <email>yry@cs.yale.edu</email>
+      </address>
+    </author>
+
+    <author fullname="Mario Lassnig" initials="M." surname="Lassnig">
+      <organization>CERN</organization>
+      <address>
+        <postal>
+          <street/>
+          <city>Geneva</city>
+          <code>201804</code>
+          <country>Switzerland</country>
+        </postal>
+        <email>TODO</email>
+      </address>
+    </author>
+
+    <date day="12" month="March" year="2023"/>
+    <area>TSV Area</area>
+    <workgroup>ALTO Working Group</workgroup>
+    <keyword>RFC</keyword>
+    <keyword>Request for Comments</keyword>
+    <keyword>I-D</keyword>
+    <keyword>Internet-Draft</keyword>
+    <keyword>Application-Layer Traffic Optimization, Multi-Domain, BGP</keyword>
+    <abstract>
+      <t>This is abstract.
+      </t>
+    </abstract>
+    <note>
+      <name>Requirements Language</name>
+      <t>
+          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+          "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY",
+          and "OPTIONAL" in this document are to be interpreted as described
+          in BCP 14 <xref target="RFC2119" format="default"/>
+          <xref target="RFC8174" format="default"/> when,
+          and only when, they appear in all capitals, as shown here.
+      </t>
+    </note>
+  </front>
+
+  <middle>
+    <section anchor="intro" numbered="true" toc="default">
+      <name>Introduction</name>
+      <t>Application-Layer Traffic Optimization (ALTO) 
+      provides means for network applications to obtain network information. For example, 
+      the Endpoint Cost Service (ECS) defined by ALTO in <xref target="RFC7285" format="default"/>  
+      can provide the network costs of data transmissions from a set of sources to a set of 
+      destinations. These costs are the distances that Rucio need, to select data sources or 
+      destinations, where Rucio is the de facto data orchestration system of CERN experiments. 
+      In the initial ALTO protocol, the costs were called distances.</t>
+  
+      <t>In the definitions of ALTO services ([RFC7285] and existing extensions), there is no 
+        requirement on whether the source and the destination endpoints must belong to the same 
+        autonomous network, which is a single-domain setting, or they can belong to different 
+        autonomous networks, which is a multi-domain setting. The unification of a single interface
+        covering both single-domain and multi-domain settings provides a simple-to-use interface to ALTO clients. However, it leaves standardization gaps in multi-domain settings. Although participating autonomous systems can define private mechanisms to realize ALTO services in multi-domain settings, standard mechanisms allow wider deployment.
+      </t>
+
+      <t>The rest of the document first specifies the issues that may arise in a multi-domain 
+        settings. It then provides initial designs, based on current implementation experiences to start the design conversation. To be concrete, this document is based on the basic ALTO 
+        ECS service. Additional complexities such as network maps and cost maps will be discussed in
+        the next iteration.</t>
+
+    </section>
+
+    <section anchor="problem" numbered="true" toc="default">
+      <name>Problem Specification</name>
+
+      <artwork name="" type="" align="left" alt=""><![CDATA[        
+  POST /endpointcost/lookup HTTP/1.1
+  Host: alto.example.com
+  Content-Length: 248
+  Content-Type: application/alto-endpointcostparams+json
+  Accept: application/alto-endpointcost+json,application/alto-error+json
+
+  {
+    "cost-type": {"cost-mode" : "ordinal",
+                  "cost-metric" : "routingcost"},
+    "endpoints" : {
+      "srcs": [ "ipv4:192.0.2.2" ],
+      "dsts": [
+        "ipv4:192.0.2.89",
+        "ipv4:198.51.100.34",
+        "ipv4:203.0.113.45"
+      ]
+    }
+  }
+
+
+  HTTP/1.1 200 OK
+  Content-Length: 274
+  Content-Type: application/alto-endpointcost+json
+
+  {
+    "meta" : {
+      "cost-type": {"cost-mode" : "ordinal",
+                    "cost-metric" : "routingcost"
+      }
+    },
+    "endpoint-cost-map" : {
+      "ipv4:192.0.2.2": {
+        "ipv4:192.0.2.89"    : 1,
+        "ipv4:198.51.100.34" : 2,
+        "ipv4:203.0.113.45"  : 3
+      }
+    }
+  }
+      ]]></artwork>
+
+
+    </section>
+
+
+    <section anchor="ianaconsider" numbered="true" toc="default">
+      <name>IANA Considerations</name>
+      <t>IANA will need to register the following:
+      </t>
+    </section>
+
+    <section numbered="true" toc="default">
+      <name>Acknowledgments</name>
+      <t>The authors of this document would also like to thank many
+      for the reviews and comments.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references>
+      <name>References</name>
+      <references>
+        <name>Normative References</name>
+
+        <reference anchor="RFC2119" target="https://www.rfc-editor.org/info/rfc2119" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml">
+          <front>
+            <title>Key words for use in RFCs to Indicate Requirement Levels</title>
+            <author initials="S." surname="Bradner" fullname="S. Bradner">
+              <organization/>
+            </author>
+            <date year="1997" month="March"/>
+          </front>
+          <seriesInfo name="BCP" value="14"/>
+          <seriesInfo name="RFC" value="2119"/>
+          <seriesInfo name="DOI" value="10.17487/RFC2119"/>
+        </reference>
+
+
+         <reference anchor="RFC7285" target="https://www.rfc-editor.org/info/rfc7285" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7285.xml">
+          <front>
+            <title>Application-Layer Traffic Optimization (ALTO) Protocol</title>
+            <author initials="R." surname="Alimi" fullname="R. Alimi" role="editor">
+              <organization/>
+            </author>
+            <author initials="R." surname="Penno" fullname="R. Penno" role="editor">
+              <organization/>
+            </author>
+            <author initials="Y." surname="Yang" fullname="Y. Yang" role="editor">
+              <organization/>
+            </author>
+            <author initials="S." surname="Kiesel" fullname="S. Kiesel">
+              <organization/>
+            </author>
+            <author initials="S." surname="Previdi" fullname="S. Previdi">
+              <organization/>
+            </author>
+            <author initials="W." surname="Roome" fullname="W. Roome">
+              <organization/>
+            </author>
+            <author initials="S." surname="Shalunov" fullname="S. Shalunov">
+              <organization/>
+            </author>
+            <author initials="R." surname="Woundy" fullname="R. Woundy">
+              <organization/>
+            </author>
+            <date year="2014" month="September"/>
+            <abstract>
+              <t>Applications using the Internet already have access to some topology information of Internet Service Provider (ISP) networks.  For example, views to Internet routing tables at Looking Glass servers are available and can be practically downloaded to many network application clients.  What is missing is knowledge of the underlying network topologies from the point of view of ISPs.  In other words, what an ISP prefers in terms of traffic optimization -- and a way to distribute it.</t>
+              <t>The Application-Layer Traffic Optimization (ALTO) services defined in this document provide network information (e.g., basic network location structure and preferences of network paths) with the goal of modifying network resource consumption patterns while maintaining or improving application performance.  The basic information of ALTO is based on abstract maps of a network.  These maps provide a simplified view, yet enough information about a network for applications to effectively utilize them.  Additional services are built on top of the maps.</t>
+              <t>This document describes a protocol implementing the ALTO services. Although the ALTO services would primarily be provided by ISPs, other entities, such as content service providers, could also provide ALTO services.  Applications that could use the ALTO services are those that have a choice to which end points to connect.  Examples of such applications are peer-to-peer (P2P) and content delivery networks.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="RFC" value="7285"/>
+          <seriesInfo name="DOI" value="10.17487/RFC7285"/>
+        </reference>
+        <!-- alto base -->
+
+
+        <reference anchor="RFC8174" target="https://www.rfc-editor.org/info/rfc8174" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml">
+          <front>
+            <title>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</title>
+            <author initials="B." surname="Leiba" fullname="B. Leiba">
+              <organization/>
+            </author>
+            <date year="2017" month="May"/>
+            <abstract>
+              <t>RFC 2119 specifies common key words that may be used in protocol  specifications.  This document aims to reduce the ambiguity by clarifying that only UPPERCASE usage of the key words have the  defined special meanings.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="BCP" value="14"/>
+          <seriesInfo name="RFC" value="8174"/>
+          <seriesInfo name="DOI" value="10.17487/RFC8174"/>
+        </reference>
+        <!-- requirements words -->
+       </references>    
+
+       <references>
+        <name>Informative References</name>
+
+        <reference anchor="RFC7971" target="https://www.rfc-editor.org/info/rfc7971" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7971.xml">
+          <front>
+            <title>Application-Layer Traffic Optimization (ALTO) Deployment Considerations</title>
+            <author initials="M." surname="Stiemerling" fullname="M. Stiemerling">
+              <organization/>
+            </author>
+            <author initials="S." surname="Kiesel" fullname="S. Kiesel">
+              <organization/>
+            </author>
+            <author initials="M." surname="Scharf" fullname="M. Scharf">
+              <organization/>
+            </author>
+            <author initials="H." surname="Seidel" fullname="H. Seidel">
+              <organization/>
+            </author>
+            <author initials="S." surname="Previdi" fullname="S. Previdi">
+              <organization/>
+            </author>
+            <date year="2016" month="October"/>
+            <abstract>
+              <t>Many Internet applications are used to access resources such as pieces of information or server processes that are available in several equivalent replicas on different hosts.  This includes, but is not limited to, peer-to-peer file sharing applications.  The goal of Application-Layer Traffic Optimization (ALTO) is to provide guidance to applications that have to select one or several hosts from a set of candidates capable of providing a desired resource. This memo discusses deployment-related issues of ALTO.  It addresses different use cases of ALTO such as peer-to-peer file sharing and Content Delivery Networks (CDNs) and presents corresponding examples. The document also includes recommendations for network administrators and application designers planning to deploy ALTO, such as recommendations on how to generate ALTO map information.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="RFC" value="7971"/>
+          <seriesInfo name="DOI" value="10.17487/RFC7971"/>
+        </reference>
+        <!-- requirements -->
+
+    </references>
+    </references>
+
+  </back>
+</rfc>

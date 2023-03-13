@@ -1,0 +1,224 @@
+
+
+
+
+ALTO Working Group                                               Y. Yang
+Internet-Draft                                           Yale University
+Intended status: Standards Track                              M. Lassnig
+Expires: 13 September 2023                                          CERN
+                                                           12 March 2023
+
+
+                       ALTO Multi-Domain Services
+                    draft-ietf-alto-new-transport-05
+
+Abstract
+
+   This is abstract.
+
+Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 13 September 2023.
+
+Copyright Notice
+
+   Copyright (c) 2023 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+
+
+
+Yang & Lassnig          Expires 13 September 2023               [Page 1]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
+
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Problem Specification . . . . . . . . . . . . . . . . . . . .   2
+   3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   3
+   4.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   3
+   5.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     5.1.  Normative References  . . . . . . . . . . . . . . . . . .   4
+     5.2.  Informative References  . . . . . . . . . . . . . . . . .   4
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   4
+
+1.  Introduction
+
+   Application-Layer Traffic Optimization (ALTO) provides means for
+   network applications to obtain network information.  For example, the
+   Endpoint Cost Service (ECS) defined by ALTO in [RFC7285] can provide
+   the network costs of data transmissions from a set of sources to a
+   set of destinations.  These costs are the distances that Rucio need,
+   to select data sources or destinations, where Rucio is the de facto
+   data orchestration system of CERN experiments.  In the initial ALTO
+   protocol, the costs were called distances.
+
+   In the definitions of ALTO services ([RFC7285] and existing
+   extensions), there is no requirement on whether the source and the
+   destination endpoints must belong to the same autonomous network,
+   which is a single-domain setting, or they can belong to different
+   autonomous networks, which is a multi-domain setting.  The
+   unification of a single interface covering both single-domain and
+   multi-domain settings provides a simple-to-use interface to ALTO
+   clients.  However, it leaves standardization gaps in multi-domain
+   settings.  Although participating autonomous systems can define
+   private mechanisms to realize ALTO services in multi-domain settings,
+   standard mechanisms allow wider deployment.
+
+   The rest of the document first specifies the issues that may arise in
+   a multi-domain settings.  It then provides initial designs, based on
+   current implementation experiences to start the design conversation.
+   To be concrete, this document is based on the basic ALTO ECS service.
+   Additional complexities such as network maps and cost maps will be
+   discussed in the next iteration.
+
+2.  Problem Specification
+
+
+
+
+Yang & Lassnig          Expires 13 September 2023               [Page 2]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
+
+  POST /endpointcost/lookup HTTP/1.1
+  Host: alto.example.com
+  Content-Length: 248
+  Content-Type: application/alto-endpointcostparams+json
+  Accept: application/alto-endpointcost+json,application/alto-error+json
+
+  {
+    "cost-type": {"cost-mode" : "ordinal",
+                  "cost-metric" : "routingcost"},
+    "endpoints" : {
+      "srcs": [ "ipv4:192.0.2.2" ],
+      "dsts": [
+        "ipv4:192.0.2.89",
+        "ipv4:198.51.100.34",
+        "ipv4:203.0.113.45"
+      ]
+    }
+  }
+
+
+  HTTP/1.1 200 OK
+  Content-Length: 274
+  Content-Type: application/alto-endpointcost+json
+
+  {
+    "meta" : {
+      "cost-type": {"cost-mode" : "ordinal",
+                    "cost-metric" : "routingcost"
+      }
+    },
+    "endpoint-cost-map" : {
+      "ipv4:192.0.2.2": {
+        "ipv4:192.0.2.89"    : 1,
+        "ipv4:198.51.100.34" : 2,
+        "ipv4:203.0.113.45"  : 3
+      }
+    }
+  }
+
+3.  IANA Considerations
+
+   IANA will need to register the following:
+
+4.  Acknowledgments
+
+   The authors of this document would also like to thank many for the
+   reviews and comments.
+
+
+
+
+Yang & Lassnig          Expires 13 September 2023               [Page 3]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
+
+5.  References
+
+5.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC7285]  Alimi, R., Ed., Penno, R., Ed., Yang, Y., Ed., Kiesel, S.,
+              Previdi, S., Roome, W., Shalunov, S., and R. Woundy,
+              "Application-Layer Traffic Optimization (ALTO) Protocol",
+              RFC 7285, DOI 10.17487/RFC7285, September 2014,
+              <https://www.rfc-editor.org/info/rfc7285>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+5.2.  Informative References
+
+   [RFC7971]  Stiemerling, M., Kiesel, S., Scharf, M., Seidel, H., and
+              S. Previdi, "Application-Layer Traffic Optimization (ALTO)
+              Deployment Considerations", RFC 7971,
+              DOI 10.17487/RFC7971, October 2016,
+              <https://www.rfc-editor.org/info/rfc7971>.
+
+Authors' Addresses
+
+   Y. Richard Yang
+   Yale University
+   51 Prospect St
+   New Haven, CT 06520
+   United States of America
+   Email: yry@cs.yale.edu
+
+
+   Mario Lassnig
+   CERN
+   CH-201804 Geneva
+   Switzerland
+   Email: TODO
+
+
+
+
+
+
+
+
+
+Yang & Lassnig          Expires 13 September 2023               [Page 4]
