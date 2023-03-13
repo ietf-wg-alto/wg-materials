@@ -5,41 +5,41 @@
 ALTO Working Group                                             R. Schott
 Internet-Draft                                          Deutsche Telekom
 Intended status: Standards Track                                 Y. Yang
-Expires: 3 September 2023                                Yale University
+Expires: 13 September 2023                               Yale University
                                                                   K. Gao
                                                       Sichuan University
                                                              L. Delwiche
                                                                L. Keller
                                                          Yale University
-                                                            2 March 2023
+                                                           12 March 2023
 
 
-             ALTO Transport Information Publication Service
+           The ALTO Transport Information Publication Service
                     draft-ietf-alto-new-transport-07
 
 Abstract
 
-   The ALTO protocol (RFC 7285) leverages HTTP/1.x and is designed for
+   The ALTO Protocol (RFC 7285) leverages HTTP/1.x and is designed for
    the simple, sequential request-reply use case, in which an ALTO
    client requests a sequence of information resources, and the server
    responds with the complete content of each resource one at a time.
 
-   ALTO/SSE (RFC 8895) defines a multiplexing protocol on top of
-   HTTP/1.x, so that the server can incrementally push resource updates
-   to the client whenever monitored network information resources
-   change, allowing the client to monitor multiple resources at the same
-   time.  However, HTTP/2 and later versions already support concurrent,
-   non-blocking transport of multiple streams in the same HTTP
-   connection.
+   ALTO incremental updates using Server-Sent Events (SSE) (RFC 8895)
+   defines a multiplexing protocol on top of HTTP/1.x, so that an ALTO
+   server can incrementally push resource updates to clients whenever
+   monitored network information resources change, allowing the clients
+   to monitor multiple resources at the same time.  However, HTTP/2 and
+   later versions already support concurrent, non-blocking transport of
+   multiple streams in the same HTTP connection.
 
    To take advantage of newer HTTP features, this document introduces
    the ALTO Transport Information Publication Service (TIPS).  TIPS uses
    an incremental RESTful design to give an ALTO client the new
    capability to explicitly, concurrently (non-blocking) request (pull)
    specific incremental updates using native HTTP/2 or HTTP/3, while
-   still functioning for HTTP/1.x.  It also provides an ALTO server the
-   new capability to concurrently push specific incremental updates
-   using native HTTP/2 or HTTP/3 server push.
+   still functioning for HTTP/1.x.  TIPS also provides an ALTO server to
+   concurrently push specific incremental updates using native HTTP/2 or
+   HTTP/3 server push.
 
 Status of This Memo
 
@@ -53,7 +53,7 @@ Status of This Memo
 
 
 
-Schott, et al.          Expires 3 September 2023                [Page 1]
+Schott, et al.          Expires 13 September 2023               [Page 1]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -63,7 +63,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 September 2023.
+   This Internet-Draft will expire on 13 September 2023.
 
 Copyright Notice
 
@@ -109,52 +109,52 @@ Table of Contents
 
 
 
-Schott, et al.          Expires 3 September 2023                [Page 2]
+Schott, et al.          Expires 13 September 2023               [Page 2]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
 
      5.4.  Refresh Directory . . . . . . . . . . . . . . . . . . . .  27
-       5.4.1.  Request . . . . . . . . . . . . . . . . . . . . . . .  28
-       5.4.2.  Response  . . . . . . . . . . . . . . . . . . . . . .  28
+       5.4.1.  Request . . . . . . . . . . . . . . . . . . . . . . .  27
+       5.4.2.  Response  . . . . . . . . . . . . . . . . . . . . . .  27
      5.5.  Server Updates Directory Invariants . . . . . . . . . . .  28
    6.  TIPS Data Transfers - Client Pull . . . . . . . . . . . . . .  29
      6.1.  Request . . . . . . . . . . . . . . . . . . . . . . . . .  29
-     6.2.  Response  . . . . . . . . . . . . . . . . . . . . . . . .  30
+     6.2.  Response  . . . . . . . . . . . . . . . . . . . . . . . .  29
        6.2.1.  Server Processing "Error" Conditions  . . . . . . . .  30
      6.3.  Example . . . . . . . . . . . . . . . . . . . . . . . . .  30
-   7.  TIPS Data Transfer - Server Push  . . . . . . . . . . . . . .  31
+   7.  TIPS Data Transfer - Server Push  . . . . . . . . . . . . . .  30
      7.1.  Manage Server Push  . . . . . . . . . . . . . . . . . . .  31
        7.1.1.  Start Server Push . . . . . . . . . . . . . . . . . .  31
-       7.1.2.  Read Push State . . . . . . . . . . . . . . . . . . .  34
-       7.1.3.  Stop Push . . . . . . . . . . . . . . . . . . . . . .  34
-     7.2.  Server Push of Incremental Updates  . . . . . . . . . . .  35
-       7.2.1.  Server Push . . . . . . . . . . . . . . . . . . . . .  36
-       7.2.2.  Examples  . . . . . . . . . . . . . . . . . . . . . .  36
-     7.3.  Server Push Stream Management . . . . . . . . . . . . . .  38
+       7.1.2.  Read Push State . . . . . . . . . . . . . . . . . . .  33
+       7.1.3.  Stop Push . . . . . . . . . . . . . . . . . . . . . .  33
+     7.2.  Server Push of Incremental Updates  . . . . . . . . . . .  34
+       7.2.1.  Server Push . . . . . . . . . . . . . . . . . . . . .  35
+       7.2.2.  Examples  . . . . . . . . . . . . . . . . . . . . . .  35
+     7.3.  Server Push Stream Management . . . . . . . . . . . . . .  37
        7.3.1.  Server -> Client [PUSH_PROMISE for updates graph on
-               Stream SID_tq]  . . . . . . . . . . . . . . . . . . .  38
-   8.  Operation and Processing Considerations . . . . . . . . . . .  38
+               Stream SID_tq]  . . . . . . . . . . . . . . . . . . .  37
+   8.  Operation and Processing Considerations . . . . . . . . . . .  37
      8.1.  Considerations for Load Balancing . . . . . . . . . . . .  38
-     8.2.  Considerations for Choosing Updates . . . . . . . . . . .  39
+     8.2.  Considerations for Choosing Updates . . . . . . . . . . .  38
      8.3.  Considerations for Cross-Resource Dependency
            Scheduling  . . . . . . . . . . . . . . . . . . . . . . .  39
      8.4.  Considerations for Client Processing Updates  . . . . . .  40
      8.5.  Considerations for Updates to Filtered Cost Maps  . . . .  41
-     8.6.  Considerations for Updates to Ordinal Mode Costs  . . . .  42
+     8.6.  Considerations for Updates to Ordinal Mode Costs  . . . .  41
    9.  Security Considerations . . . . . . . . . . . . . . . . . . .  42
      9.1.  TIPS: Denial-of-Service Attacks . . . . . . . . . . . . .  42
-     9.2.  ALTO Client: Update Overloading or Instability  . . . . .  43
+     9.2.  ALTO Client: Update Overloading or Instability  . . . . .  42
      9.3.  Spoofed URI . . . . . . . . . . . . . . . . . . . . . . .  43
    10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  43
      10.1.  application/alto-tips+json Media Type  . . . . . . . . .  43
      10.2.  application/alto-tipsparams+json Media Type  . . . . . .  44
      10.3.  application/alto-tipsview+json Media Type  . . . . . . .  45
    11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  46
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  47
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  47
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  46
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  46
      12.2.  Informative References . . . . . . . . . . . . . . . . .  47
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  48
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  47
 
 
 
@@ -165,7 +165,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023                [Page 3]
+Schott, et al.          Expires 13 September 2023               [Page 3]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -177,60 +177,60 @@ Internet-Draft                  ALTO TIPS                     March 2023
    two transport protocols have been designed: (1) The ALTO base
    protocol [RFC7285], which is designed for the simple use case in
    which an ALTO client requests a network information resource, and the
-   server sends the complete content of the requested information
-   resource to the client; and (2) ALTO/SSE (ALTO Incremental Updates
-   Using Server-Sent Events) [RFC8895], which is designed for the use
-   case that an ALTO client indicates to the server that it wants to
-   receive updates for a set of resources, and the server can then
-   concurrently, and incrementally push updates to the client whenever
-   monitored resources change.
+   server sends the complete content of the requested information (if
+   any) resource to the client; and (2) ALTO incremental updates using
+   Server-Sent Events (ALTO/SSE) [RFC8895], which is designed for an
+   ALTO client to indicate to the server that it wants to receive
+   updates for a set of resources, and the server can then concurrently,
+   and incrementally push updates to that client whenever monitored
+   resources change.
 
    Both protocols are designed for HTTP/1.x [RFC9112] and, ideally, they
    should be able to automatically take advantage of newer HTTP versions
    such as HTTP/2 [RFC9113] and HTTP/3 [RFC9114].  However, there are
-   issues with both protocols when HTTP moves to higher versions.  First
-   consider the ALTO base protocol, which is designed to transfer only
-   complete information resources.  Hence, a client can run the base
-   protocol on top of HTTP/2 or HTTP/3 to request multiple information
-   resources concurrently, in concurrent streams, but each request must
-   be for a complete information resource; there is no capability of
-   transferring incremental updates.  Hence, there can be large overhead
-   when the client already has an information resource and then there
-   are small changes to the resource.  Next, consider ALTO/SSE.
-   Although ALTO/SSE can transfer incremental updates, it introduces a
-   customized multiplexing protocol on top of HTTP, assuming a total-
-   order message channel from the server to the client.  The
-   multiplexing design does not provide naming (i.e., providing resource
-   identifier) to individual incremental updates.  Hence, the design
-   cannot use concurrent per-stream server push or non-blocking per-
-   stream client pull, available in HTTP/2 and HTTP/3, because both
+   issues with both protocols when higher HTTP versions are used.
+   First, consider the ALTO base protocol, which is designed to transfer
+   only complete information resources.  Hence, a client can run the
+   base protocol on top of HTTP/2 or HTTP/3 to request multiple
+   information resources concurrently, in concurrent streams, but each
+   request must be for a complete information resource; there is no
+   capability of transferring incremental updates.  Hence, there can be
+   large overhead when the client already has an information resource
+   and then there are small changes to the resource.  Next, consider
+   ALTO/SSE.  Although ALTO/SSE can transfer incremental updates, it
+   introduces a customized multiplexing protocol on top of HTTP,
+   assuming a total-order message channel from the server to the client.
+   The multiplexing design does not provide naming (i.e., providing
+   resource identifier) to individual incremental updates.  Hence, the
+   design cannot use concurrent per-stream server push or non-blocking
+   per-stream client pull, available in HTTP/2 and HTTP/3, because both
    cases require the resource identifier.  Additionally, ALTO/SSE is a
    push-only protocol, which denies the client flexibility in choosing
    how and when it receives updates.
 
-   This document introduces a new ALTO service called the transport
-   information publication service (TIPS).  TIPS uses an incremental
-   RESTful design to give an ALTO client the new capability to
+   This document introduces a new ALTO service called the Transport
+   Information Publication Service (TIPS).  TIPS uses an incremental
+   RESTful design to provide an ALTO client with a new capability to
    explicitly, concurrently (non-blocking) request (pull) specific
    incremental updates using native HTTP/2 or HTTP/3, while still
-   functioning for HTTP/1.x.  It also provides an ALTO server the new
-   capability to concurrently push specific incremental updates using
-   native HTTP/2 or HTTP/3 server push.  This document specifies the
+   functioning for HTTP/1.x.  TIPS also provides an ALTO server to
+   concurrently push specific incremental updates using native HTTP/2 or
+   HTTP/3 server push.  Specifically, this document specifies the
    following:
 
 
 
 
-Schott, et al.          Expires 3 September 2023                [Page 4]
+Schott, et al.          Expires 13 September 2023               [Page 4]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
 
-   *  ALTO protocol extensions to create/update/remove an incremental
-      representational state transfer resource (iREST);
+   *  Extensions to the ALTO Protocol to create, update, or remove an
+      incremental representational state transfer resource (iREST).
 
    *  A new resource type that specifies the iREST graph model for a
-      resource;
+      resource.
 
    *  URI patterns to fetch the snapshots or incremental updates.
 
@@ -245,8 +245,8 @@ Internet-Draft                  ALTO TIPS                     March 2023
 1.2.  Notations
 
    This document uses the same syntax and notations as introduced in
-   Section 8.2 of RFC 7285 [RFC7285] to specify the extensions to
-   existing ALTO resources and services.
+   Section 8.2 [RFC7285] to specify the extensions to existing ALTO
+   resources and services.
 
 2.  TIPS Overview
 
@@ -277,7 +277,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023                [Page 5]
+Schott, et al.          Expires 13 September 2023               [Page 5]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -333,7 +333,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023                [Page 6]
+Schott, et al.          Expires 13 September 2023               [Page 6]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -389,7 +389,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023                [Page 7]
+Schott, et al.          Expires 13 September 2023               [Page 7]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -445,7 +445,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023                [Page 8]
+Schott, et al.          Expires 13 September 2023               [Page 8]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -501,7 +501,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023                [Page 9]
+Schott, et al.          Expires 13 September 2023               [Page 9]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -557,7 +557,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 10]
+Schott, et al.          Expires 13 September 2023              [Page 10]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -613,7 +613,7 @@ b) Filterable resource (#3) such as FilteredCostMap
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 11]
+Schott, et al.          Expires 13 September 2023              [Page 11]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -669,7 +669,7 @@ tvi/rs = receiver set of tvi (for server push)
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 12]
+Schott, et al.          Expires 13 September 2023              [Page 12]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -725,7 +725,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 13]
+Schott, et al.          Expires 13 September 2023              [Page 13]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -781,7 +781,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 14]
+Schott, et al.          Expires 13 September 2023              [Page 14]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -837,14 +837,15 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 15]
+Schott, et al.          Expires 13 September 2023              [Page 15]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
 
       whether the given TIPS supports server push.  If the "support-
-      server-push" field is "true", this TIPS will allow a client to
-      start or stop server push.
+      server-push" field is TRUE, this TIPS will allow a client to start
+      or stop server push.  If the field is FALSE or not present, this
+      TIPS does not provide server push.
 
 3.3.  Uses
 
@@ -889,15 +890,15 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
      "my-filtered-cost-map": {
        "uri":
-         "https://alto.example.com/costmap/filtered/constraints",
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 16]
+Schott, et al.          Expires 13 September 2023              [Page 16]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
 
+         "https://alto.example.com/costmap/filtered/constraints",
        "media-type": "application/alto-costmap+json",
        "accepts": "application/alto-costmapfilter+json",
        "uses": ["my-networkmap"],
@@ -945,15 +946,15 @@ Internet-Draft                  ALTO TIPS                     March 2023
        "uses": [
            "my-network-map",
            "my-routingcost-map",
-           "my-hopcount-map",
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 17]
+Schott, et al.          Expires 13 September 2023              [Page 17]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
 
+           "my-hopcount-map",
            "my-simple-filtered-cost-map"
        ],
        "capabilities": {
@@ -1001,15 +1002,15 @@ Internet-Draft                  ALTO TIPS                     March 2023
      },
      "update-my-pv": {
        "uri": "https://alto.example.com/updates/pv",
-       "media-type": "text/event-stream",
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 18]
+Schott, et al.          Expires 13 September 2023              [Page 18]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
 
+       "media-type": "text/event-stream",
        "uses": [ "my-pv" ],
        "accepts": "application/alto-updatestreamparams+json",
        "capabilities": {
@@ -1060,8 +1061,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-
-Schott, et al.          Expires 3 September 2023               [Page 19]
+Schott, et al.          Expires 13 September 2023              [Page 19]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -1085,7 +1085,8 @@ Internet-Draft                  ALTO TIPS                     March 2023
       the parameters that the resource expects.
 
    server-push:  Set to TRUE if a client desires to receive updates via
-      server push.
+      server push.  If the value is FALSE or not present, the client
+      does not accept server push updates.
 
 4.2.  Open Response
 
@@ -1113,14 +1114,15 @@ Internet-Draft                  ALTO TIPS                     March 2023
            JSONNumber       seq-j;
          } StartEdgeRec;
 
-   with the following fields:
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 20]
+Schott, et al.          Expires 13 September 2023              [Page 20]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
+
+   with the following fields:
 
    tips-view-uri:  Relative URI to the TIPS view of a network resource.
 
@@ -1135,24 +1137,24 @@ Internet-Draft                  ALTO TIPS                     March 2023
       However, the exact mechanism is left to the TIPS provider.
 
    tips-view-summary:  Contains both an updates-graph-summary and an
-      optional server-push boolean value which is set to TRUE if the
-      client indicated server push
+      optional server-push boolean value which is set to TRUE if and
+      only if the client indicates server push.
 
-      updates-graph-summary provides the starting sequence number
-      (start-seq) of the updates graph and the last sequence number
-      (end-seq) that is currently available, along with a recommended
-      edge to consume (start-edge-rec).  How the server calculates the
-      recommended edge depends on the implementation.  Ideally, if the
-      client does not provide a version tag, the server should recommend
-      the edge of the latest snapshot available.  If the client does
-      provide a version tag, the server should calculate the cumulative
-      size of the patch updates availabe from that version onward and
-      compare it to the size of the complete resource snapshot.  If the
-      snapshot is bigger, the server should recommend the first patch
-      update edge starting from client's tagged version.  Else, the
-      server should recommend the latest snapshot edge.  If the client
-      indicated server push, the recommended edge will be the first
-      content pushed.
+      The updates-graph-summary field contains the starting sequence
+      number (start-seq) of the updates graph and the last sequence
+      number (end-seq) that is currently available, along with a
+      recommended edge to consume (start-edge-rec).  How the server
+      calculates the recommended edge depends on the implementation.
+      Ideally, if the client does not provide a version tag, the server
+      should recommend the edge of the latest snapshot available.  If
+      the client does provide a version tag, the server should calculate
+      the cumulative size of the patch updates availabe from that
+      version onward and compare it to the size of the complete resource
+      snapshot.  If the snapshot is bigger, the server should recommend
+      the first patch update edge starting from client's tagged version.
+      Else, the server should recommend the latest snapshot edge.  If
+      the client indicates server push, the recommended edge will be the
+      first content pushed.
 
    If the request has any errors, the TIPS service MUST return an HTTP
    "400 Bad Request" to the ALTO client; the body of the response
@@ -1171,9 +1173,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-
-
-Schott, et al.          Expires 3 September 2023               [Page 21]
+Schott, et al.          Expires 13 September 2023              [Page 21]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -1229,7 +1229,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 22]
+Schott, et al.          Expires 13 September 2023              [Page 22]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -1285,7 +1285,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 23]
+Schott, et al.          Expires 13 September 2023              [Page 23]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -1341,7 +1341,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 24]
+Schott, et al.          Expires 13 September 2023              [Page 24]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -1358,11 +1358,11 @@ Internet-Draft                  ALTO TIPS                     March 2023
        } GraphDirMeta;
 
        object-map {
-         StartSeq -> EndSeqUpdates;
+         JSONString -> EndSeqUpdates;
        } UpdatesGraph;
 
        object-map {
-         EndSeq -> UpdateItemMeta;
+         JSONString -> UpdateItemMeta;
        } EndSeqUpdates;
 
        object {
@@ -1397,7 +1397,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 25]
+Schott, et al.          Expires 13 September 2023              [Page 25]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -1410,54 +1410,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 5.3.  Example
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 26]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
      GET /tips/2718281828459 HTTP/1.1
      Host: alto.example.com
      Accept: application/alto-tipsview+json, application/alto-error+json
@@ -1466,35 +1418,59 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
      HTTP/1.1 200 OK
      Content-Type: application/alto-tipsview+json
-     Content-Length: 488
+     Content-Length: 1239
 
      {
         "meta": {
           "resource-id": "2718281828459",
-          "tag": 125351264356
+          "tag": "125351264356"
         },
         "updates-graph": {
-          0: {
-            101: {alto-costmap+json, 109783421097, 1000000},
-            103: {alto-costmap+json, 123400881080, 1004000},
-            105: {alto-costmap+json, 123567838392, 1008033}
+          "0": {
+            "101": {
+              "media-type": "alto-costmap+json",
+              "tag": "109783421097", "size": 1000000 },
+            "103": {
+              "media-type": "alto-costmap+json",
+              "tag": "123400881080", "size": 1004000 },
+            "105": {
+              "media-type": "alto-costmap+json",
+              "tag": "123567838392", "size": 1008033 }
           },
-          101: {
-            102: {application/merge-patch+json, 123566431234, 4040}
+          "101": {
+            "102": {
+              "media-type": "application/merge-patch+json",
+              "tag": "123566431234", "size": 4040}
           },
-          102: {
-            103: {application/merge-patch+json, 123400881080, 3000}
+          "102": {
+            "103": {
+              "media-type": "application/merge-patch+json",
+              "tag": "123400881080", "size": 3000}
           },
-          103: {
-            104: {application/merge-patch+json, 123566452654, 8000}
+          "103": {
+             "104": {
+               "media-type": "application/merge-patch+json",
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 26]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
+
+               "tag": "123566452654", "size": 8000}
           },
-          104: {
-            105: {application/merge-patch+json, 123567838392, 10000}
+          "104": {
+            "105": {
+              "media-type": "application/merge-patch+json",
+              "tag": "123567838392", "size": 10000}
           },
-          105: {
-            106: {application/merge-patch+json, 123566470983, 4040}
+          "105": {
+            "106": {
+              "media-type": "application/merge-patch+json",
+              "tag": "123566470983", "size": 4040}
           }
-        }
+        },
         "push-state": {
           "server-push": false,
           "next-edge": null
@@ -1505,14 +1481,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
    An ALTO client can refresh the updates graph directory without re-
    fetching the whole updates graph object.
-
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 27]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
 
 5.4.1.  Request
 
@@ -1528,10 +1496,10 @@ Internet-Draft                  ALTO TIPS                     March 2023
                application/alto-error+json
        Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
        Content-Type: application/alto-tipsparams+json
-       Content-Length: 41
+       Content-Length: 43
 
        {
-         "tag": 125351264356
+         "tag": "125351264356"
        }
 
 5.4.2.  Response
@@ -1539,21 +1507,28 @@ Internet-Draft                  ALTO TIPS                     March 2023
    The server may return the whole directory or the incremental changes,
    using merge-patch.  A patch response looks like:
 
+
+
+Schott, et al.          Expires 13 September 2023              [Page 27]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
+
        HTTP/1.1 200 OK
        Content-Type: application/merge-patch+json
-       Content-Length: 200
+       Content-Length: 212
 
        {
          "meta": {
-           "tag": 543353364839
+           "tag": "543353364839"
          },
          "updates-map": {
-           0: {
-             101: null,
-             107: {...}
+           "0": {
+             "101": null,
+             "107": {...}
            },
-           101: null,
-           102: null
+           "101": null,
+           "102": null
          }
        }
 
@@ -1561,14 +1536,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
    A server may change its updates graph (to compact, etc.), but it must
    satisfy the following invariants:
-
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 28]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
 
    *  Continuity: ns -> ne, anything in between ns and ne also exists
       (implies ni -> ni + 1 patch exists), where ns is start-seq and ne
@@ -1592,6 +1559,16 @@ Internet-Draft                  ALTO TIPS                     March 2023
    that the right content of the version at 102, in the first example,
    and 104, in the second example, cannot be obtained by a client that
    does not have the previous version at 101 or 103, respectively.
+
+
+
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 28]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
 6.  TIPS Data Transfers - Client Pull
 
@@ -1618,14 +1595,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
    update item (0 -> 101), it can send a request to
    "/tips/2718281828459/ug/0/101".
 
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 29]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
 6.2.  Response
 
    If the request is valid (ug/<i>/<j> exists), the response is encoded
@@ -1646,6 +1615,16 @@ Internet-Draft                  ALTO TIPS                     March 2023
       backlog queue.
 
    *  Else: return error.
+
+
+
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 29]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
 6.2.1.  Server Processing "Error" Conditions
 
@@ -1674,14 +1653,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
    Assume the client wants to get the contents of the update item on
    edge 0 to 101.  The request is:
 
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 30]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
       GET /tips/2718281828459/ug/0/101 HTTP/1.1
       Host: alto.example.com
       Accept: application/alto-costmap+json, application/alto-error+json
@@ -1702,6 +1673,14 @@ Internet-Draft                  ALTO TIPS                     March 2023
    If a client registers for server push, it should not request updates
    via pull to avoid receiving the same information twice, unless the
    client does not receive the expected updates (see Section 8.4).
+
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 30]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
 7.1.  Manage Server Push
 
@@ -1731,13 +1710,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
          JSONNumber       seq-j;
        } NextEdge;
 
-
-
-Schott, et al.          Expires 3 September 2023               [Page 31]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
    with the following fields:
 
    server-push:  Set to true if the client desires to receive server
@@ -1761,35 +1733,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 32]
+Schott, et al.          Expires 13 September 2023              [Page 31]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -1845,7 +1789,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 33]
+Schott, et al.          Expires 13 September 2023              [Page 32]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -1901,7 +1845,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 34]
+Schott, et al.          Expires 13 September 2023              [Page 33]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -1957,7 +1901,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 35]
+Schott, et al.          Expires 13 September 2023              [Page 34]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -2013,7 +1957,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 36]
+Schott, et al.          Expires 13 September 2023              [Page 35]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -2069,7 +2013,7 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 37]
+Schott, et al.          Expires 13 September 2023              [Page 36]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
@@ -2117,18 +2061,50 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 8.  Operation and Processing Considerations
 
-8.1.  Considerations for Load Balancing
-
-   TODO
 
 
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 38]
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 37]
 
 Internet-Draft                  ALTO TIPS                     March 2023
 
+
+8.1.  Considerations for Load Balancing
+
+   TIPS allow clients to make concurrent pulls of the incremental
+   updates potentianlly through different HTTP connections.  As a
+   consequence, it introduces additional complexties when the ALTO
+   server is being load balanced -- a feature widely used to build
+   scalable and fault-tolerant web services.  For example, a request may
+   be incorrectly processed if
+
+   *  the backend servers are stateful, i.e., the TIPS view is created
+      and stored only on a single server;
+
+   *  the ALTO server is using layer-4 load balancing, i.e., the
+      requests are distributed based on the TCP 5-tuple.
+
+   Thus, additional considerations are required to enable correct load
+   balancing for TIPS, including:
+
+   *  Use a stateless architecture: One solution is to follow the
+      stateless computing pattern: states about the TIPS view are not
+      maintained by the backend servers but are stored in a distributed
+      database.  Thus, concurrent requests to the same TIPS view can be
+      processed on arbitrary stateless backend servers, which all
+      fetches data from the same database.
+
+   *  Configure the load balancers properly: In case when the backend
+      servers are stateful, the load balancers must be properly
+      configured to guarantee that requests of the same TIPS view always
+      arrive at the same server.  For example, the ALTO server may
+      configure layer-7 load balancers that distribute requests based on
+      URL or cookies.
 
 8.2.  Considerations for Choosing Updates
 
@@ -2143,6 +2119,16 @@ Internet-Draft                  ALTO TIPS                     March 2023
    while.  TIPS should be cognizant that batching reduces the freshness
    of information.  The server should also consider the effect of such
    delays on client behaviors.
+
+
+
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 38]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
    For incremental updates, this design allows both JSON patch and JSON
    merge patch for incremental changes.  JSON merge patch is clearly
@@ -2179,13 +2165,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
    TIPS.  Consider the following pair of resources, where my-cost-map is
    dependent on my-network-map:
 
-
-
-Schott, et al.          Expires 3 September 2023               [Page 39]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
                           +---+   +---+   +---+   +---+   +---+
      my-network-map (N)   | 0 |-->|101|-->|102|-->|103|-->|104|
                           +---+   +---+   +---+   +---+   +---+
@@ -2197,6 +2176,15 @@ Internet-Draft                  ALTO TIPS                     March 2023
                            |_______________________|
 
                      Figure 7: Example Dependency Model
+
+
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 39]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
    In pull-mode, a client can decide the order in which to receive the
    updates.
@@ -2232,16 +2220,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
    cost map messages, although these techniques apply to any dependent
    resources.
 
-
-
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 40]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
    Note that when a network map changes, the server SHOULD send the
    network map update message before sending the updates for the
    dependent cost maps.
@@ -2256,6 +2234,14 @@ Internet-Draft                  ALTO TIPS                     March 2023
    immediately.  In this case, the cost maps using the network map
    become invalid because they are inconsistent with the current network
    map; hence, the ALTO client MUST mark each such dependent cost map as
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 40]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
+
    temporarily invalid and MUST NOT use each such cost map until the
    ALTO client receives a cost map update indicating that it is based on
    the new network map version tag.
@@ -2287,17 +2273,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
    offering TIPS only for Filtered Cost Maps that do not allow
    constraint tests.
 
-
-
-
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 41]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
 8.6.  Considerations for Updates to Ordinal Mode Costs
 
    For an ordinal mode cost map, a change to a single cost point may
@@ -2312,6 +2287,16 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
    A TIPS can avoid this complication by only offering full replacements
    as updates in the updates graph for ordinal cost maps.
+
+
+
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 41]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
 9.  Security Considerations
 
@@ -2345,15 +2330,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
    and compartmentalization of the overall threshold into smaller
    thresholds that apply to subsets of potential clients.
 
-
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 42]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
 9.2.  ALTO Client: Update Overloading or Instability
 
    The availability of continuous updates, when the client indicates
@@ -2368,6 +2344,15 @@ Internet-Draft                  ALTO TIPS                     March 2023
    whether information is still fresh or has become stale.  In such a
    case, the client should be careful in how it uses the information to
    avoid stability or efficiency issues.
+
+
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 42]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
 9.3.  Spoofed URI
 
@@ -2402,14 +2387,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
       those specified for the "application/json" media type.  See
       [RFC8259].
 
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 43]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
    Security considerations:  Security considerations relating to the
       generation and consumption of ALTO Protocol messages are discussed
       in Section 10 of [RFC8895] and Section 15 of [RFC7285].
@@ -2425,6 +2402,13 @@ Internet-Draft                  ALTO TIPS                     March 2023
    Fragment identifier considerations:  N/A
 
    Additional information:
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 43]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
       Deprecated alias names for this type:  N/A
 
@@ -2458,14 +2442,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
    Optional parameters:  N/A
 
    Encoding considerations:  Encoding considerations are identical to
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 44]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
       those specified for the "application/json" media type.  See
       [RFC8259].
 
@@ -2482,6 +2458,13 @@ Internet-Draft                  ALTO TIPS                     March 2023
       either stand alone or are embedded within other applications.
 
    Fragment identifier considerations:  N/A
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 44]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
    Additional information:
 
@@ -2514,14 +2497,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
    Required parameters:  N/A
 
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 45]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
    Optional parameters:  N/A
 
    Encoding considerations:  Encoding considerations are identical to
@@ -2539,6 +2514,13 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
    Applications that use this media type:  ALTO servers and ALTO clients
       either stand alone or are embedded within other applications.
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 45]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
    Fragment identifier considerations:  N/A
 
@@ -2571,13 +2553,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
    Qin Wu, Jordi Ros Giralt, and the many others who reviewed and
    commented on previous drafts of this document.
 
-
-
-Schott, et al.          Expires 3 September 2023               [Page 46]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
 12.  References
 
 12.1.  Normative References
@@ -2592,6 +2567,16 @@ Internet-Draft                  ALTO TIPS                     March 2023
               "Application-Layer Traffic Optimization (ALTO) Protocol",
               RFC 7285, DOI 10.17487/RFC7285, September 2014,
               <https://www.rfc-editor.org/info/rfc7285>.
+
+
+
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 46]
+
+Internet-Draft                  ALTO TIPS                     March 2023
+
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
@@ -2626,14 +2611,6 @@ Internet-Draft                  ALTO TIPS                     March 2023
               <https://datatracker.ietf.org/doc/draft-schott-alto-new-
               transport-push/>.
 
-
-
-
-Schott, et al.          Expires 3 September 2023               [Page 47]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
    [RFC7971]  Stiemerling, M., Kiesel, S., Scharf, M., Seidel, H., and
               S. Previdi, "Application-Layer Traffic Optimization (ALTO)
               Deployment Considerations", RFC 7971,
@@ -2644,10 +2621,17 @@ Authors' Addresses
 
    Roland Schott
    Deutsche Telekom
-   Heinrich-Hertz-Strasse 3-7
+   Ida-Rhodes-Strasse 2
    64295 Darmstadt
    Germany
    Email: Roland.Schott@telekom.de
+
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 47]
+
+Internet-Draft                  ALTO TIPS                     March 2023
 
 
    Y. Richard Yang
@@ -2664,7 +2648,7 @@ Authors' Addresses
    Chengdu
    Sichuan, 610065
    China
-   Email: kgao@scu.edu.cn
+   Email: kaigao@scu.edu.cn
 
 
    Lauren Delwiche
@@ -2685,4 +2669,20 @@ Authors' Addresses
 
 
 
-Schott, et al.          Expires 3 September 2023               [Page 48]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schott, et al.          Expires 13 September 2023              [Page 48]

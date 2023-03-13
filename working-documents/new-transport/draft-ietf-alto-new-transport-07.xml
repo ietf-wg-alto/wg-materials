@@ -12,13 +12,13 @@
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
   <front>
-    <title abbrev="ALTO TIPS">ALTO Transport Information Publication Service</title>
+    <title abbrev="ALTO TIPS">The ALTO Transport Information Publication Service</title>
     <seriesInfo name="Internet-Draft" value="draft-ietf-alto-new-transport-07"/>
     <author fullname="Roland Schott" initials="R." surname="Schott">
       <organization>Deutsche Telekom</organization>
       <address>
         <postal>
-          <street>Heinrich-Hertz-Strasse 3-7</street>
+          <street>Ida-Rhodes-Strasse 2</street>
           <city>64295 Darmstadt</city>
           <country>Germany</country>
         </postal>
@@ -48,7 +48,7 @@
           <code>610065</code>
           <country>China</country>
         </postal>
-        <email>kgao@scu.edu.cn</email>
+        <email>kaigao@scu.edu.cn</email>
       </address>
     </author>
     <author fullname="Lauren Delwiche" initials="L." surname="Delwiche">
@@ -76,7 +76,7 @@
         <email>lachlan.keller@yale.edu</email>
       </address>
     </author>
-    <date day="2" month="March" year="2023"/>
+    <date day="12" month="March" year="2023"/>
     <area>TSV Area</area>
     <workgroup>ALTO Working Group</workgroup>
     <keyword>RFC</keyword>
@@ -86,17 +86,17 @@
     <keyword>Application-Layer Traffic Optimization, HTTP/2, HTTP/3, SSE, Updates Graph</keyword>
     <abstract>
       <t>
-      The ALTO protocol (RFC 7285) leverages HTTP/1.x and is designed for the simple,
+      The ALTO Protocol (RFC 7285) leverages HTTP/1.x and is designed for the simple,
       sequential request-reply use case, in which an ALTO client requests a
       sequence of information resources, and the server responds with the complete
       content of each resource one at a time.
       </t>
 
       <t>
-      ALTO/SSE (RFC 8895) defines a multiplexing protocol on top
-      of HTTP/1.x, so that the server can incrementally push resource updates
-      to the client whenever monitored network information resources change, allowing the
-      client to monitor multiple resources at the same time.
+      ALTO incremental updates using Server-Sent Events (SSE) (RFC 8895) defines a multiplexing protocol on top
+      of HTTP/1.x, so that an ALTO server can incrementally push resource updates
+      to clients whenever monitored network information resources change, allowing the
+      clients to monitor multiple resources at the same time.
       However, HTTP/2 and later versions already support concurrent, non-blocking transport of
       multiple streams in the same HTTP connection.
       </t>
@@ -106,8 +106,7 @@
       Information Publication Service (TIPS).  TIPS uses an incremental RESTful design to
       give an ALTO client the new capability to explicitly, concurrently (non-blocking) request (pull)
       specific incremental updates using native HTTP/2 or HTTP/3, while still
-      functioning for HTTP/1.x.  It also provides an ALTO server the new capability
-      to concurrently push specific incremental updates using native HTTP/2 or HTTP/3
+      functioning for HTTP/1.x.  TIPS also provides an ALTO server to concurrently push specific incremental updates using native HTTP/2 or HTTP/3
       server push.
       </t>
     </abstract>
@@ -120,12 +119,12 @@
        two transport protocols have been designed: (1) The ALTO base
        protocol <xref target="RFC7285" format="default"/>, which is designed for the simple use case in
        which an ALTO client requests a network information resource, and the
-       server sends the complete content of the requested information
-       resource to the client; and (2) ALTO/SSE (ALTO Incremental Updates
-       Using Server-Sent Events) <xref target="RFC8895" format="default"/>,
-       which is designed for the use case that an ALTO client indicates to the server that it wants to
+       server sends the complete content of the requested information (if any)
+       resource to the client; and (2) ALTO incremental updates
+       using Server-Sent Events (ALTO/SSE) <xref target="RFC8895" format="default"/>,
+       which is designed for an ALTO client to indicate to the server that it wants to
        receive updates for a set of resources, and the server can then
-       concurrently, and incrementally push updates to the client whenever
+       concurrently, and incrementally push updates to that client whenever
        monitored resources change.</t>
 
 
@@ -133,8 +132,8 @@
         they should be able to automatically take advantage of newer HTTP
         versions such as HTTP/2 <xref target="RFC9113" format="default"/>
         and HTTP/3 <xref target="RFC9114" format="default"/>.  However,
-        there are issues with both protocols when HTTP moves to higher versions.
-        First consider the ALTO base protocol, which is designed to transfer
+        there are issues with both protocols when higher HTTP versions are used.
+        First, consider the ALTO base protocol, which is designed to transfer
         only complete information resources.  Hence, a client can run the
         base protocol on top of HTTP/2 or HTTP/3 to request multiple information
         resources concurrently, in concurrent streams, but each request must be
@@ -154,17 +153,16 @@
         receives updates.
       </t>
 
-      <t>This document introduces a new ALTO service called the transport
-        information publication service (TIPS).  TIPS uses an incremental RESTful design to
-        give an ALTO client the new capability to explicitly, concurrently (non-blocking) request (pull)
+      <t>This document introduces a new ALTO service called the Transport
+        Information Publication Service (TIPS).  TIPS uses an incremental RESTful design to
+        provide an ALTO client with a new capability to explicitly, concurrently (non-blocking) request (pull)
         specific incremental updates using native HTTP/2 or HTTP/3, while still
-        functioning for HTTP/1.x.  It also provides an ALTO server the new capability
-        to concurrently push specific incremental updates using native HTTP/2 or HTTP/3
-        server push. This document specifies the following:</t>
+        functioning for HTTP/1.x.  TIPS also provides an ALTO server to concurrently push specific incremental updates using native HTTP/2 or HTTP/3
+        server push. Specifically, this document specifies the following:</t>
       <ul>
-        <li>ALTO protocol extensions to create/update/remove an incremental representational
-        state transfer resource (iREST);</li>
-        <li>A new resource type that specifies the iREST graph model for a resource;</li>
+        <li>Extensions to the ALTO Protocol to create, update, or remove an incremental representational
+        state transfer resource (iREST).</li>
+        <li>A new resource type that specifies the iREST graph model for a resource.</li>
         <li>URI patterns to fetch the snapshots or incremental updates.</li>
       </ul>
 
@@ -181,8 +179,7 @@
 
       <section anchor="notations" numbered="true" toc="default">
         <name>Notations</name>
-        <t>This document uses the same syntax and notations as introduced in Section 8.2 of
-            RFC 7285 <xref target="RFC7285" format="default"/> to specify the extensions to existing ALTO resources and
+        <t>This document uses the same syntax and notations as introduced in Section 8.2 <xref target="RFC7285" format="default"/> to specify the extensions to existing ALTO resources and
             services.
         </t>
       </section>
@@ -637,8 +634,8 @@ Client                                  TIPS
           <dd>
           <t>The "support-server-push" field specifies whether the given TIPS
               supports server push.  If the "support-server-push"
-              field is "true", this TIPS will allow a client to start or stop server
-          push.</t>
+              field is TRUE, this TIPS will allow a client to start or stop server
+          push. If the field is FALSE or not present, this TIPS does not provide server push.</t>
           </dd>
         </dl>
       </section>
@@ -869,7 +866,7 @@ Client                                  TIPS
           </dd>
           <dt>server-push: </dt>
           <dd>
-            <t>Set to TRUE if a client desires to receive updates via server push.</t>
+            <t>Set to TRUE if a client desires to receive updates via server push. If the value is FALSE or not present, the client does not accept server push updates.</t>
           </dd>
         </dl>
       </section>
@@ -926,9 +923,9 @@ Client                                  TIPS
             <dt>tips-view-summary: </dt>
             <dd>
               <t>Contains both an updates-graph-summary and an optional server-push boolean value
-              which is set to TRUE if the client indicated server push</t>
+              which is set to TRUE if and only if the client indicates server push.</t>
 
-              <t>updates-graph-summary provides the starting sequence number (start-seq) of the updates graph
+              <t>The updates-graph-summary field contains the starting sequence number (start-seq) of the updates graph
               and the last sequence number (end-seq) that is currently available, along with
               a recommended edge to consume (start-edge-rec).  How the server calculates the recommended edge
               depends on the implementation.  Ideally, if the client does not provide a version
@@ -937,7 +934,7 @@ Client                                  TIPS
               patch updates availabe from that version onward and compare it to the size of the
               complete resource snapshot.  If the snapshot is bigger, the server should
               recommend the first patch update edge starting from client's tagged version. Else,
-              the server should recommend the latest snapshot edge.  If the client indicated
+              the server should recommend the latest snapshot edge.  If the client indicates
               server push, the recommended edge will be the first content pushed. </t>
             </dd>
           </dl>
@@ -1068,7 +1065,7 @@ Client                                  TIPS
         <name>TIPS View Metadata Directory</name>
 
         <t>An ALTO client can read the metadata directory of the TIPS view
-        to understand its full contents beyond the intial summary provided. </t> 
+        to understand its full contents beyond the intial summary provided. </t>
 
         <section anchor="dir-req" numbered="true" toc="default">
           <name>Request</name>
@@ -1104,7 +1101,7 @@ Client                                  TIPS
              error HTTP message with status code 404 (Not Found) and media type
              "application/alto-error+json".</t>
 
-          <t>The response from the server, if no error, for the entire metadata directory of the TIPS view 
+          <t>The response from the server, if no error, for the entire metadata directory of the TIPS view
           is the UpdatesDirectory object indicated as "application/alto-tipsview+json" media type:</t>
 
           <artwork name="" type="" align="left" alt=""><![CDATA[
@@ -1120,11 +1117,11 @@ Client                                  TIPS
     } GraphDirMeta;
 
     object-map {
-      StartSeq -> EndSeqUpdates;
+      JSONString -> EndSeqUpdates;
     } UpdatesGraph;
 
     object-map {
-      EndSeq -> UpdateItemMeta;
+      JSONString -> UpdateItemMeta;
     } EndSeqUpdates;
 
     object {
@@ -1157,14 +1154,14 @@ Client                                  TIPS
               <t>Contains a map of edges in the updates graph (start-seq to end-seq).  Each
               edge has a corresponding update-item-meta which includes the edge's
               media type, resource version tag, and size of the content in kilobytes.
-              Note that two different edges will share the same resource version tag 
+              Note that two different edges will share the same resource version tag
               if they connect to the same end-seq node in the graph.</t>
             </dd>
             <dt>push-state: </dt>
-            <dd> 
-              <t>Contains server-push boolean which is set to TRUE if the client has indicated server 
-              push.  Otherwise, it is set to FALSE.  push-state also contains next-edge which indicates 
-              the next edge that will be pushed to the client. If server-push is FALSE, next-edge is NULL. </t>
+            <dd>
+              <t>Contains server-push boolean which is set to TRUE if the client has indicated server
+              push.  Otherwise, it is set to FALSE.  push-state also contains next-edge which indicates
+              the next edge that will be pushed to the client. If server-push is FALSE, next-edge is NULL.</t>
             </dd>
           </dl>
 
@@ -1182,35 +1179,51 @@ Client                                  TIPS
 
    HTTP/1.1 200 OK
    Content-Type: application/alto-tipsview+json
-   Content-Length: 488
+   Content-Length: 1239
 
    {
       "meta": {
         "resource-id": "2718281828459",
-        "tag": 125351264356
+        "tag": "125351264356"
       },
       "updates-graph": {
-        0: {
-          101: {alto-costmap+json, 109783421097, 1000000},
-          103: {alto-costmap+json, 123400881080, 1004000},
-          105: {alto-costmap+json, 123567838392, 1008033}
+        "0": {
+          "101": {
+            "media-type": "alto-costmap+json",
+            "tag": "109783421097", "size": 1000000 },
+          "103": {
+            "media-type": "alto-costmap+json",
+            "tag": "123400881080", "size": 1004000 },
+          "105": {
+            "media-type": "alto-costmap+json",
+            "tag": "123567838392", "size": 1008033 }
         },
-        101: {
-          102: {application/merge-patch+json, 123566431234, 4040}
+        "101": {
+          "102": {
+            "media-type": "application/merge-patch+json",
+            "tag": "123566431234", "size": 4040}
         },
-        102: {
-          103: {application/merge-patch+json, 123400881080, 3000}
+        "102": {
+          "103": {
+            "media-type": "application/merge-patch+json",
+            "tag": "123400881080", "size": 3000}
         },
-        103: {
-          104: {application/merge-patch+json, 123566452654, 8000}
+        "103": {
+           "104": {
+             "media-type": "application/merge-patch+json",
+             "tag": "123566452654", "size": 8000}
         },
-        104: {
-          105: {application/merge-patch+json, 123567838392, 10000}
+        "104": {
+          "105": {
+            "media-type": "application/merge-patch+json",
+            "tag": "123567838392", "size": 10000}
         },
-        105: {
-          106: {application/merge-patch+json, 123566470983, 4040}
+        "105": {
+          "106": {
+            "media-type": "application/merge-patch+json",
+            "tag": "123566470983", "size": 4040}
         }
-      }
+      },
       "push-state": {
         "server-push": false,
         "next-edge": null
@@ -1230,7 +1243,7 @@ Client                                  TIPS
 
           <t>An ALTO client requests the TIPS view metadata directory
         by sending an HTTP GET request with the media type
-        "application/alto-tipsview+json" and the version tag of the 
+        "application/alto-tipsview+json" and the version tag of the
         TIPS view directory it has currently.  The GET request looks like:</t>
 
         <artwork name="" type="" align="left" alt=""><![CDATA[
@@ -1241,10 +1254,10 @@ Client                                  TIPS
             application/alto-error+json
     Authorization: Basic Y2xpZW50MTpoZWxsb2FsdG8K
     Content-Type: application/alto-tipsparams+json
-    Content-Length: 41
+    Content-Length: 43
 
     {
-      "tag": 125351264356
+      "tag": "125351264356"
     }
         ]]></artwork>
       </section>
@@ -1259,19 +1272,19 @@ Client                                  TIPS
 
     HTTP/1.1 200 OK
     Content-Type: application/merge-patch+json
-    Content-Length: 200
+    Content-Length: 212
 
     {
       "meta": {
-        "tag": 543353364839
+        "tag": "543353364839"
       },
       "updates-map": {
-        0: {
-          101: null,
-          107: {...}
+        "0": {
+          "101": null,
+          "107": {...}
         },
-        101: null,
-        102: null
+        "101": null,
+        "102": null
       }
     }
         ]]></artwork>
@@ -1445,8 +1458,8 @@ Client                                  TIPS
             </dd>
             <dt>next-edge: </dt>
             <dd>
-              <t>Optional field to request a starting edge to be pushed if the client has pulled the 
-              updates graph directory and has calculated the path it desires to take.  The server is 
+              <t>Optional field to request a starting edge to be pushed if the client has pulled the
+              updates graph directory and has calculated the path it desires to take.  The server is
               MAY push this edge first if available.</t>
             </dd>
           </dl>
@@ -1753,7 +1766,16 @@ Client                                  TIPS
 
       <section anchor="ops-loadbalancing" numbered="true" toc="default">
          <name>Considerations for Load Balancing</name>
-         <t>TODO</t>
+         <t>TIPS allow clients to make concurrent pulls of the incremental updates potentianlly through different HTTP connections. As a consequence, it introduces additional complexties when the ALTO server is being load balanced -- a feature widely used to build scalable and fault-tolerant web services. For example, a request may be incorrectly processed if</t>
+         <ul spacing="normal">
+           <li>the backend servers are stateful, i.e., the TIPS view is created and stored only on a single server;</li>
+           <li>the ALTO server is using layer-4 load balancing, i.e., the requests are distributed based on the TCP 5-tuple.</li>
+         </ul>
+         <t>Thus, additional considerations are required to enable correct load balancing for TIPS, including:</t>
+         <ul>
+             <li>Use a stateless architecture: One solution is to follow the stateless computing pattern: states about the TIPS view are not maintained by the backend servers but are stored in a distributed database. Thus, concurrent requests to the same TIPS view can be processed on arbitrary stateless backend servers, which all fetches data from the same database.</li>
+           <li>Configure the load balancers properly: In case when the backend servers are stateful, the load balancers must be properly configured to guarantee that requests of the same TIPS view always arrive at the same server. For example, the ALTO server may configure layer-7 load balancers that distribute requests based on URL or cookies.</li>
+         </ul>
       </section>
 
       <section anchor="ops-chooseupdates" numbered="true" toc="default">
