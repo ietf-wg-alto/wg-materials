@@ -7,6 +7,58 @@
 
 - **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
 
+------------------------------
+
+**IETF, ALTO Meeting: March 7th, 2023**
+
+**Agenda:**
+
+- Dashboard: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- Chartered items
+- Deployment
+- Recharter items for IETF 116
+  - Multi-domain use cases
+  - compute and network information exposure
+  - Trust
+
+
+**Minutes:**
+
+Note Taker: Y. Richard
+
+IETF 116 planning:
+Ayoub: trust side meeting at IETF 116, please attend
+Qin: Identity IAB discussion, related with trust, please consider
+Richard: zero knowledge as a tool for WG to consider
+
+Engage with CAN -> renamed to CATS (computing aware traffic steering)
+Jordi and Luis involve and present at CATS meeting, 
+
+multidomain (Richard), compute (Jordi and Luis), and trust (Ayoub) as 3 key topics for ietf 116
+
+Deployment page update: Adding Benocs as a section
+
+Chartered items:
+  Transport update: Implementation using zoo keeper. 
+  Deployment update: update at IETF 116 of hackathon, give short summary in session
+  OAM implementation asked by Med: Jensen updates in progress
+
+Hackathon:
+  Please kindly register the OAM and transport projects to the IETF hackathon 116 wiki page: 
+    https://wiki.ietf.org/en/meeting/116/hackathon
+
+CERN deployment
+  Three threads: visibility, FTS scheduling, and Rucio orchestration help/senior member guidance needed.
+
+Multi-domain use case: posted by Richard on WG mailing list, Tong will help to discuss multi-domain use case 
+Suggest Mowie (Yunfei) and Tong sync up to have a clear update on 3GPP (mengtong1@huawei.com). 
+
+OAM access control: Jensen proposes a new design, and will share on the mailing list. Qin suggests adding the new design in the document and asking Last Call reviewers pay more attention to this.
+
+Drafts to be updated before cut off: Luis's draft; multi-domain (-00 draft) problem statement; Ayoub draft on trust (focus on side meeting)
+
+------------------------------
+
 **IETF, ALTO Meeting: February 28th, 2023**
 
 **Agenda:**
