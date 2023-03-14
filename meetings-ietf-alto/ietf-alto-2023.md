@@ -14,6 +14,27 @@
 **Agenda:**
 
 - Dashboard: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- IETF 116 Agenda
+- Chartered items
+- Deployment
+- Recharter items for IETF 116
+  - Multi-domain use cases
+  - compute and network information exposure
+  - Trust
+
+
+**Minutes:**
+
+Note Taker: 
+
+
+------------------------------
+
+**IETF, ALTO Meeting: March 7th, 2023**
+
+**Agenda:**
+
+- Dashboard: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 - Chartered items
 - Deployment
 - Recharter items for IETF 116
