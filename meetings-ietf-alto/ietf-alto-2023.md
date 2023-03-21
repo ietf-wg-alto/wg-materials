@@ -25,7 +25,62 @@
 
 **Minutes:**
 
-Note Taker: 
+Note Taker: Kai
+
+
+
+Qin: Formulate the discussion (IETF 116). Focus on two deployments: CERN and Telefonica.
+Qin: We can raise use cases and write problem statements.
+Qin: Any idea on how to make the meeting more efficient?
+Richard: Scheduled a meeting with Ingmar and Danny. May be one more deployment report. 
+
+Telefonica - Luis
+CERN - Mihai/Mario/Richard
+NRP - Jordi
+Benox - Ingmar/Danny
+
+Richard: Start to put unified vision and related work.
+Richard: Visibility, prediction and control. Visibility is one small piece. G2 provides predictability which should be discussed. Then people will know that predicability is one focus of ALTO.
+Also talk about applications built on top of ALTO. We may use the term proposed by Google -- application defined networking. 
+There are two pieces: 1. scheduling: use the visibility to define the applications' behaviors; 2. 
+
+Qin: For prediction, coordinate with PANRG. For control, probably beyond the current charter.
+Richard: Not expanding the scope but to show how ALTO fits in the bigger picture.
+Qin: Commerical use cases to convince AD and the community. Cooridinate with the CATS to see how to work together. Security may be part of the multi-domain setting. One of the CATS chairs will attend the ALTO session for discussion. Open doors to transport-enhanced networking.
+Richard: I can send some feedback and review to the CATS group.
+Jordi: What is the best way to coordinate with CATS? Is there an open discussion to have?
+Qin: No discussion is initiated. Both WG focus on overlay networking.
+Luis: The difference is that in ALTO the metrics are directly exposed but in CATS the metrics are derived. One key point is that which WG will define the metrics.
+Sabine: I follow the CATS drafts. The appendix they provide hints on how to combine metrics. It's in a very preliminary stage. There is room to jointly define metrics. In particular, whether the metrics are consumed off path (ALTO) of in path (CATS). What types of metrics are collected and how to make them update to date fast enough.
+Richard: What exactly is the transport the CATS WG envision? In ALTO WG, we propose solutions such as MoWIE to enable on-path signaling. A big aspect of new transport is to enable fast streaming.
+Qin: Original proposal is to use BGP. The challenge is that BGP cannot be used to carry multiple metrics. Not sure what signaling is proposed for the overlay. Maybe someone from the ALTO WG to take a look at the CATS metrics. 
+Luis: We should not see CATS as owner of us. CATS can consume ALTO information. ALTO can be a tool for CATS but not the other way around. ALTO is not behind CATS but more up front.
+Jordi: There is a lot of common ground there to define metrics.
+Sabine: One of the CATS use case is compatible in ALTO, for example, edge selection. IPPM would be the one natural starting point and be extended to include computing metrics.
+Richard: Kafka has concepts such as the broker, connect, adapter. Maybe CATS framework is similar to the Kafka architecture. One question of CAN is that after making the computing resources available, but the computing resources are owned by different parties. The problem is that it is a highly heterogeneous environment. The problem is that how to share the computing resources? Not sure if this is within the scope of CATS.
+Sabine: ALTO is useful as it exposes information to 3rd parties. The use cases are carefully sorted out in the CATS document. The big issue of heterogneity is that even if you have access, it is important to make sure the consumer of the information understands what the information means. ALTO can play a fundamental role there because it exposes information that is explainable. It means you understand what is the semantics.
+Qin: We should raise the issues in the CATS meeting. ALTO is driving fast and we want to solve the multi-domain issue. Need to justify the use cases. Is there any technical issue for us to support the end-to-end visibility?
+Qin: For agenda, we want to focus on deployment.
+Jordi: What is the goal for the deployment report? In IETF, we have the ALTO session, a side meeting held by Fujitsu, CATS. For the ALTO session, we drive the discussion with deployment. In the CERN deployment, it would be to justify the multi-domain case. For the telefonica deployment, it is to open discussions on compute.
+Richard: For the CERN deployment, should the architectures be discussed on how ALTO fits into it or the multi-domain issue?
+Qin: Use the framework to motivate the multi-domain use case. Emphasize that in the use case we already implement multi-domain use case to justify it as a new charter item.
+Ayoub: March 28, 1:00 - 18:30
+Ayoub: The agenda includs 1. TEN concept and prob statement; 2. Robust localization as a use case; 3. Trust measurement: issues and challenges; 4. Presenters from other WG; 5. Open discussion.
+Ayoub: Is there any references to the trust in multi domain settings?
+Richard: There is some object (packets, web page). The setting is to assess the trust level of the objects. One way is to do the assessment from the network infrastructure.
+Ayoub: I can explain the items in another 1-on-1 meeting.
+Richard: I can send the references of the multi-domain.
+Qin: Maybe take out the multi-domain setting?
+Ayoub: What do you suggest for the last item?
+Jordi: Maybe Brian Trammell?
+Ayoub: Brian is a good choice. He authored one of the PANRG documents which mentions trustworthiness in PAN.
+Richard: I can make the connection. Endpoint property map can provide accurate information about the location. 
+Sabine: Do you consider making a presentation in the PANRG? There is a call for presentation.
+Motoyoshi: We are interested in the zero trust topic.
+
+
+
+
 
 
 ------------------------------
