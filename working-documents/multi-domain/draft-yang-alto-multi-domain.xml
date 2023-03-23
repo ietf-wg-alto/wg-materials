@@ -33,11 +33,11 @@
       <address>
         <postal>
           <street/>
-          <city>Geneva</city>
-          <code>201804</code>
+          <city>Geneva 23</city>
+          <code>1211</code>
           <country>Switzerland</country>
         </postal>
-        <email>TODO</email>
+        <email>mario.lassnig@cern.ch</email>
       </address>
     </author>
 
@@ -73,9 +73,13 @@
       provides means for network applications to obtain network information. For example, 
       the Endpoint Cost Service (ECS) defined by ALTO in <xref target="RFC7285" format="default"/>  
       can provide the network costs of data transmissions from a set of sources to a set of 
-      destinations. These costs are the distances that Rucio need, to select data sources or 
-      destinations, where Rucio is the de facto data orchestration system of CERN experiments. 
-      In the initial ALTO protocol, the costs were called distances.</t>
+      destinations. The costs (called distances) then can be used by Rucio to rank data sources or 
+      destinations to make data orchestration decisions, where Rucio is the de facto data orchestration system of CERN experiments. 
+      </t>
+
+      <t>As another example, to extend FTS, which is the data scheduling system of CERN experiments, to realize resource allocation to multiple 
+        experiments sharing the same network link, the ongoing TCN project need the ALTO 
+        path vector service to map each source-destination pair to the links used by the pair. The project then computes the total traffic sent by each activity of each experiment on a given link, where each experiment consists of a set of activities, each activity consists of a set of data transfers, and each data transfer has a given source-destination pair. With the aggregation, TCN computes scheduling of data transfers according to resource allocation policies.</t>
   
       <t>In the definitions of ALTO services ([RFC7285] and existing extensions), there is no 
         requirement on whether the source and the destination endpoints must belong to the same 
@@ -84,7 +88,7 @@
         covering both single-domain and multi-domain settings provides a simple-to-use interface to ALTO clients. However, it leaves standardization gaps in multi-domain settings. Although participating autonomous systems can define private mechanisms to realize ALTO services in multi-domain settings, standard mechanisms allow wider deployment.
       </t>
 
-      <t>The rest of the document first specifies the issues that may arise in a multi-domain 
+      <t>This document first specifies the issues that may arise in providing ECS in multi-domain 
         settings. It then provides initial designs, based on current implementation experiences to start the design conversation. To be concrete, this document is based on the basic ALTO 
         ECS service. Additional complexities such as network maps and cost maps will be discussed in
         the next iteration.</t>
@@ -92,24 +96,30 @@
     </section>
 
     <section anchor="problem" numbered="true" toc="default">
-      <name>Problem Specification</name>
+      <name>Multi-domain Problem</name>
 
-      <artwork name="" type="" align="left" alt=""><![CDATA[        
+      <section anchor="problem-usecase" numbered="true" toc="default">
+        <name>Use Cases</name>
+      
+        <t>Consider the following ECS query realizing ALTO ECS for LHCONE to support Rucio. The source is located at CERN and the destination candidates are at multiple locations of the LHCONE network (BNL, Caltech, and KIT, for example).</t>
+
+        <artwork name="" type="" align="left" alt=""><![CDATA[        
   POST /endpointcost/lookup HTTP/1.1
   Host: alto.example.com
   Content-Length: 248
   Content-Type: application/alto-endpointcostparams+json
-  Accept: application/alto-endpointcost+json,application/alto-error+json
+  Accept: 
+     application/alto-endpointcost+json,application/alto-error+json
 
   {
-    "cost-type": {"cost-mode" : "ordinal",
+    "cost-type": {"cost-mode" : "numerical",
                   "cost-metric" : "routingcost"},
     "endpoints" : {
-      "srcs": [ "ipv4:192.0.2.2" ],
+      "srcs": [ "ipv4:128.141.201.74" ],
       "dsts": [
-        "ipv4:192.0.2.89",
-        "ipv4:198.51.100.34",
-        "ipv4:203.0.113.45"
+        "ipv4:130.199.4.27",
+        "ipv4:104.18.24.74",
+        "ipv4:141.3.128.6"        
       ]
     }
   }
@@ -121,27 +131,150 @@
 
   {
     "meta" : {
-      "cost-type": {"cost-mode" : "ordinal",
+      "cost-type": {"cost-mode" : "numerical",
                     "cost-metric" : "routingcost"
       }
     },
     "endpoint-cost-map" : {
-      "ipv4:192.0.2.2": {
-        "ipv4:192.0.2.89"    : 1,
-        "ipv4:198.51.100.34" : 2,
-        "ipv4:203.0.113.45"  : 3
+      "ipv4:128.141.201.74": {
+        "ipv4:130.199.4.27" : 20,
+        "ipv4:104.18.24.74" : 30,
+        "ipv4:141.3.128.6"  : 10
       }
     }
   }
       ]]></artwork>
 
 
+        <t>It is straightforward to change the query to be the ALTO path vector service, to support TCN: the value is a vector of network links (e.g., [link-1, link-2, ...]), not the numerical routingcost (e.g., 20).</t>
+        
+        <t>The use cases provide examples of multi-domain settings, which the figure below shows. We choose one of the destinations as an example. For such a query, the path from src to dst spans multiple autonomous networks.
+        </t>
+
+        <artwork name="" type="" align="left" alt=""><![CDATA[                                                                                       
+      AS S              AS A        AS B         AS D            
++-------------+se1  +---------+   +-----+   +------------+     
+| src       --|-----|ai1   ae1|---|     |---|di1     dst |     
+|+--+    --/  |     |         |   |     |   |       +--+ |     
+||  | --/     |     |         |   |     |   |       |  | |     
+|+--+    \    |se2  |         |   |     |   |       +--+ |     
+|         \__ |_____|ai2   ae2|---|     |---|di2         |     
++-------------+     +---------+   +-----+   +------------+     
+       ]]></artwork>
+
+      
+      </section>
+      
+
+      <section anchor="problem-challenge-distinfo" numbered="true" toc="default">
+        <name>Challenge: Distributed Information</name>
+
+        <t>In the Internet setting which we consider, the network information
+        of the path from the src to the dst spreads into multiple autonomous networks: 4 autonomous networks (AS A, B, and D) in the example.  BGP collects information from multiple autonomous networks through back propagation from the destination, but the information is coarse-grained, and incomplete.
+        </t>
+
+        <t>Source: The BGP router at AS S knows that the path from src to dst consists of 
+           the AS-PATH [S A B D]. Combining BGP and intradomain routing, AS S will also know which one of the two egress routers (se1, se2) that it will use to forward traffic to dst. However, AS S does not know more details downstream: for example, it does not know whether the packet will use ae1 or ae2 as the egress router at AS A to enter AS B; neither does it know the internal routing inside AS A. Hence, an ALTO server provided by AS S cannot provide all of the information for the example ECS query.
+        </t>
+
+        <t>Non-Source AS: A non-source AS knows the AS-PATH starting from itself to dst. But it may not know the ingress point. For example, AS A does not know whether the packet will come in from ai1 or ai2. Hence, an ALTO server provided by AS A may consider the example ECS query as an ambiguous query (because it gives only source (src) and destination (dst), but it does not in general know the ingress point). 
+        </t>
+      </section>
+
+      <section anchor="problem-challenge-partial-deploy" numbered="true" toc="default">
+        <name>Challenge: Partial Deployment</name>
+        <t>It is possible to design protocol extensions to collect the aforementioned distributed information to provide complete information (see below), but one challenge is that the deployment may be only incremental and hence is partially deployed during the process. Consider the example, assume that AS B will run only standard protocols (also no traceroute) and will not provide extended ALTO, then the ingress point to D will be ambiguous.</t>
+      </section>
+
+    </section> <!-- problem -->
+
+    <section anchor="solutions" numbered="true" toc="default">
+      <name>Candidate Solutions</name>
+      <t>During the process of integrating ALTO into Rucio and FTS, multiple solution candidates are discussed and below we enumerate each of them. 
+      </t>
+
+      <section anchor="solution-routing-layer" numbered="true" toc="default">
+        <name>Candidate Solution: Routing Layer Design</name>
+        <t>This is a type of solution that makes it possible to collect all needed network information at a single autonomous network, and then use an ALTO server at the source network to abstract and expose the information. One natural candidate is to modify the routing control plane itself: BGP extensions, which can be extended to collect needed information and propagate upstream. For example, when a BGP router at AS A (e.g., ai1) propagates BGP info to its peer at AS S (se1), it includes not only the AS-PATH [A, B, D], but also additional information so that the upstream can construct the complete path cost (distance) metrics. The upside of this design is that it integrates with routing system and hence may even extend routing capabilities. However, routing protocol extensions can be complex in deployment. Further, it provides a different trust model: the original ALTO model is a star trust model, with the application (e.g., Rucio/FTS) at the hub and each AS needs to trust the application. The BGP extension model requires the trust of peers and recursive peers (BGP community may be used to impose policies).</t>
+      </section>
+
+      <section anchor="solution-data-path-sampling" numbered="true" toc="default">
+        <name>Candidate Solution: Data-Path Sampling/Collection</name>
+        <t>This is a type of solution that allows data path to collect control plane information. For 
+          example, a traceroute based system called PerfSonar is widely deployed. Such a system can 
+          collect other network information such as delay and loss naturally as measurements. However, this type of solution typically cannot collect full topology information such as link capacity or handle more complex query such as ALTO Path Vector.
+        </t>
+      </section>
+
+
+      <section anchor="solution-alto" numbered="true" toc="default">
+        <name>Candidate Solution: Multi-Domain ALTO Composition Refinement</name>
+        <t>This is an ALTO based system, and consists of two components: (1) it introduces a new abstraction of each autonomous network and associated query process to allow multi-domain ALTO information composition; and (2) it introduces a generic-path model at ALTO clients so that they can use the acquired information to gradually refine network information.
+        </t>
+
+        <section anchor="solution-alto-server" numbered="true" toc="default">
+          <name>ALTO Server Multi-Domain Information Model</name>
+
+          <t>In the ALTO base model, a network is a container, with endpoints 
+          attached to the big switch. In the multi-domain model, each network 
+          (represented by an ALTO server) has a set of ingress points (in-1 to in-m) and a set of egress points (e-1 to e-n). An endpoint belonging to the network will be attached to an ingress point and an egress point. Hence, a single-domain ALTO query will specify ingress and egress directly attached to an ingress point and an egress point. A source network, to a destination that is not in the same network, however, will only return the egress point; a destination network, when the source is from a different network, will need an ingress 
+          point. A general transit network will need an ingress point and return egress point. For consistency, the egress point must be a valid ingress point, represented by a unique address, of the peer.
+          </t>  
+
+          <artwork name="" type="" align="left" alt=""><![CDATA[
+
+                                                                                
+            in-1   +-------------+  e-1                                         
+               ----|             |----                                          
+                   |             |                                              
+               ----|             |----                                          
+                   |             |                                              
+               ----|             |----                                          
+                   |             |                                              
+               ----|             |----                                          
+            in-m   +-------------+  e-n                                         
+          ]]></artwork>
+
+          <t>ALTO Server Multi-domain Query Model: Each ECS query, if the src is not in the home domain of the ALTO 
+          server, should include an ingress point, where the ingress point is returned by the 
+          ALTO server of the previous domain. If the domain of the ALTO server is not the home domain of the destination, the ALTO server should return the egress point of the home domain and the ingress of the network domain.</t>
+
+          <t>As an optional feature, the query should allow indication of iterative or recursive queries.</t>
+
+          <t>To support incremental deployment, an ALTO server may respond to a query without specifying an ingress point and the source is not in the domain of the ALTO server. In this case, the ALTO server will return the results from each potential ingress points. For each ingress point indicated, the server indicates information of the previous hop (e.g., peer AS number and potential address).</t>
+
+        </section>
+
+        <section anchor="solution-alto-client" numbered="true" toc="default">
+          <name>ALTO Client General-Path Model</name>
+
+          <t>In particular, it allows the path from a src to a dst to be a directed acyclic graph, with the following components:</t>
+
+          <t>A set of nodes, where each node has both a type, and attributes, where the type 
+            can be 
+            (1) host: such as src/dst, with attributes such as IP address; 
+            (2) AS: which is a group of nodes, i.e., subgraph, with attributes including ASN; 
+            (3) router, with subtypes such as BGP-router, with attributes such as IP address. </t>
+
+          <t>A set of links, where each link has a head and a tail; hence the types of links 
+            will be the unique combinations of head-type x tail type. A link can have its attributes as well.</t>
+
+          <t>Now, some examples of this representation in our deployment use case:</t>
+
+          <t>For the geo-distance ALTO cost derived from geo-ip: the src is a host and the dst is also a host, and the metric is the geo distance;</t>
+
+
+          <t>For CERN looking glass ALTO server, from a src host in CERN to a dst host in another network, say KIT, the src is a host, with two links, one for each of the two looking glass BGP routers from cern; each of these BGP routers links to its BGP peer, and each such BGP peer links to the next AS, in the AS-PATH exposed by CERN.</t>
+        </section>  
+
+      </section>
+
     </section>
 
 
     <section anchor="ianaconsider" numbered="true" toc="default">
       <name>IANA Considerations</name>
-      <t>IANA will need to register the following:
+      <t>Some of the solutions will need IANA registrations. 
       </t>
     </section>
 
