@@ -14,9 +14,10 @@ Placeholder to discuss future ALTO work. The discussion is open till end of May 
 ## Proposed direction of work
 
 *	Recharter the WG with a focus on ALTO maintenance, fixes to the integration complexity, and integration with data sources. Candidate milestines are:
-  -	M1: Dedicated YANG modules to integarte data from specific source types
-  -	M2: Reuse existing network resources to identify resources (e.g., BGP communities)
-  -	M3: Privacy/Isolation of ALTO information
+
+    -	M1: Dedicated YANG modules to integarte data from specific source types
+    -	M2: Reuse existing network resources to identify resources (e.g., BGP communities)
+    -	M3: Privacy/Isolation of ALTO information
 
 # Proposal # 2: Revitalize ALTO
 
