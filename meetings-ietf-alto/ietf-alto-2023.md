@@ -5,7 +5,79 @@
 
 - **Location:** https://ietf.webex.com/ietf/j.php?MTID=ma0e97cc97c4cd71bb59cf1a094682686
 
-- **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Yuhang, Ziyang Xing. 
+- **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Tong Meng, Yuhang, Ziyang Xing. 
+
+------------------------------
+
+**IETF, ALTO Meeting: March 21th, 2023**
+
+**Agenda:**
+
+- Dashboard: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- IETF 116 Agenda
+- Chartered items
+- Deployment
+- Hackathon
+- Recharter items for IETF 116
+  - Multi-domain use cases
+  - compute and network information exposure
+  - Trust
+
+
+**Minutes:**
+
+Note Taker: Jensen
+
+- IETF 116 Meeting Agenda
+  - Qin: not only deployment update, but also some other charter item discussions
+- Multi-domain ALTO
+  - Richard will sync up with Benocs and update to WG
+    - 10:30 am ET
+  - Collab on multi-domain TE with ESnet/NRP/GRP
+    - Ranking info
+    - Routing info: multi-domain sharing of routing
+    - Topo/network graph info: multi-domain TE (sharing of topo)
+- WGLC for two WG charter items
+  - WGLC issues are also tracked in GitHub
+- IETF Hackathon
+  - Two hackathon projects will be presented: oam yang model and new transport
+  - Kai: what will be good use cases (settings, demo workflow) to demonstrate these two projects? need discussions offline
+  - A zookeeper based distributed backend has been implemented to support new transport
+  - Progress are tracked in GitHub: https://github.com/openalto/alto/issues?q=is%3Aopen+is%3Aissue+label%3AIETF-Hackathon-116
+- Open discussion
+  - Qin: More discussions should go to WG mailing list
+  - Sabine: engage cross-group discussions
+
+
+----
+**Logistics:**
+
+- **Meeting times:** Tue 9:00 to 10:00am EST
+
+- **Location:** https://ietf.webex.com/ietf/j.php?MTID=ma0e97cc97c4cd71bb59cf1a094682686
+
+- **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Tong Meng, Yuhang, Ziyang Xing. 
+
+------------------------------
+
+**IETF, ALTO Meeting: March 14th, 2023**
+
+**Agenda:**
+
+- Dashboard: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- IETF 116 Agenda
+- Chartered items
+- Deployment
+- Recharter items for IETF 116
+  - Multi-domain use cases
+  - compute and network information exposure
+  - Trust
+
+
+**Minutes:**
+
+Note Taker: 
+
 
 ------------------------------
 
