@@ -44,4 +44,4 @@ Placeholder to discuss future ALTO work. The discussion is open till end of May 
 
 ## Proposed direction of work:
 
-*	Recharter the WG with a focus on ALTO to cover both maintenance and the new industry needs (where such needs are currently being discussed in the ALTO WG internal meetings and mailing list, see also my next comment on logistics).
+*	Recharter the WG with a focus on ALTO to cover both maintenance and the new industry needs (where such needs are currently being discussed in the ALTO WG internal meetings and mailing list).
