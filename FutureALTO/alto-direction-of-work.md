@@ -13,11 +13,17 @@ Placeholder to discuss future ALTO work. The discussion is open till end of May 
 
 ## Proposed direction of work
 
-*	Recharter the WG with a focus on ALTO maintenance, fixes to the integration complexity, and integration with data sources. Candidate milestines are:
+*	Recharter the WG with a focus on ALTO maintenance, fixes to the integration complexity, and integration with data sources. Candidate milestones are:
 
-    -	M1: Dedicated YANG modules to integarte data from specific source types
+    -	M1: Dedicated YANG modules to integrate data from specific source types
     -	M2: Reuse existing network resources to identify ALTO resources (e.g., BGP communities)
     -	M3: Privacy/Isolation of ALTO information
+
+## Critique
+
+* TBC
+* TBC
+* TBC
 
 # Proposal # 2: Revitalize ALTO
 
@@ -35,7 +41,13 @@ Placeholder to discuss future ALTO work. The discussion is open till end of May 
 *	Use the ALTO/TSVWG mailing lists to socialize deployment experience.
 *	Based on the maintenance that might be shown in TSVWG and shared deployments, reassess the interest of the community in enriching ALTO with additional features by organizing a formal BoF.
 
-# Proposal #3: Support ALTO extensions for the new industry needs
+## Critique
+
+* TBC
+* TBC
+* TBC
+
+# Proposal #3: Support ALTO Extensions for the New Industry Needs
 
 ## Rationale:
 
@@ -49,3 +61,9 @@ Placeholder to discuss future ALTO work. The discussion is open till end of May 
 ## Proposed direction of work:
 
 *	Recharter the WG with a focus on ALTO to cover both maintenance and the new industry needs (where such needs are currently being discussed in the ALTO WG internal meetings and mailing list).
+
+## Critique
+
+* TBC
+* TBC
+* TBC
