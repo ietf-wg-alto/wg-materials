@@ -13,6 +13,25 @@
 
 **Agenda:**
 
+- IETF 116 Retrospective
+- Preparations for the forthcoming ALTO Interim Meetings starting on April 11th
+    - Review chairs' proposed agendas for interim meetings
+- Review outstanding WGLC github tickets / pull requests: 
+    - Transport: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport/issues
+    - OAM: https://github.com/ietf-wg-alto/draft-ietf-alto-oam-yang/issues
+
+**Minutes:**
+
+Note Taker: 
+
+
+
+------------------------------
+
+**IETF, ALTO Meeting: March 21th, 2023**
+
+**Agenda:**
+
 - Dashboard: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
 - IETF 116 Agenda
 - Chartered items
