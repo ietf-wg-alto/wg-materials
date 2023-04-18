@@ -7,6 +7,20 @@
 
 - **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Tong Meng, Yuhang, Ziyang Xing. 
 
+
+------------------------------
+**IETF, ALTO Meeting: April 25th, 2023**
+
+**Agenda:**
+
+- Review outstanding WGLC github tickets / pull requests: 
+    - Transport: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport/issues
+    - OAM: https://github.com/ietf-wg-alto/draft-ietf-alto-oam-yang/issues
+- Preparations for the forthcoming ALTO Interim Meeting #3:
+   - Integration with data sources: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgIAAUZe2vjeO_1U/edit#gid=0
+
+
+
 ------------------------------
 **IETF, ALTO Meeting: April 18th, 2023**
 
@@ -18,6 +32,33 @@
 - Preparations for the forthcoming ALTO Interim Meeting #3:
    - Integration with data sources: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgIAAUZe2vjeO_1U/edit#gid=0
 
+
+**Agenda:**
+
+- Round Table over current activities
+- 
+- Dashboard: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
+- IETF 116 Agenda
+- Chartered items
+- Deployment
+- Hackathon
+- Recharter items for IETF 116
+  - Multi-domain use cases
+  - compute and network information exposure
+  - Trust
+
+
+**Minutes:**
+
+Note Taker: Roland
+
+**Round Table:**
+
+*Transport Document
+
+*Issues:
+	- Session Semantics
+	- Concerns from Martin: should not give the client the whole meta data
 
 
 ------------------------------
