@@ -77,7 +77,7 @@ Material: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgI
 		- check: bgp communities and LS to revisit both draft as suggested by the WG Chairs
 			(draft-contreras-alto-bgp-communities & draft-zhang-alto-bgp-ls)
 		
-**Potential Future Activities**
+**Potential Future Activities:**
 	What is the next programmable frontier e.g., layer 4 as control point? 
 	Please, think about it.
 
