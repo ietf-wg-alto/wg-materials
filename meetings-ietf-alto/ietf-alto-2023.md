@@ -69,7 +69,7 @@ Material: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgI
 
 	- Variety of information and data sources that could be of interest for ALTO
 	- Discussion with the chairs in IETF is ongoing e.g., bottleneck structures
-	- Idea to stengthen how ALTO can be used better in production environment
+	- Idea to strengthen how ALTO can be used better in production environment
 	- Comments:
 		- long term approach, ALTO can play the role of NETWORK EXPOSURE FUNCTION
 		- network and cost map might be limited use cases
