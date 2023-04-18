@@ -47,7 +47,7 @@ Note Taker: Roland
 
 Transport Document
 
-	Lachlan is updating the document including feedback
+Lachlan is updating the document including feedback
 	Issues:
 	- Session Semantics
 	- Concerns from Martin Duke: should not give the client the whole meta data
