@@ -33,19 +33,10 @@
    - Integration with data sources: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgIAAUZe2vjeO_1U/edit#gid=0
 
 
-**Agenda:**
+**Detailed Agenda on April 18th:**
 
 - Round Table over current activities
-- 
-- Dashboard: https://github.com/orgs/ietf-wg-alto/projects/1/views/2
-- IETF 116 Agenda
-- Chartered items
-- Deployment
-- Hackathon
-- Recharter items for IETF 116
-  - Multi-domain use cases
-  - compute and network information exposure
-  - Trust
+- Interim Meeting
 
 
 **Minutes:**
@@ -54,11 +45,31 @@ Note Taker: Roland
 
 **Round Table:**
 
-*Transport Document
+Transport Document
 
-*Issues:
+	Lachlan is updating the document including feedback
+	Issues:
 	- Session Semantics
-	- Concerns from Martin: should not give the client the whole meta data
+	- Concerns from Martin Duke: should not give the client the whole meta data
+	- Concurrency
+	Conclusion:
+	- Have a dedicated session regarding the issues in a small round and forward conclusions on the list
+	
+OAM Document
+
+	Yangdoctors review has been done
+	Issues:
+	- Meta data values
+	
+Priorities are to close both documents as requested by the WG Chairs.
+
+**Interim Meeting:**
+On May 3rd is the next interim meeting, see info on mailing list.
+Material: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgIAAUZe2vjeO_1U/edit#gid=0
+
+	- Variety of information and data sources that could be of interest for ALTO
+	- Discussion with the chairs in IETF is ongoing e.g., bottleneck structures
+	- Idea to stengthen how ALTO can be used better in production environment
 
 
 ------------------------------
