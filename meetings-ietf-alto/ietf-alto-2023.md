@@ -8,21 +8,15 @@
 - **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Tong Meng, Yuhang, Ziyang Xing. 
 
 ------------------------------
-
-**IETF, ALTO Meeting: March 21th, 2023**
+**IETF, ALTO Meeting: April 18th, 2023**
 
 **Agenda:**
 
-- IETF 116 Retrospective
-- Preparations for the forthcoming ALTO Interim Meetings starting on April 11th
-    - Review chairs' proposed agendas for interim meetings
 - Review outstanding WGLC github tickets / pull requests: 
     - Transport: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport/issues
     - OAM: https://github.com/ietf-wg-alto/draft-ietf-alto-oam-yang/issues
-
-**Minutes:**
-
-Note Taker: 
+- Preparations for the forthcoming ALTO Interim Meeting #3:
+   - Integration with data sources: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgIAAUZe2vjeO_1U/edit#gid=0
 
 
 
