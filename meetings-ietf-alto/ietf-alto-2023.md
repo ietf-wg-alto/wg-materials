@@ -47,7 +47,7 @@ Note Taker: Roland
 
 Transport Document
 
-Lachlan is updating the document including feedback
+	Lachlan is updating the document including feedback
 	Issues:
 	- Session Semantics
 	- Concerns from Martin Duke: should not give the client the whole meta data
@@ -61,7 +61,7 @@ OAM Document
 	Issues:
 	- Meta data values
 	
-Priorities are to close both documents as requested by the WG Chairs.
+Priorities are to finalize and close both documents as requested by the WG Chairs.
 
 **Interim Meeting:**
 On May 3rd is the next interim meeting, see info on mailing list.
@@ -70,7 +70,16 @@ Material: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgI
 	- Variety of information and data sources that could be of interest for ALTO
 	- Discussion with the chairs in IETF is ongoing e.g., bottleneck structures
 	- Idea to stengthen how ALTO can be used better in production environment
-
+	- Comments:
+		- long term approach, ALTO can play the role of NETWORK EXPOSURE FUNCTION
+		- network and cost map might be limited use cases
+		- comments are welcome i.e., feedback in our next week meeting
+		- check: bgp communities and LS to revisit both draft as suggested by the WG Chairs
+			(draft-contreras-alto-bgp-communities & draft-zhang-alto-bgp-ls)
+		
+**Potential Future Activities**
+	What is the next programmable frontier e.g., layer 4 as control point? 
+	Please, think about it.
 
 ------------------------------
 
