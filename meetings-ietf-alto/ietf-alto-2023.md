@@ -19,6 +19,50 @@
 - Preparations for the forthcoming ALTO Interim Meeting #3:
    - Integration with data sources: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgIAAUZe2vjeO_1U/edit#gid=0
 
+**Minutes**
+
+*Note taker: Kai*
+
+Transport:
+
+- negotiation of HTTP versions
+- Richard: what is the principle for the solutions?
+- Qin: The principle is to reuse the IRD to announce any capabilities.
+- Kai: There are two cases: For https services, version negotiation can be done using TLS; for http services, HTTP versions that are supported by the server are announced through the IRD.
+- Qin: Need to confirm with Spencer before getting back to Martin.
+- Lachlan: We have moved forward with the options for removing the metadata.
+
+Logistics:
+
+- Jordi: We need to forward the activities from the github to the mailing list.
+- Qin: Subscribing the mailing list to the github issues may be too noisy.
+- Jordi: I can forward the mails to the mailing list.
+
+OAM:
+
+- Jensen: Two issues raised in the OPSDIR review
+- Jensen: Not sure about the scalability issue.
+- Jensen: Two kinds of scalabilities: 1) the number of entities in a domain or even multi-domain, or 2) large number of client connections. Need to include load-balancing configurations in the model. Question is whether to include such configurations in the document.
+- Qin: It could be deploying multiple server in multiple domain or in a single domain. The impression is to support multi-server deployment -- each in one domain -- and support server-server communication. 
+- Jensen: For multi-domain setting, the model does not provide a single mechanism. Each domain will have their own model(s). For a single domain, load-balancing may be configured.
+- Qin: Confirm with Dan about the issue. If the issue is on server-server communication, need to discuss with Martin and get feedback.
+- Richard: Have multiple OAM servers -- usually for scalability and availability. Two choices: caching or replication. Which one?
+- Jensen: How the data model can address the scalability issue?
+- Kai: I just checked the review and it seems that the scalability Dan is referring to is from a paragraph in the current document. Seems that we need to clarify what the word means rather than give a solution.
+- Richard: We need to clarify what scalability means in the paragraph.
+
+Data sources:
+
+Jordi: Call for participation and feedback for the data source document.
+Ayoub: What kind of inputs are required? 3, 8 and 11 are related to the interest of Fujitsu.
+Luis: If there are particular comments, add comments to the google sheet.
+Ayoub: Find use cases?
+Luis: Use cases, extensions or problems/limitations.
+Ayoub: Have local discussions on how to integrate trust in the ALTO protocol.
+Qin: Seems that the document is trying to define a framework to integrate different data sources into ALTO. BGP-LS and BGP communities are missing pieces in the ALTO protocol, for example, creating PID for BGP community.
+Luis: We are in the first step to understand potential data sources ("what") before designing how to incorperate these data sources ("how").
+Qin: There are some solutions for some of the data sources. What is missing is the metrics for the trust.
+Jordi: The document is providing an umbrella for potential data sources. What can be done is to zoom in some of the data sources. Two-level approach: first define "what" and then work on solutions on specific data sources.
 
 
 ------------------------------
