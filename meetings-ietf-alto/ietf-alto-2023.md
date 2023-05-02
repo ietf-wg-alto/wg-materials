@@ -9,6 +9,53 @@
 
 
 ------------------------------
+**IETF, ALTO Meeting: May 2nd, 2023**
+
+**Agenda:**
+
+- Review outstanding WGLC github tickets / pull requests: 
+  - Transport: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport/issues
+  - OAM: https://github.com/ietf-wg-alto/draft-ietf-alto-oam-yang/issues
+- Preparations for the forthcoming ALTO Interim (May 3rd at 10am EST) Meeting #3:
+  - Integration with data sources: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgIAAUZe2vjeO_1U/edit#gid=0
+  - Reviving draft-contreras-alto-bgp-communities & draft-zhang-alto-bgp-ls:
+    - https://datatracker.ietf.org/doc/html/draft-contreras-alto-bgp-communities-00
+    - https://datatracker.ietf.org/doc/html/draft-zhang-alto-bgp-ls
+- Group's work awareness:
+  - Internet Protocol Journal article on ALTO accepted for publication
+
+**Minutes**
+
+*Note taker: Jensen*
+
+WG Charter Items:
+
+- New Transport:
+  - Kai and Lachlan have replied to WGLC reviews. Waiting for feedback
+  - Richard will discuss with Martin Thomathon
+- OAM:
+  - All the director reviews have been addressed and got confirmation.
+  - Some remaining chair reviews are to be closed soon
+  - A new version is target to be uploaded in this week
+
+Interim Meeting Preparation:
+
+- Data Sources:
+  - Jordi and Luis will summarize the information collected in the spreadsheet
+  - Feedback from mailing list are merged
+- BGP-LS
+  - Jensen will lead the discussion about the complete solution of generation ALTO maps using BGP-LS
+  - Kai suggested to focus on the general process using common information model of BGP-LS
+  - Richard: how to handle multi-domain?
+  - Qin: shall we bring the BGP-LS YANG data model extension to IETF?
+  - Richard will invite Danny from BENOCS to join the discussion and bring the insight and experience from FlowDirector implementation
+- BGP Community:
+  - Luis will prepare slides and lead the discussion about how to leverage BGP community information in ALTO
+- Logistics:
+  - Qin: everyone please tests the meetecho connection before the interim meeting
+
+
+------------------------------
 **IETF, ALTO Meeting: April 25th, 2023**
 
 **Agenda:**
