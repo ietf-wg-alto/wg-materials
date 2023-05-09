@@ -9,6 +9,73 @@
 
 
 ------------------------------
+
+**IETF, ALTO Meeting: May 9th, 2023**
+
+**Agenda:**
+
+- Retrospective on ALTO Interim #3
+  - Integration with data sources: https://docs.google.com/spreadsheets/d/1P4GrhQz_t17jIWg-3b1ycldhBWEEgIAAUZe2vjeO_1U/edit#gid=0
+  - Reviving draft-contreras-alto-bgp-communities & draft-zhang-alto-bgp-ls:
+    - https://datatracker.ietf.org/doc/html/draft-contreras-alto-bgp-communities-00
+    - https://datatracker.ietf.org/doc/html/draft-zhang-alto-bgp-ls
+  - Action Items: Compute metrics
+- ALTO for Quering LMAP Results
+- CATS metrics discussion
+- Review of outstanding WGLC github tickets / pull requests:
+	- Transport: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport/issues
+	- OAM: https://github.com/ietf-wg-alto/draft-ietf-alto-oam-yang/issues
+- Preparation of the forthcoming ALTO Interim (May 16h at 10am EST) Meeting #4
+
+
+**Minutes**
+
+*Note taker: Roland*
+
+
+Retrospective on ALT Interim #3:
+	- Discussion regarding the impression of Interim #3
+	- Action Items: Compute metrics
+	
+	
+ALTO for Querying LMAP Results:
+	- Presentation of Qiufang Ma regarding LMAP, https://github.com/QiufangMa/alto-lmap
+	- LMAP: Large-Scale Measurement of Broadband Performance
+	- Proposal of measurement framework to improve QoE
+	- Check if LMAP can be an interesting WG item
+	- Questions & ideas for next versions: 
+		- Information about motivation and where LMAP is used.
+		- How to correlate the measurements, handling of PIDs?
+		- Explain why this data source is relevant?
+		- How integration with data sources simplifies ATLO deployments?
+		- Section 6.2 - additional cost map metrics - is interesting.
+		- Add chapter regarding security considerations.
+
+
+CATS metrics discussion
+	- see: https://mailarchive.ietf.org/arch/msg/cats/KEovVYox1iWzlyJ54dmmY2xdB1M/
+	- small group had a call last week to discuss metrics for CATS
+	- draft-du-cats-computing-modeling-description
+	- CATS is oriented to traffic steering
+	- use case "delay" (round-trip, one-way) has been identified
+	- proposal: network and service delay metric both
+
+
+WG Charter Items:
+- New Transport:
+  - ART review triggered
+- OAM:
+  - Discussions on the mailing list regarding security
+  - Upload of new version soon
+
+
+Interim Meeting Preparation:
+- Discussion and preparation next week in ALTO weekly, 30 minutes might be sufficient before Interim
+- Please upload the slides ahead of the meeting
+
+
+
+------------------------------
 **IETF, ALTO Meeting: May 2nd, 2023**
 
 **Agenda:**
