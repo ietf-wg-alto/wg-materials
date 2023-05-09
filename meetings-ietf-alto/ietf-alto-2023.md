@@ -20,7 +20,8 @@
     - https://datatracker.ietf.org/doc/html/draft-contreras-alto-bgp-communities-00
     - https://datatracker.ietf.org/doc/html/draft-zhang-alto-bgp-ls
   - Action Items: Compute metrics
-- ALTO for Quering LMAP Results
+- ALTO for Querying LMAP Results:
+    - https://datatracker.ietf.org/doc/draft-xie-alto-lmap/
 - CATS metrics discussion
 - Review of outstanding WGLC github tickets / pull requests:
 	- Transport: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport/issues
