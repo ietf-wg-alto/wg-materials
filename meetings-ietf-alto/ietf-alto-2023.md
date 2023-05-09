@@ -57,12 +57,12 @@ ALTO for Querying LMAP Results:
 
 CATS metrics discussion:
 
-- see: https://mailarchive.ietf.org/arch/msg/cats/KEovVYox1iWzlyJ54dmmY2xdB1M/
-- small group had a call last week to discuss metrics for CATS
+- See: https://mailarchive.ietf.org/arch/msg/cats/KEovVYox1iWzlyJ54dmmY2xdB1M/
+- Small group had a call last week to discuss metrics for CATS
 - draft-du-cats-computing-modeling-description
 - CATS is oriented to traffic steering
-- use case "delay" (round-trip, one-way) has been identified
-- proposal: network and service delay metric both
+- Use case "delay" (round-trip, one-way) has been identified
+- Proposal: network and service delay metric both
 
 
 WG Charter Items:
