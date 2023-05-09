@@ -34,11 +34,13 @@
 
 
 Retrospective on ALT Interim #3:
+
 	- Discussion regarding the impression of Interim #3
 	- Action Items: Compute metrics
 	
 	
 ALTO for Querying LMAP Results:
+
 	- Presentation of Qiufang Ma regarding LMAP, https://github.com/QiufangMa/alto-lmap
 	- LMAP: Large-Scale Measurement of Broadband Performance
 	- Proposal of measurement framework to improve QoE
@@ -52,7 +54,8 @@ ALTO for Querying LMAP Results:
 		- Add chapter regarding security considerations.
 
 
-CATS metrics discussion
+CATS metrics discussion:
+
 	- see: https://mailarchive.ietf.org/arch/msg/cats/KEovVYox1iWzlyJ54dmmY2xdB1M/
 	- small group had a call last week to discuss metrics for CATS
 	- draft-du-cats-computing-modeling-description
