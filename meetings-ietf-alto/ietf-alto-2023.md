@@ -7,7 +7,35 @@
 
 - **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Tong Meng, Yuhang, Ziyang Xing. 
 
+------------------------------
 
+**IETF, ALTO Meeting: May 16th, 2023**
+
+**Agenda:**
+
+- Preparation of the forthcoming ALTO Interim (May 16h at 10am EST) Meeting #4
+
+
+**Minutes**
+
+*Note taker: Richard*
+
+- Transport updates (Kai)
+  - Need to get updates from reviewers; 
+  - TSV review by Barnard and wait for update
+  - HTTP review meeting with Martin Thompson
+  - Med suggests that transport design team should discuss with Martin Thompson and clarify design motivation and choice
+
+- OAM updates (Jensen)
+  - Qin: updates on security, agrees with Med, need YANG expert to close the issue
+  - Almost closes all of the reviews; 
+  - Open issue: Clarify typedef (proposal remove pattern)
+  - Open issue: add notification; Qin comment: check alarms YANG data model and see if we can reuse
+  - Qin: close the 3 open issues as soon as possible.
+
+- Planning for the next interim meeting (Ayoub, Qin)
+  - Flesh out the security/trust during the final interim meeting; please consider multi-domain
+  
 ------------------------------
 
 **IETF, ALTO Meeting: May 9th, 2023**
