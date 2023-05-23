@@ -9,6 +9,54 @@
 
 ------------------------------
 
+**IETF, ALTO Meeting: May 23th, 2023**
+
+**Agenda:**
+
+- Retrospective on ALTO Interim #4
+- 2nd WGLC on new transport and OAM docs
+- Review outstanding WGLC github tickets / pull requests:  
+  - Transport: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport/issues 
+  - OAM: https://github.com/ietf-wg-alto/draft-ietf-alto-oam-yang/issues 
+- Preparations for the forthcoming ALTO Interim (May 30th at 10am EST) Meeting #5
+
+**Minutes**
+
+*Note taker: Jensen*
+
+Summary of last interim meeting:
+- OAM:
+  - Close to ready.
+  - TODO: upload a new version and start 2nd round WGLC.
+- New transport:
+  - TODO: schedule a meeting with Martin Thompson to discuss the update soon.
+
+Preparation for 2nd WGLC:
+
+- OAM:
+  - Received 4 more thorough reviews and one more quick review.
+  - All reivews have been replied.
+  - yry: There are a lot of design decision made from multiple design choices without clarification. Will IESG fight back?
+  - Qin: If IESG provides any concrete concerns, we can disucss and address them. WG members can also send their concerns and discuss on the mailing list.
+  - The basic principle of this document is to align with the base protocol but also allowed to be extended by the private (vendor) modules.
+- New transport:
+  - Kai went over the changes that addressed comments from Adrian and Qiufang.
+  - The changes have been updated to GitHub: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport
+
+Peparation for next interim meeting:
+- Trusted network
+- Data source collection
+
+Additional items:
+- Richard mentioned netbox and webhook method that can be helpful for new transport.
+  - Richard and John Graham will discuss netbox related topic next week.
+- Potential updates for individual drafts:
+  - Jordi will update the service edge draft.
+- Sabine suggested that we should engage CATS WG more.
+
+
+------------------------------
+
 **IETF, ALTO Meeting: May 16th, 2023**
 
 **Agenda:**
