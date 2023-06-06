@@ -1,7 +1,7 @@
 Placeholder to discuss future ALTO work. The discussion is open till end of May 2023.
 
 
-# Proposal # 1: Support ATLO Operations
+# Proposal # 1: Support ALTO Operations
 
 ## Rationale
 
@@ -30,7 +30,12 @@ Placeholder to discuss future ALTO work. The discussion is open till end of May 
 ## Rationale
 
 *	Some of the proposed ALTO work is research-oriented (PANRG, would be more appropriate for some items), while other may be conducted in new WGs (e.g., CATS).
-*	Some of the key foundations of ATLO might not be valid after 15 years.
+*	Some of the key foundations of 
+
+
+
+
+might not be valid after 15 years.
 *	Closing the WG is not a failure, but a sign of ALTO specification maturity.
 *	Revitalizing the ALTO effort is thus needed.
 
