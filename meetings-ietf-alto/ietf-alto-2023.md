@@ -8,6 +8,32 @@
 - **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Tong Meng, Yuhang, Ziyang Xing. 
 
 ------------------------------
+**IETF, ALTO Meeting: June 6, 2023**
+
+**Agenda:**
+- Working item
+- Future of WG
+- cats metrics discussion
+
+**Minutes**
+
+*Note taker: Richard*
+
+- WGLC last call is over
+- OAM updates: Additional reviews, including individual reviews by Mahdi, and comments by Med
+Plan is to provide a new version by this week. 
+
+- Transport updates: new comment by Mahdi, and one from Meng from Huawei. Mentioned reviews by Qiufang, as WG last call reviews. Med created github issues. Kai submitted revisions to address the issues. One technical issue (#30) on the github, adding paragraph, why creating a single connection. Spencer is ok with ART review. Richard will add the paragraph on why single connection.
+
+- Future of the WG: https://github.com/ietf-wg-alto/wg-materials/blob/main/FutureALTO/alto-direction-of-work.md
+  - Update: Med initial two directions, and Jordi added the third
+  - Richard: potential to think about decouple concepts (e.g., distance), drivers (BGP-LS), and bits-and-bytes (ALTO protocol, or spreadsheet)
+  - Sabine: what people like/dislike the encoding, or there exist other bodies; people want interop info. Do we have mechanism to easily translate into standard format? How the mechanisms such as meta info are used/needed by infrastructure operators? We should look into some informational documents on ALTO encoding. CATS can benefit from querying ALTO servers. A more normative way to look the proposals in direction 3.
+  - Jordi: Chairs directed the WG to check why ALTO can integarte with data sources. There is an element that we can enhance the adoption of the protocol. Compute is on the standard track. Sabine: to take into account, already in the ALTO edge services, how to use ALTO info? We need several levels of abstractions. How feasible to obtain the info?
+  - Ayoub: Interested in Proposal #3. Have practical discussions on the 3 proposed directions. Put pros and cons for each proposed direction. 
+  - Jordi: Direction 2 is not ideal. WG is the right WG to attack the important problem of application-network integration. Not optimal from architecture or engieering. For the next decade, one mission is to build edge cloud infrastructure. To do a really good job, we really need visibility (where is compute, networking) to the infrastructure. Homework: (1) work on the proposal level; to work on the edge services draft, to position the compute the draft for ALTO, and also the performance metrics draft; (2) Fujitsu puts a security draft, to have security in the new charter. Work offline, w/ Luis and others. Sabine two questions: (1) What is the take, by the Fujitsu team, on the security considerations on all recent related documents/RFCs? Ayoub: So far not bottom up, can discuss more. Take a look at risks at the RFC security sections, what can be extended/analyzed. Motoyoshi: if a new architecture (e.g., edge cloud) comes, what are the security concerns?
+  - Schedule a meeting w/ Sabine, Luis and Jordi on compute/edge.
+  - Bring some visbility to the WG. Sabine can summarize the comments to the WG mailing list.
 
 **IETF, ALTO Meeting: May 23th, 2023**
 
