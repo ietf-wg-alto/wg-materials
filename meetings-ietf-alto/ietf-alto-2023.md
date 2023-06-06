@@ -34,6 +34,8 @@ Plan is to provide a new version by this week.
   - Jordi: Direction 2 is not ideal. WG is the right WG to attack the important problem of application-network integration. Not optimal from architecture or engieering. For the next decade, one mission is to build edge cloud infrastructure. To do a really good job, we really need visibility (where is compute, networking) to the infrastructure. Homework: (1) work on the proposal level; to work on the edge services draft, to position the compute the draft for ALTO, and also the performance metrics draft; (2) Fujitsu puts a security draft, to have security in the new charter. Work offline, w/ Luis and others. Sabine two questions: (1) What is the take, by the Fujitsu team, on the security considerations on all recent related documents/RFCs? Ayoub: So far not bottom up, can discuss more. Take a look at risks at the RFC security sections, what can be extended/analyzed. Motoyoshi: if a new architecture (e.g., edge cloud) comes, what are the security concerns?
   - Schedule a meeting w/ Sabine, Luis and Jordi on compute/edge.
   - Bring some visbility to the WG. Sabine can summarize the comments to the WG mailing list.
+  - Ayoub/Sabine: Wednesday 9:00-9:30 am meeting.
+- Energy efficiency: Sabine considers this crucial. Roland: Many efforts on energy in DT operations. Although each piece can be small, they together can make a difference. 
 
 **IETF, ALTO Meeting: May 23th, 2023**
 
