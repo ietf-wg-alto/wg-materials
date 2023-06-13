@@ -8,6 +8,45 @@
 - **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Tong Meng, Yuhang, Ziyang Xing. 
 
 ------------------------------
+
+**IETF, ALTO Meeting: June 13, 2023**
+
+**Agenda:**
+
+- Progress of OAM and new transport drafts
+- Potential topics for Proposal #3: Support ALTO Extensions for the New Industry Needs 
+- Plan to participate hackthon
+
+**Minutes**
+
+*Note taker: Dong,Shenshen,Ryan*
+
+Prograss of drafts:
+- New Transport (Kai):
+    - A new version is uploaded
+    - Most of the issues were addressed
+    - Use different status codes to indicate different types of errors
+    - Use a single connection for each session
+- OAM (Jenson):
+    - Upload a new version of OAM
+    - Provide two data modules, need to clarify the two yang modules
+
+Additional items:
+- Richard: 
+    - Use server push to reduce latency and server load
+    - Propose to use Informational North Bound API
+    - Consider cascading alto for multi-domain setting
+- Sabine: 
+    - Decide how kick start the discussion for use cases, also related to CATS
+    - Use positioning to show where alto is better, where others(CATS) is better.
+- Jordi: 
+    - Connect edge framework for use cases with open source community
+- Qin:
+    - Try to engage with cats people, integration new data sources, complement alto as extensions
+    - Reconsider collaboration with 3gpp, maybe dig into Movie for looking for new performance metrics
+
+------------------------------
+
 **IETF, ALTO Meeting: June 6, 2023**
 
 **Agenda:**
@@ -36,6 +75,8 @@ Plan is to provide a new version by this week.
   - Bring some visbility to the WG. Sabine can summarize the comments to the WG mailing list.
   - Ayoub/Sabine: Wednesday 9:00-9:30 am meeting.
 - Energy efficiency: Sabine considers this crucial. Roland: Many efforts on energy in DT operations. Although each piece can be small, they together can make a difference. 
+
+------------------------------
 
 **IETF, ALTO Meeting: May 23th, 2023**
 
