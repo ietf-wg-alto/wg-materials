@@ -36,33 +36,33 @@
   - Overview: Jordi started with an update on the planning: Please follow the ongoing conversation on the WG mailing list initiated by Sabine, engaged by Jordi and Luis; the WG welcomes conversations by all; please socialize the ideas; leadership is important and please take ownership; this WG meets each week, and we do not know any other IETF WG that meets each week, but because we meet each week, we do not use the mailing list, which may appear to be inactive by those not attending the weekly meeting.
 
   - Individual topics:
-      - Jordi summarized that from the mailing list, item 3 appears to be the most preferred; please do discussions, propose charter and then write documents; The goal is to go to 117 and should be prepared. 
-      - Richard commented that one of his focus points will be on data sources, which can be more informational than standard. Luis advised that there can be two types of approaches: bottom up (individuals propose ideas), and top down (chairs/AD guidance).  
-     - Luis suggests that we should take a look at chair mentioned items such as: BGP communities, security; mid-term: such as data sources, please go to mailing list.
+      - Jordi summarized that from the mailing list, item 3 appears to be the most preferred; please do discussions, propose a charter item and then write documents; The goal is to go to 117 and should be prepared. 
+      - Richard commented that one of his focus points will be on data sources, which can be more informational than standard. Luis advised that there can be two types of approaches: bottom-up (individuals propose ideas), and top-down (chairs/AD guidance).  
+     - Luis suggests that we should take a look at chair-mentioned items such as BGP communities, and security; mid-term: such as data sources, please go to the mailing list.
 
-- Work organization: Meeting notes work plan: Ayoub gave the suggestion that note taker shares the note to the mailing list, some kind of annotated meeting minutes. Roland clarified that the sharing notes can be double send, or summary/highlights, or up to note taker. Organizing discussions: Luis/Jordi: email as record, github tickets to organize; Jordi creates 4 tickets, and puts links to doc.
+- Work organization: Meeting notes work plan: Ayoub gave the suggestion that note taker shares the note to the mailing list, some kind of annotated meeting minutes. Roland clarified that the sharing notes can be double sent, or summary/highlights, or up to note taker. Organizing discussions: Luis/Jordi: email as record, GitHub tickets to organize; Jordi creates 4 tickets, and puts links to doc.
 
-- Issues, leads, and working document: 
+- Issues, leads, and working documents: 
   - Topic A:
-     - github issue: https://github.com/ietf-wg-alto/wg-materials/issues/48
+     - GitHub issue: https://github.com/ietf-wg-alto/wg-materials/issues/48
      - Topic coordinator: Jordi, Kai
 
    - Topic B:
-     - github: https://github.com/ietf-wg-alto/wg-materials/issues/49 
+     - GitHub: https://github.com/ietf-wg-alto/wg-materials/issues/49 
      - Topic coordinator: Roland, Sabine
 
    - Topic C:
-     - github: https://github.com/ietf-wg-alto/wg-materials/issues/50
+     - GitHub: https://github.com/ietf-wg-alto/wg-materials/issues/50
      - Topic coordinator: Ayoub, Junichi, Motoyoshi
    
    - Topic D:
-      - github: https://github.com/ietf-wg-alto/wg-materials/issues/51
+      - GitHub: https://github.com/ietf-wg-alto/wg-materials/issues/51
       - Coordinator: Luis, Jordi
-      - 
+        
   - Discussion Google doc:
   	- https://docs.google.com/document/d/1rpziU7NZEE8f84XkJSjMhEIHUA5G7rXkGB5c_7UFxUY/edit?usp=sharing
 
-  - Goasl: Enabling conversations and concrete documents (compute, edge service, etc), need to focus, real good way to make progress is internet-draft (ID) as ground truth, from dynamic to stable, with focus on finalizing to the right).
+  - Goals: Enabling conversations and concrete documents (compute, edge service, etc), need to focus; real good way to make progress is internet-draft (ID) as ground truth, from dynamic to stable, with focus on writing drafts for concrete results).
 
 ------------------------------
 
