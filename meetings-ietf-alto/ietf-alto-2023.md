@@ -9,19 +9,76 @@
 
 ------------------------------
 
+**IETF, ALTO Meeting: June 20, 2023**
+
+**Agenda:**
+
+- Transport and OAM documents
+    - Transport: https://github.com/ietf-wg-alto/draft-ietf-alto-new-transport/issues 
+- OAM: https://github.com/ietf-wg-alto/draft-ietf-alto-oam-yang/issues 
+- ALTO Future Work: 
+    https://mailarchive.ietf.org/arch/msg/alto/uIFD6Dhikfu4J4PYcpJTbsiXbnE/
+    https://github.com/ietf-wg-alto/wg-materials/blob/main/FutureALTO/alto-direction-of-work.md
+- Preps for IETF 117:
+  - Drafts and presentations that the ALTO group plans to work on
+  - Agenda
+- New revision of Green Networking Metrics draft in opsawg: https://datatracker.ietf.org/doc/draft-cx-opsawg-green-metrics/
+
+**Minutes**
+
+*Note taker: Richard
+
+- Charter documents: transport and OAM updates
+  - OAM: Jensen and Med had a discussion on the draft and submit the revision to IESG. The document is now waiting for AD review.
+  - Transport: Richard sent a note to Martin Thompson, to provide the justification on introducing server push using PUSH PROMISE. It includes two basic reasonings: lower load, and the feature is optional; Kai updated that Med sent two pull requests and sent the latest version for AD review, and wait for updates.
+
+- Updates on future work on ALTO
+  - Overview: Jordi started with an update on the planning: Please follow the ongoing conversation on the WG mailing list initiated by Sabine, engaged by Jordi and Luis; the WG welcomes conversations by all; please socialize the ideas; leadership is important and please take ownership; this WG meets each week, and we do not know any other IETF WG that meets each week, but because we meet each week, we do not use the mailing list, which may appear to be inactive by those not attending the weekly meeting.
+
+  - Individual topics:
+      - Jordi summarized that from the mailing list, item 3 appears to be the most preferred; please do discussions, propose charter and then write documents; The goal is to go to 117 and should be prepared. 
+      - Richard commented that one of his focus points will be on data sources, which can be more informational than standard. Luis advised that there can be two types of approaches: bottom up (individuals propose ideas), and top down (chairs/AD guidance).  
+     - Luis suggests that we should take a look at chair mentioned items such as: BGP communities, security; mid-term: such as data sources, please go to mailing list.
+
+- Work organization: Meeting notes work plan: Ayoub gave the suggestion that note taker shares the note to the mailing list, some kind of annotated meeting minutes. Roland clarified that the sharing notes can be double send, or summary/highlights, or up to note taker. Organizing discussions: Luis/Jordi: email as record, github tickets to organize; Jordi creates 4 tickets, and puts links to doc.
+
+- Issues, leads, and working document: 
+  - Topic A:
+     - github issue: https://github.com/ietf-wg-alto/wg-materials/issues/48
+     - Topic coordinator: Jordi, Kai
+
+   - Topic B:
+     - github: https://github.com/ietf-wg-alto/wg-materials/issues/49 
+     - Topic coordinator: Roland, Sabine
+
+   - Topic C:
+     - github: https://github.com/ietf-wg-alto/wg-materials/issues/50
+     - Topic coordinator: Ayoub, Junichi, Motoyoshi
+   
+   - Topic D:
+      - github: https://github.com/ietf-wg-alto/wg-materials/issues/51
+      - Coordinator: Luis, Jordi
+      - 
+  - Discussion Google doc:
+  	- https://docs.google.com/document/d/1rpziU7NZEE8f84XkJSjMhEIHUA5G7rXkGB5c_7UFxUY/edit?usp=sharing
+
+  - Goasl: Enabling conversations and concrete documents (compute, edge service, etc), need to focus, real good way to make progress is internet-draft (ID) as ground truth, from dynamic to stable, with focus on finalizing to the right).
+
+------------------------------
+
 **IETF, ALTO Meeting: June 13, 2023**
 
 **Agenda:**
 
 - Progress of OAM and new transport drafts
 - Potential topics for Proposal #3: Support ALTO Extensions for the New Industry Needs 
-- Plan to participate hackthon
+- Plan to participate hackathon
 
 **Minutes**
 
-*Note taker: Dong,Shenshen,Ryan*
+*Note taker: Dong, Shenshen, Ryan*
 
-Prograss of drafts:
+Progress of drafts:
 - New Transport (Kai):
     - A new version is uploaded
     - Most of the issues were addressed
@@ -34,13 +91,13 @@ Prograss of drafts:
 Additional items:
 - Richard: 
     - Use server push to reduce latency and server load
-    - Propose to use Informational North Bound API
+    - Propose to use of Informational North Bound API
     - Consider cascading alto for multi-domain setting
 - Sabine: 
     - Decide how kick start the discussion for use cases, also related to CATS
     - Use positioning to show where alto is better, where others(CATS) is better.
 - Jordi: 
-    - Connect edge framework for use cases with open source community
+    - Connect edge framework for use cases with open-source community
 - Qin:
     - Try to engage with cats people, integration new data sources, complement alto as extensions
     - Reconsider collaboration with 3gpp, maybe dig into Movie for looking for new performance metrics
