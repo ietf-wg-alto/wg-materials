@@ -9,6 +9,87 @@
 
 ------------------------------
 
+**IETF, ALTO Meeting: June 27, 2023**
+
+**Minutes:** (*Note taker: Ryan*)
+The meeting began with a discussion of IETF 117 logistics, then covered the four directions the WG is working towards (A,B,C,D), and then concluded by discussing three specific hackathon projects. 
+
+IETF 117 Logistics (9:00-9:20)
+- Although the WG hoped to get a 1.5 hour block, it was assigned a 1-hour block for IETF 117, as the revision was late. The scheduled time is Monday, July 24, from 17:30-18:30 pm PT (local time) (Qin)
+- Future discussions
+	- New charter/directions
+	- New tradition of looking back (Richard)
+	- Adding security, encoders, transport on top of data sources, and BGP.
+
+Current state of “​​Topic A: Integration of new data sources and their exposure.”
+- Rephrasing of current title: 
+	- New data sources suggests that the focus is on getting information from southbound APIs (Richard)
+	- Concerns about getting information (Sabine)
+	- Data metrics (Kai)
+	- Possible overlaps with maintenance (direction B)
+	- TODO: follow the suggestion by the WG chairs.
+- Infrastructure
+	- Model of sites with resources, and links connecting sites. 
+	- Resources are compute, storage, and transport.
+	- Connectivity is a relatively uniform resource, whereas compute can be heterogeneous (CPUs, GPUs, TPUs, etc.).
+- Kubernetes as a solution very similar to ALTO
+	-- Node = PID, but Kubernetes has attributes/labels that help handle heterogeneity (https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+	- Commands such as exists/contains
+	- ETCD ~ ALTO Server
+	- openstack/opennebula
+	- Visibility. Kubernetes low-level pods
+	- ALTO offers possibility of hierarchy of metrics with several abstraction levels (Sabine)
+		- KPIs
+	- Resources at edge vs. cloud (Jordi)
+		- At cloud they can be packaged nicely
+		- Dealing with finite control. Selecting which resources to use is a combinatorial problem with exponential growth in difficulty. What is meaningful/maintainable.
+		- Label, selector (Kubernetes) for combinatorial problems
+		- Integral vs. link
+		- A cloud related project: https://www.caida.org/projects/cloudtrace/ (Richard)
+- Server Edge Discovery (existing draft on topic)
+	- Modeling: constant map, property map
+	- Online networker
+- Edge Service Draft
+	- 1: New use case motivations
+	- 2: New capabilities
+
+Current state of “Topic B: Maintenance of ALTO protocol”
+- BGP Community (Qin)
+- How related to PID. What will solution look like (Qin)?
+- BGP LS successful. A possibility is to BGP-ALTO as north bound: using BGP to communicate network map, cost map.
+- Luis clarifies that there are two aspects of ALTO security: the security of ALTO protocol in operations, and using ALTO to convey security information. Topic B should be the first aspect and Topic C for the second aspect (Ayoub).
+
+Current state of “Topic C: Trusted related ALTO properties”
+- New mailing list created (Ayoub) so that there is now one for all four directions
+- New trust and security. New solutions and services.
+- Suggestion to add summary to the [planning document](https://docs.google.com/document/d/1rpziU7NZEE8f84XkJSjMhEIHUA5G7rXkGB5c_7UFxUY/edit#heading=h.wbkp0e3rua1) (Jordi)
+
+Current state of “Topic D: New architectural extensions”
+- NA. Not discussed.
+
+Hackathon items
+- A. Visibility of cost map w/ perfSONAR
+	- Latency, bandwidth
+	- Iperf3 
+	- Trace route for multi hops
+	- ALTO server on perfSONAR w/ elastic search
+	- OWP3
+- B: build selection Rucio algorithm. 
+	- Use distances cost map from ALTO and source selection
+- C: FTS scheduling control
+	- Using alto 
+	- [Cautious] model
+	- Control bandwidth partition inside large autonomous system cluster 
+
+TODO: Register hackathon projects on the IETF community wiki: 
+https://wiki.ietf.org/en/meeting/117/hackathon
+
+Links from chat:
+- a cloud related project: https://www.caida.org/projects/cloudtrace/
+- Reference on services and modeling: https://github.com/esnet/nml-mrml/blob/master/reference/NML-Topology-0001.pdf
+
+------------------------------
+
 **IETF, ALTO Meeting: June 20, 2023**
 
 **Agenda:**
