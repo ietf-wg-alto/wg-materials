@@ -7,7 +7,7 @@
 ]>
 <!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
      by Daniel M Kohn (private) -->
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-yang-alto-multi-domain-01" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-yang-alto-multi-domain-02" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
   <!-- xml2rfc v2v3 conversion 3.12.10 -->
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
@@ -27,6 +27,18 @@
       </address>
     </author>
 
+    <author fullname="Ingmar Poese" initials="I." surname="Poese">
+      <organization>Benocs</organization>
+      <address>
+        <postal>
+          <street/>
+          <city>Berlin</city>
+          <country>Germany</country>
+        </postal>
+        <email>ingmar@benocs.com</email>
+      </address>
+    </author>
+
     <author fullname="Mario Lassnig" initials="M." surname="Lassnig">
       <organization>CERN</organization>
       <address>
@@ -37,18 +49,6 @@
           <country>Switzerland</country>
         </postal>
         <email>mario.lassnig@cern.ch</email>
-      </address>
-    </author>
-
-    <author fullname="Jordi Ros Giralt" initials="J." surname="Ros Giralt">
-      <organization>Qualcomm</organization>
-      <address>
-        <postal>
-          <street/>
-          <city>Madrid</city>
-          <country>Spain</country>
-        </postal>
-        <email>jros@qti.qualcomm.com</email>
       </address>
     </author>
 
@@ -80,6 +80,17 @@
       </address>
     </author>
 
+    <author fullname="Jordi Ros Giralt" initials="J." surname="Ros Giralt">
+      <organization>Qualcomm</organization>
+      <address>
+        <postal>
+          <street/>
+          <city>Madrid</city>
+          <country>Spain</country>
+        </postal>
+        <email>jros@qti.qualcomm.com</email>
+      </address>
+    </author>
 
     <date day="10" month="July" year="2023"/>
     <area>TSV Area</area>
@@ -90,9 +101,10 @@
     <keyword>Internet-Draft</keyword>
     <keyword>Application-Layer Traffic Optimization, Multi-Domain, BGP</keyword>
     <abstract>
-      <t>Application-Layer Traffic Optimization (ALTO) provides means for network applications 
-         to obtain network information. In the definitions of ALTO services ([RFC7285] and existing extensions), there is no requirement on whether the source and the destination endpoints 
-         must belong to the same autonomous network, which is a single-domain setting, or they can belong to different autonomous networks, which is a multi-domain setting. This document explains problems of realizing ALTO in multi-domain settings and then presents 3 potential solutions to realize ALTO multi-domain services.
+      <t>Application-Layer Traffic Optimization (ALTO) provides means for network 
+        applications to obtain network information. Although ALTO is inherently 
+        multi-domain, in that the ALTO server representing the network and the ALTO client requesting the network information belong to different trust domains, 
+        there are more general cases where the path from the source and the destination spans multiple autonomous networks, which we call multi-domain settings. This document first gives 3 multi-domain use cases, and the challenges to address the challenges. It then gives a brief update on the implementation solutions that we explored to address the challenges.
       </t>
     </abstract>
     <note>
@@ -313,34 +325,42 @@
       </t>
 
       <section anchor="solution-space" numbered="true" toc="default">
-        <name>Solution Space to Obtain Forwarding Information Base (FIB)</name>
+        <name>Solution Space to Obtain Forwarding Information Bases (FIBs)</name>
 
         <t>Obtaining FIBs is a basic building block of implementing ALTO route-related visibility services. At a high-level, FIBs have the following 
           life cycle:</t>
 
         <dl newline="true">
           <dt>FIB-Configure/input:</dt>
-            <dd>Each router is configured with its configuration. Each router also
-                takes its external input such as BGP routes from peers.
+            <dd>Consider a network as a distributed system. Then the input to the 
+                distributed system is the input to the components: the routers. 
+                The input to each router is its configuration, and external input such as BGP routes from peers outside the network.
             </dd>
 
           <dt>FIB-Compute:</dt>
-            <dd>A distributed system computes the FIBs. During the computing process,
-                the vendor specific configuration may be turned into standard format
-                such as IGP information model.</dd>
+            <dd>The distributed system computes the FIBs using a distributed 
+                protocol (or configured by a logically centralized control plane). 
+                During the computing process, the vendor specific 
+                configuration may be turned into standard format such as IGP 
+                information model.
+            </dd>
 
           <dt>FIB-Apply:</dt>
-            <dd>The FIBs are applied. When applied to data packets, the application may be observed by NetFlow/sFlow or similar capturing capabilities; it may also be applied to control such as traceoute, which can be observed.
+            <dd>The FIBs are computed and then applied. When FIBs are applied to 
+                data packets, the application may be observed by NetFlow/sFlow or 
+                similar capturing capabilities; it may also be applied to control 
+                mechanisms such as traceoute, which can be observed.
             </dd>
         </dl>
 
       </section>
       
       <section anchor="solution-routing-layer" numbered="true" toc="default">
-        <name>Candidate Solution: FIB-Compute Based Design</name>
-        <t>This is a type of solution that makes it possible to extends FIB_Compute 
-           to collect all needed network information at a single autonomous network, 
-           and then use an ALTO server at the source network to abstract and expose 
+        <name>FIB-Compute Based Design</name>
+        <t>This is a type of solution that makes it possible to extends FIB-Compute 
+           to compute all needed network information at a single autonomous network, 
+           addressing the distributed information challenge. Assume that 
+           use an ALTO server at the source network to abstract and expose 
            the information. One natural candidate is to modify the routing control 
            plane itself: BGP extensions, which can be extended to collect needed 
            information and propagate upstream. For example, when a BGP router at AS A 
@@ -358,7 +378,7 @@
       </section>
 
       <section anchor="solution-data-path-sampling" numbered="true" toc="default">
-        <name>Candidate Solution: FIB-Apply Based Design</name>
+        <name>FIB-Apply Based Design</name>
         
         <t>This is a type of solution that allows data path to collect control 
            plane information. For example, a traceroute based system called PerfSonar 
@@ -375,21 +395,28 @@
       </section>
 
 
-      <section anchor="solution-alto" numbered="true" toc="default">
-        <name>Candidate Solution: Multi-Domain ALTO Composition</name>
-        <t>This is an ALTO based system, and consists of two components: (1) it introduces a new abstraction of each autonomous network and associated query process to allow multi-domain ALTO information composition; and (2) it introduces a generic-path model at ALTO clients so that they can use the acquired information to gradually refine network information.
-        </t>
+      <section anchor="solution-x-alto" numbered="true" toc="default">
+        <name>Multi-Domain Cascading ALTO</name>
 
-        <section anchor="solution-alto-server" numbered="true" toc="default">
-          <name>ALTO Server Multi-Domain Information Model</name>
+        <t>This is a model that is presented by Ingmar Poese as Cascading 
+          ALTO at IETF 116. For Cascading ALTO by Poese, please see his IETF 116 slides.</t>
 
-          <t>In the ALTO base model, a network is a container, with endpoints 
-          attached to the big switch. In the multi-domain model, each network 
-          (represented by an ALTO server) has a set of ingress points (in-1 to in-m) and a set of egress points (e-1 to e-n). An endpoint belonging to the network will be attached to an ingress point and an egress point. Hence, a single-domain ALTO query will specify ingress and egress directly attached to an ingress point and an egress point. A source network, to a destination that is not in the same network, however, will only return the egress point; a destination network, when the source is from a different network, will need an ingress 
-          point. A general transit network will need an ingress point and return egress point. For consistency, the egress point must be a valid ingress point, represented by a unique address, of the peer.
-          </t>  
+        <t>In the ALTO base model, a network is a container, which we call a big 
+             switch, with endpoints attached to the big switch. In the multi-domain
+             model, each network (represented by an ALTO server) has a set of ingress 
+             points (in-1 to in-m) and a set of egress points (e-1 to e-n). An 
+             endpoint belonging to the network will be attached to an ingress point 
+             and an egress point. Hence, a single-domain ALTO query will specify 
+             ingress and egress directly attached to an ingress point and an egress 
+             point. A source network, to a destination that is not in the same 
+             network, however, will only return the egress point; a destination 
+             network, when the source is from a different network, will need an 
+             ingress point. A general transit network will need an ingress point and 
+             return egress point. For consistency, the egress point must be a valid 
+             ingress point, represented by a unique address, of the peer.
+        </t>  
 
-          <artwork name="" type="" align="left" alt=""><![CDATA[
+        <artwork name="" type="" align="left" alt=""><![CDATA[
 
                                                                                 
             in-1   +-------------+  e-1                                         
@@ -401,43 +428,47 @@
                    |             |                                              
                ----|             |----                                          
             in-m   +-------------+  e-n                                         
-          ]]></artwork>
+        ]]></artwork>
 
-          <t>ALTO Server Multi-domain Query Model: Each ECS query, if the src is not in the home domain of the ALTO 
-          server, should include an ingress point, where the ingress point is returned by the 
-          ALTO server of the previous domain. If the domain of the ALTO server is not the home domain of the destination, the ALTO server should return the egress point of the home domain and the ingress of the network domain.</t>
+        <t>ALTO Server Multi-domain Query Model: Each ECS query, if the src is not in the home domain of the ALTO 
+        server, should include an ingress point, where the ingress point is returned by the 
+        ALTO server of the previous domain. If the domain of the ALTO server is not the home domain of the destination, the ALTO server should return the egress point of the home domain and the ingress of the network domain.</t>
 
-          <t>As an optional feature, the query should allow indication of iterative or recursive queries.</t>
+        <t>As an optional feature, the query should allow indication of iterative or recursive queries.</t>
 
-          <t>To support incremental deployment, an ALTO server may respond to a query without specifying an ingress point and the source is not in the domain of the ALTO server. In this case, the ALTO server will return the results from each potential ingress points. For each ingress point indicated, the server indicates information of the previous hop (e.g., peer AS number and potential address).</t>
+        <t>To support incremental deployment, an ALTO server may respond to a query without specifying an ingress point and the source is not in the domain of the ALTO server. In this case, the ALTO server will return the results from each potential ingress points. For each ingress point indicated, the server indicates information of the previous hop (e.g., peer AS number and potential address).</t>
 
-        </section>
+      </section> <!-- x-alto -->
 
-        <section anchor="solution-alto-client" numbered="true" toc="default">
-          <name>ALTO Client General-Path Model</name>
+      <section anchor="solution-alto-general-path" numbered="true" toc="default">
+        <name>General-Path Model Supporting Partial Deployment</name>
 
-          <t>In particular, it allows the path from a src to a dst to be a directed acyclic graph, with the following components:</t>
+        <t>Complementing the cascading model, we introduced a generic-path model at 
+           ALTO clients so that they can use the acquired information to gradually 
+           refine network information.
+        </t>
 
-          <t>A set of nodes, where each node has both a type, and attributes, where the type 
+        <t>In particular, it allows the path from a src to a dst to be a directed acyclic graph, with the following components:</t>
+
+        <t>A set of nodes, where each node has both a type, and attributes, where the type 
             can be 
             (1) host: such as src/dst, with attributes such as IP address; 
             (2) AS: which is a group of nodes, i.e., subgraph, with attributes including ASN; 
             (3) router, with subtypes such as BGP-router, with attributes such as IP address. </t>
 
-          <t>A set of links, where each link has a head and a tail; hence the types of links 
+        <t>A set of links, where each link has a head and a tail; hence the types of links 
             will be the unique combinations of head-type x tail type. A link can have its attributes as well.</t>
 
-          <t>Now, some examples of this representation in our deployment use case:</t>
+        <t>Now, some examples of this representation in our deployment use case:</t>
 
-          <t>For the geo-distance ALTO cost derived from geo-ip: the src is a host and the dst is also a host, and the metric is the geo distance;</t>
+        <t>For the geo-distance ALTO cost derived from geo-ip: the src is a host and the dst is also a host, and the metric is the geo distance;</t>
 
 
-          <t>For CERN looking glass ALTO server, from a src host in CERN to a dst host in another network, say KIT, the src is a host, with two links, one for each of the two looking glass BGP routers from cern; each of these BGP routers links to its BGP peer, and each such BGP peer links to the next AS, in the AS-PATH exposed by CERN.</t>
-        </section>  
+        <t>For CERN looking glass ALTO server, from a src host in CERN to a dst host in another network, say KIT, the src is a host, with two links, one for each of the two looking glass BGP routers from cern; each of these BGP routers links to its BGP peer, and each such BGP peer links to the next AS, in the AS-PATH exposed by CERN.</t>
+        
+      </section> <!-- general path model -->
 
-      </section>
-
-    </section>
+    </section> <!-- solution -->
 
 
     <section anchor="ianaconsider" numbered="true" toc="default">

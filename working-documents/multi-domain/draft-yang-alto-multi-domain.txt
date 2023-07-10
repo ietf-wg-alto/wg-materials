@@ -3,31 +3,33 @@
 
 
 ALTO Working Group                                             D. Lachos
-Internet-Draft                                                    Benocs
-Intended status: Standards Track                              M. Lassnig
-Expires: 11 January 2024                                            CERN
-                                                           J. Ros Giralt
-                                                                Qualcomm
+Internet-Draft                                                  I. Poese
+Intended status: Standards Track                                  Benocs
+Expires: 11 January 2024                                      M. Lassnig
+                                                                    CERN
                                                                    A. Gu
                                                                  Y. Yang
                                                          Yale University
+                                                           J. Ros Giralt
+                                                                Qualcomm
                                                             10 July 2023
 
 
                 ALTO Multi-Domain Use Cases and Services
-                    draft-yang-alto-multi-domain-01
+                    draft-yang-alto-multi-domain-02
 
 Abstract
 
    Application-Layer Traffic Optimization (ALTO) provides means for
-   network applications to obtain network information.  In the
-   definitions of ALTO services ([RFC7285] and existing extensions),
-   there is no requirement on whether the source and the destination
-   endpoints must belong to the same autonomous network, which is a
-   single-domain setting, or they can belong to different autonomous
-   networks, which is a multi-domain setting.  This document explains
-   problems of realizing ALTO in multi-domain settings and then presents
-   3 potential solutions to realize ALTO multi-domain services.
+   network applications to obtain network information.  Although ALTO is
+   inherently multi-domain, in that the ALTO server representing the
+   network and the ALTO client requesting the network information belong
+   to different trust domains, there are more general cases where the
+   path from the source and the destination spans multiple autonomous
+   networks, which we call multi-domain settings.  This document first
+   gives 3 multi-domain use cases, and the challenges to address the
+   challenges.  It then gives a brief update on the implementation
+   solutions that we explored to address the challenges.
 
 Requirements Language
 
@@ -46,8 +48,6 @@ Status of This Memo
    Task Force (IETF).  Note that other groups may also distribute
    working documents as Internet-Drafts.  The list of current Internet-
    Drafts is at https://datatracker.ietf.org/drafts/current/.
-
-
 
 
 
@@ -90,19 +90,19 @@ Table of Contents
      3.1.  Challenge: Distributed Information  . . . . . . . . . . .   6
      3.2.  Challenge: Partial Deployment . . . . . . . . . . . . . .   6
    4.  Solution Space Exploration  . . . . . . . . . . . . . . . . .   7
-     4.1.  Solution Space to Obtain Forwarding Information Base
-           (FIB) . . . . . . . . . . . . . . . . . . . . . . . . . .   7
-     4.2.  Candidate Solution: FIB-Compute Based Design  . . . . . .   7
-     4.3.  Candidate Solution: FIB-Apply Based Design  . . . . . . .   8
-     4.4.  Candidate Solution: Multi-Domain ALTO Composition . . . .   8
-       4.4.1.  ALTO Server Multi-Domain Information Model  . . . . .   8
-       4.4.2.  ALTO Client General-Path Model  . . . . . . . . . . .   9
+     4.1.  Solution Space to Obtain Forwarding Information Bases
+           (FIBs)  . . . . . . . . . . . . . . . . . . . . . . . . .   7
+     4.2.  FIB-Compute Based Design  . . . . . . . . . . . . . . . .   7
+     4.3.  FIB-Apply Based Design  . . . . . . . . . . . . . . . . .   8
+     4.4.  Multi-Domain Cascading ALTO . . . . . . . . . . . . . . .   8
+     4.5.  General-Path Model Supporting Partial Deployment  . . . .   9
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
    6.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  10
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
      7.2.  Informative References  . . . . . . . . . . . . . . . . .  10
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  10
+
 
 
 
@@ -344,48 +344,48 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    use cases, multiple potential solutions are implemented.  Below we
    discuss them briefly to motivate discussions.
 
-4.1.  Solution Space to Obtain Forwarding Information Base (FIB)
+4.1.  Solution Space to Obtain Forwarding Information Bases (FIBs)
 
    Obtaining FIBs is a basic building block of implementing ALTO route-
    related visibility services.  At a high-level, FIBs have the
    following life cycle:
 
    FIB-Configure/input:
-      Each router is configured with its configuration.  Each router
-      also takes its external input such as BGP routes from peers.
+      Consider a network as a distributed system.  Then the input to the
+      distributed system is the input to the components: the routers.
+      The input to each router is its configuration, and external input
+      such as BGP routes from peers outside the network.
 
    FIB-Compute:
-      A distributed system computes the FIBs.  During the computing
-      process, the vendor specific configuration may be turned into
-      standard format such as IGP information model.
+      The distributed system computes the FIBs using a distributed
+      protocol (or configured by a logically centralized control plane).
+      During the computing process, the vendor specific configuration
+      may be turned into standard format such as IGP information model.
 
    FIB-Apply:
-      The FIBs are applied.  When applied to data packets, the
-      application may be observed by NetFlow/sFlow or similar capturing
-      capabilities; it may also be applied to control such as traceoute,
-      which can be observed.
+      The FIBs are computed and then applied.  When FIBs are applied to
+      data packets, the application may be observed by NetFlow/sFlow or
+      similar capturing capabilities; it may also be applied to control
+      mechanisms such as traceoute, which can be observed.
 
-4.2.  Candidate Solution: FIB-Compute Based Design
+4.2.  FIB-Compute Based Design
 
-   This is a type of solution that makes it possible to extends
-   FIB_Compute to collect all needed network information at a single
-   autonomous network, and then use an ALTO server at the source network
-   to abstract and expose the information.  One natural candidate is to
-   modify the routing control plane itself: BGP extensions, which can be
-   extended to collect needed information and propagate upstream.  For
-   example, when a BGP router at AS A (e.g., ai1) propagates BGP info to
-   its peer at AS S (se1), it includes not only the AS-PATH [A, B, D],
-   but also additional information so that the upstream can construct
-   the complete path cost (distance) metrics.
+   This is a type of solution that makes it possible to extends FIB-
+   Compute to compute all needed network information at a single
+   autonomous network, addressing the distributed information challenge.
+   Assume that use an ALTO server at the source network to abstract and
+   expose the information.  One natural candidate is to modify the
+   routing control plane itself: BGP extensions, which can be extended
+   to collect needed information and propagate upstream.  For example,
+   when a BGP router at AS A (e.g., ai1) propagates BGP info to its peer
+   at AS S (se1), it includes not only the AS-PATH [A, B, D], but also
+   additional information so that the upstream can construct the
+   complete path cost (distance) metrics.
 
    The upside of this design is that it integrates with routing system
    and hence may even extend routing capabilities.  However, routing
    protocol extensions can be complex in deployment.  Further, it
    provides a different trust model: the original ALTO model is a star
-   trust model, with the application (e.g., Rucio/FTS) at the hub and
-   each AS needs to trust the application.  The BGP extension model
-   requires the trust of peers and recursive peers (BGP community may be
-   used to impose policies).
 
 
 
@@ -394,7 +394,12 @@ Lachos, et al.           Expires 11 January 2024                [Page 7]
 Internet-Draft              ALTO Multi-Domain                  July 2023
 
 
-4.3.  Candidate Solution: FIB-Apply Based Design
+   trust model, with the application (e.g., Rucio/FTS) at the hub and
+   each AS needs to trust the application.  The BGP extension model
+   requires the trust of peers and recursive peers (BGP community may be
+   used to impose policies).
+
+4.3.  FIB-Apply Based Design
 
    This is a type of solution that allows data path to collect control
    plane information.  For example, a traceroute based system called
@@ -408,31 +413,26 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    resulting in node aliasing; load balancing routing resulting in link
    aliasing.
 
-4.4.  Candidate Solution: Multi-Domain ALTO Composition
+4.4.  Multi-Domain Cascading ALTO
 
-   This is an ALTO based system, and consists of two components: (1) it
-   introduces a new abstraction of each autonomous network and
-   associated query process to allow multi-domain ALTO information
-   composition; and (2) it introduces a generic-path model at ALTO
-   clients so that they can use the acquired information to gradually
-   refine network information.
+   This is a model that is presented by Ingmar Poese as Cascading ALTO
+   at IETF 116.  For Cascading ALTO by Poese, please see his IETF 116
+   slides.
 
-4.4.1.  ALTO Server Multi-Domain Information Model
-
-   In the ALTO base model, a network is a container, with endpoints
-   attached to the big switch.  In the multi-domain model, each network
-   (represented by an ALTO server) has a set of ingress points (in-1 to
-   in-m) and a set of egress points (e-1 to e-n).  An endpoint belonging
-   to the network will be attached to an ingress point and an egress
-   point.  Hence, a single-domain ALTO query will specify ingress and
-   egress directly attached to an ingress point and an egress point.  A
-   source network, to a destination that is not in the same network,
-   however, will only return the egress point; a destination network,
-   when the source is from a different network, will need an ingress
-   point.  A general transit network will need an ingress point and
-   return egress point.  For consistency, the egress point must be a
-   valid ingress point, represented by a unique address, of the peer.
-
+   In the ALTO base model, a network is a container, which we call a big
+   switch, with endpoints attached to the big switch.  In the multi-
+   domain model, each network (represented by an ALTO server) has a set
+   of ingress points (in-1 to in-m) and a set of egress points (e-1 to
+   e-n).  An endpoint belonging to the network will be attached to an
+   ingress point and an egress point.  Hence, a single-domain ALTO query
+   will specify ingress and egress directly attached to an ingress point
+   and an egress point.  A source network, to a destination that is not
+   in the same network, however, will only return the egress point; a
+   destination network, when the source is from a different network,
+   will need an ingress point.  A general transit network will need an
+   ingress point and return egress point.  For consistency, the egress
+   point must be a valid ingress point, represented by a unique address,
+   of the peer.
 
 
 
@@ -477,7 +477,11 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    ingress point indicated, the server indicates information of the
    previous hop (e.g., peer AS number and potential address).
 
-4.4.2.  ALTO Client General-Path Model
+4.5.  General-Path Model Supporting Partial Deployment
+
+   Complementing the cascading model, we introduced a generic-path model
+   at ALTO clients so that they can use the acquired information to
+   gradually refine network information.
 
    In particular, it allows the path from a src to a dst to be a
    directed acyclic graph, with the following components:
@@ -494,10 +498,6 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
 
    Now, some examples of this representation in our deployment use case:
 
-   For the geo-distance ALTO cost derived from geo-ip: the src is a host
-   and the dst is also a host, and the metric is the geo distance;
-
-
 
 
 
@@ -505,6 +505,9 @@ Lachos, et al.           Expires 11 January 2024                [Page 9]
 
 Internet-Draft              ALTO Multi-Domain                  July 2023
 
+
+   For the geo-distance ALTO cost derived from geo-ip: the src is a host
+   and the dst is also a host, and the metric is the geo distance;
 
    For CERN looking glass ALTO server, from a src host in CERN to a dst
    host in another network, say KIT, the src is a host, with two links,
@@ -550,10 +553,7 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
 
 Authors' Addresses
 
-   Danny Lachos
-   Benocs
-   Berlin
-   Germany
+
 
 
 
@@ -562,7 +562,18 @@ Lachos, et al.           Expires 11 January 2024               [Page 10]
 Internet-Draft              ALTO Multi-Domain                  July 2023
 
 
+   Danny Lachos
+   Benocs
+   Berlin
+   Germany
    Email: dlachos@benocs.com
+
+
+   Ingmar Poese
+   Benocs
+   Berlin
+   Germany
+   Email: ingmar@benocs.com
 
 
    Mario Lassnig
@@ -570,13 +581,6 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    CH-1211 Geneva 23
    Switzerland
    Email: mario.lassnig@cern.ch
-
-
-   Jordi Ros Giralt
-   Qualcomm
-   Madrid
-   Spain
-   Email: jros@qti.qualcomm.com
 
 
    Annie Gu
@@ -595,15 +599,11 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    Email: yry@cs.yale.edu
 
 
-
-
-
-
-
-
-
-
-
+   Jordi Ros Giralt
+   Qualcomm
+   Madrid
+   Spain
+   Email: jros@qti.qualcomm.com
 
 
 
