@@ -16,7 +16,7 @@ Expires: 11 January 2024                                      M. Lassnig
 
 
                 ALTO Multi-Domain Use Cases and Services
-                    draft-yang-alto-multi-domain-02
+                    draft-yang-alto-multi-domain-03
 
 Abstract
 
@@ -85,14 +85,14 @@ Table of Contents
    2.  Multi-domain Use Cases  . . . . . . . . . . . . . . . . . . .   3
      2.1.  Multi-domain Path Distance/Ranking for Rucio  . . . . . .   3
      2.2.  Multi-domain Path -> Link Mapping for FTS . . . . . . . .   5
-     2.3.  Multi-domain Resource Discovery for NOTED/SENSE . . . . .   5
+     2.3.  Multi-domain Resource Discovery for NOTED/SENSE . . . . .   6
    3.  Multi-domain Challenges . . . . . . . . . . . . . . . . . . .   6
      3.1.  Challenge: Distributed Information  . . . . . . . . . . .   6
-     3.2.  Challenge: Partial Deployment . . . . . . . . . . . . . .   6
+     3.2.  Challenge: Partial Deployment . . . . . . . . . . . . . .   7
    4.  Solution Space Exploration  . . . . . . . . . . . . . . . . .   7
      4.1.  Solution Space to Obtain Forwarding Information Bases
            (FIBs)  . . . . . . . . . . . . . . . . . . . . . . . . .   7
-     4.2.  FIB-Compute Based Design  . . . . . . . . . . . . . . . .   7
+     4.2.  FIB-Compute Based Design  . . . . . . . . . . . . . . . .   8
      4.3.  FIB-Apply Based Design  . . . . . . . . . . . . . . . . .   8
      4.4.  Multi-Domain Cascading ALTO . . . . . . . . . . . . . . .   8
      4.5.  General-Path Model Supporting Partial Deployment  . . . .   9
@@ -100,8 +100,8 @@ Table of Contents
    6.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  10
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .  10
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  10
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .  11
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
 
 
 
@@ -122,20 +122,21 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    ALTO in [RFC7285] can provide the network-path properties (e.g.,
    routing costs, or relative ranking) of data transmissions from a set
    of source network locations to a set of destination network
-   locations.  The Path Vector Service allows ALTO to provide bandwidth
-   availability (bottlenecks) for a given set of flows defined by a set
-   of source-destination pairs.
+   locations.  The Path Vector Service [RFC9275] allows ALTO to provide
+   bandwidth availability (bottlenecks) for a given set of flows defined
+   by a set of source-destination pairs.
 
-   Although such services can provide values when only a single network,
-   called a single-domain, provides these services, there are many use
-   cases where multiple networks, called multi-domains, can be involved
-   from a given source to a given destination.  [RFC7971] states that
-   "The ALTO protocol is designed for use cases where the ALTO server
-   and client can be located in different organizations or trust
-   domains.  ALTO is inherently designed for use in multi-domain
-   environments.  Most importantly, ALTO is designed to enable
-   deployments in which the ALTO server and the ALTO client are not
-   located within the same administrative domain."
+   Although such services can provide values when the network path from
+   a given source to a given destination spans only a single network,
+   called a single-domain setting, provides these services, there are
+   many use cases where the path may span multiple networks, called
+   multi-domains settings.  [RFC7971] states that "The ALTO protocol is
+   designed for use cases where the ALTO server and client can be
+   located in different organizations or trust domains.  ALTO is
+   inherently designed for use in multi-domain environments.  Most
+   importantly, ALTO is designed to enable deployments in which the ALTO
+   server and the ALTO client are not located within the same
+   administrative domain."
 
    This document first specifies three multi-domain use cases.  It then
    discusses the two challenges when deploying ALTO in multi-domain
@@ -152,8 +153,22 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
 
    The data orchestration system of CERN/WLCG is Rucio, which selects a
    source for a given downloading client when multiple sources provide
-   the data set.  Rucio also conducts destination selection, when
+   the dataset.  Rucio also conducts destination selection, when
    multiple destinations can be the target locations for replication.
+
+
+
+
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 3]
+
+Internet-Draft              ALTO Multi-Domain                  July 2023
+
 
    The main mechanism of source/destination selection in Rucio is
    distance, which is a perfect match for ALTO cost services; see
@@ -161,13 +176,7 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    Rucio.  Specifically, consider the following ECS query realizing ALTO
    ECS for Rucio to do destination selection.  The source is located at
    CERN and the destination candidates are at multiple locations of the
-   LHCONE network (BNL, Caltech, and KIT, for example).
-
-
-
-Lachos, et al.           Expires 11 January 2024                [Page 3]
-
-Internet-Draft              ALTO Multi-Domain                  July 2023
+   LHCONE network (AGLT, BNL, and KIT, for example).
 
 
      POST /endpointcost/lookup HTTP/1.1
@@ -181,9 +190,9 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
        "cost-type": {"cost-mode" : "numerical",
                      "cost-metric" : "routingcost"},
        "endpoints" : {
-         "srcs": [ "ipv4:128.141.201.74" ],
+         "srcs": [ "ipv4:188.184.9.234" ],
          "dsts": [
-           "ipv4:130.199.4.27",
+           "ipv4:192.41.231.81",
            "ipv4:104.18.24.74",
            "ipv4:141.3.128.6"
          ]
@@ -202,28 +211,29 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
          }
        },
        "endpoint-cost-map" : {
-         "ipv4:128.141.201.74": {
-           "ipv4:130.199.4.27" : 20,
+         "ipv4:188.184.9.234": {
+           "ipv4:192.41.231.81" : 20,
            "ipv4:104.18.24.74" : 30,
            "ipv4:141.3.128.6"  : 10
          }
        }
      }
 
-   The use case provides an example of a multi-domain setting, because
-   the source and the destinations are located at different networks and
-   the network paths span multiple autonomous networks.  Figure 1 below
-   illustrates a network path from src to dst spanning four networks.
-
-
-
-
-
 
 
 Lachos, et al.           Expires 11 January 2024                [Page 4]
 
 Internet-Draft              ALTO Multi-Domain                  July 2023
+
+
+   The use case provides an example of a multi-domain setting, because
+   the source and the destinations are located at different networks and
+   the network paths span multiple autonomous networks.  For example,
+   the path from CERN (188.184.9.234) to AGLT2 (192.41.231.81) spans
+   CERN, ESNet and U.  Michigan to reach the destination.
+
+   Figure 1 below illustrates a network path from src to dst spanning
+   four networks.
 
 
          AS S              AS A        AS B         AS D
@@ -257,18 +267,8 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    each link, FTS needs to know the network paths, and the paths span
    multiple autonomous networks.
 
-2.3.  Multi-domain Resource Discovery for NOTED/SENSE
 
-   An emerging capacity for LHCONE/WLCG is the ability to create new
-   paths to obtain additional capacity when there is high demand from a
-   given source storage element (SE) to a destination element (SE).  In
-   particular, the NOTED project monitors the backlog at Rucio/FTS for
-   each source SE, destination SE pair, and may decide to create a path
-   if one pair has a large backlog.
 
-   To identify available networking capacity, ALTO Path Vector Service
-   (PVS) is an ideal service.  However, as we see from Figure 1, the
-   setting can be a multi-domain setting.
 
 
 
@@ -281,6 +281,19 @@ Lachos, et al.           Expires 11 January 2024                [Page 5]
 
 Internet-Draft              ALTO Multi-Domain                  July 2023
 
+
+2.3.  Multi-domain Resource Discovery for NOTED/SENSE
+
+   An emerging capacity for LHCONE/WLCG is the ability to create new
+   paths to obtain additional capacity when there is high demand from a
+   given source storage element (SE) to a destination element (SE).  In
+   particular, the NOTED project monitors the backlog at Rucio/FTS for
+   each source SE, destination SE pair, and may decide to create a path
+   if one pair has a large backlog.
+
+   To identify available networking capacity, ALTO Path Vector Service
+   (PVS) is an ideal service.  However, as we see from Figure 1, the
+   setting can be a multi-domain setting.
 
 3.  Multi-domain Challenges
 
@@ -312,6 +325,19 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    Hence, an ALTO server provided by AS S cannot provide all of the
    information for the example ECS query.
 
+
+
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 6]
+
+Internet-Draft              ALTO Multi-Domain                  July 2023
+
+
    Non-Source AS: A non-source AS knows the AS-PATH starting from itself
    to dst.  But it may not know the ingress point.  For example, AS A
    does not know whether the packet will come in from ai1 or ai2.
@@ -327,16 +353,6 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    information (see below), but one challenge is that the deployment may
    be only incremental and hence is partially deployed during the
    process.
-
-
-
-
-
-
-Lachos, et al.           Expires 11 January 2024                [Page 6]
-
-Internet-Draft              ALTO Multi-Domain                  July 2023
-
 
 4.  Solution Space Exploration
 
@@ -368,6 +384,16 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
       similar capturing capabilities; it may also be applied to control
       mechanisms such as traceoute, which can be observed.
 
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 7]
+
+Internet-Draft              ALTO Multi-Domain                  July 2023
+
+
 4.2.  FIB-Compute Based Design
 
    This is a type of solution that makes it possible to extends FIB-
@@ -386,14 +412,6 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    and hence may even extend routing capabilities.  However, routing
    protocol extensions can be complex in deployment.  Further, it
    provides a different trust model: the original ALTO model is a star
-
-
-
-Lachos, et al.           Expires 11 January 2024                [Page 7]
-
-Internet-Draft              ALTO Multi-Domain                  July 2023
-
-
    trust model, with the application (e.g., Rucio/FTS) at the hub and
    each AS needs to trust the application.  The BGP extension model
    requires the trust of peers and recursive peers (BGP community may be
@@ -424,6 +442,14 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    domain model, each network (represented by an ALTO server) has a set
    of ingress points (in-1 to in-m) and a set of egress points (e-1 to
    e-n).  An endpoint belonging to the network will be attached to an
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 8]
+
+Internet-Draft              ALTO Multi-Domain                  July 2023
+
+
    ingress point and an egress point.  Hence, a single-domain ALTO query
    will specify ingress and egress directly attached to an ingress point
    and an egress point.  A source network, to a destination that is not
@@ -433,21 +459,6 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    ingress point and return egress point.  For consistency, the egress
    point must be a valid ingress point, represented by a unique address,
    of the peer.
-
-
-
-
-
-
-
-
-
-
-
-
-Lachos, et al.           Expires 11 January 2024                [Page 8]
-
-Internet-Draft              ALTO Multi-Domain                  July 2023
 
 
                in-1   +-------------+  e-1
@@ -486,6 +497,15 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    In particular, it allows the path from a src to a dst to be a
    directed acyclic graph, with the following components:
 
+
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 9]
+
+Internet-Draft              ALTO Multi-Domain                  July 2023
+
+
    A set of nodes, where each node has both a type and attributes, where
    the type can be (1) host: such as src/dst, with attributes such as IP
    address; (2) AS: which is a group of nodes, i.e., subgraph, with
@@ -497,14 +517,6 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    type.  A link can have its attributes as well.
 
    Now, some examples of this representation in our deployment use case:
-
-
-
-
-Lachos, et al.           Expires 11 January 2024                [Page 9]
-
-Internet-Draft              ALTO Multi-Domain                  July 2023
-
 
    For the geo-distance ALTO cost derived from geo-ip: the src is a host
    and the dst is also a host, and the metric is the geo distance.
@@ -543,6 +555,13 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
+
+
+Lachos, et al.           Expires 11 January 2024               [Page 10]
+
+Internet-Draft              ALTO Multi-Domain                  July 2023
+
+
 7.2.  Informative References
 
    [RFC7971]  Stiemerling, M., Kiesel, S., Scharf, M., Seidel, H., and
@@ -551,16 +570,12 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
               DOI 10.17487/RFC7971, October 2016,
               <https://www.rfc-editor.org/info/rfc7971>.
 
+   [RFC9275]  Gao, K., Lee, Y., Randriamasy, S., Yang, Y., and J. Zhang,
+              "An Extension for Application-Layer Traffic Optimization
+              (ALTO): Path Vector", RFC 7971, DOI 10.17487/RFC7971,
+              September 2022, <https://www.rfc-editor.org/info/rfc9275>.
+
 Authors' Addresses
-
-
-
-
-
-Lachos, et al.           Expires 11 January 2024               [Page 10]
-
-Internet-Draft              ALTO Multi-Domain                  July 2023
-
 
    Danny Lachos
    Benocs
@@ -591,6 +606,18 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    Email: annie.gu@yale.edu
 
 
+
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024               [Page 11]
+
+Internet-Draft              ALTO Multi-Domain                  July 2023
+
+
    Y. Richard Yang
    Yale University
    51 Prospect St
@@ -613,4 +640,33 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
 
 
 
-Lachos, et al.           Expires 11 January 2024               [Page 11]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024               [Page 12]

@@ -7,13 +7,13 @@
 ]>
 <!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
      by Daniel M Kohn (private) -->
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-yang-alto-multi-domain-02" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-yang-alto-multi-domain-03" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
   <!-- xml2rfc v2v3 conversion 3.12.10 -->
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
   <front>
     <title abbrev="ALTO Multi-Domain">ALTO Multi-Domain Use Cases and Services</title>
-    <seriesInfo name="Internet-Draft" value="draft-yang-alto-multi-domain-02"/>
+    <seriesInfo name="Internet-Draft" value="draft-yang-alto-multi-domain-03"/>
 
     <author fullname="Danny Lachos" initials="D." surname="Lachos">
       <organization>Benocs</organization>
@@ -132,14 +132,16 @@
          network-path properties (e.g., routing costs, or relative 
          ranking) of data transmissions from a set of source network 
          locations to a set of destination network locations. The 
-         Path Vector Service allows ALTO to provide bandwidth 
+         Path Vector Service <xref target="RFC9275" format="default"/>  
+         allows ALTO to provide bandwidth 
          availability (bottlenecks) for a given set of flows defined
          by a set of source-destination pairs. </t>
 
-      <t>Although such services can provide values when only a single
-         network, called a single-domain, provides these services, there
-         are many use cases where multiple networks, called multi-domains, 
-         can be involved from a given source to a given destination. 
+      <t>Although such services can provide values when the network 
+         path from a given source to a given destination spans only 
+         a single network, called a single-domain setting, provides 
+         these services, there are many use cases where the path 
+         may span multiple networks, called multi-domains settings.  
          <xref target="RFC7971" format="default"/> states that "The 
          ALTO protocol is designed for use cases where the ALTO server 
          and client can be located in different organizations or trust 
@@ -166,7 +168,7 @@
 
         <t>The data orchestration system of CERN/WLCG is Rucio, which 
            selects a source for a given downloading client when multiple sources 
-           provide the data set. Rucio also conducts destination selection, when 
+           provide the dataset. Rucio also conducts destination selection, when 
            multiple destinations can be the target locations for replication.</t> 
 
         <t>The main mechanism of source/destination selection in Rucio is distance, 
@@ -174,7 +176,7 @@
            of the full source/destination mecahnisms of Rucio. Specifically, consider 
            the following ECS query realizing ALTO ECS for Rucio to do destination 
            selection. The source is located at CERN and the destination candidates 
-           are at multiple locations of the LHCONE network (BNL, Caltech, and KIT, 
+           are at multiple locations of the LHCONE network (AGLT, BNL, and KIT, 
            for example).</t>
 
         <artwork name="" type="" align="left" alt=""><![CDATA[        
@@ -189,9 +191,9 @@
     "cost-type": {"cost-mode" : "numerical",
                   "cost-metric" : "routingcost"},
     "endpoints" : {
-      "srcs": [ "ipv4:128.141.201.74" ],
+      "srcs": [ "ipv4:188.184.9.234" ],
       "dsts": [
-        "ipv4:130.199.4.27",
+        "ipv4:192.41.231.81",
         "ipv4:104.18.24.74",
         "ipv4:141.3.128.6"        
       ]
@@ -210,8 +212,8 @@
       }
     },
     "endpoint-cost-map" : {
-      "ipv4:128.141.201.74": {
-        "ipv4:130.199.4.27" : 20,
+      "ipv4:188.184.9.234": {
+        "ipv4:192.41.231.81" : 20,
         "ipv4:104.18.24.74" : 30,
         "ipv4:141.3.128.6"  : 10
       }
@@ -221,9 +223,12 @@
         
         <t>The use case provides an example of a multi-domain setting, because 
            the source and the destinations are located at different networks and
-           the network paths span multiple autonomous networks. Figure 1 below
-           illustrates a network path from src to dst spanning four networks.
-        </t>
+           the network paths span multiple autonomous networks. For example, the path 
+           from CERN (188.184.9.234) to AGLT2 (192.41.231.81) spans CERN, ESNet and U. Michigan to reach the destination.</t>
+
+           
+        <t>Figure 1 below illustrates a network path from src to dst spanning four 
+          networks.</t>
 
         <artwork name="" type="" align="left" alt=""><![CDATA[                                                                                       
       AS S              AS A        AS B         AS D            
@@ -587,6 +592,47 @@
             <date year="2016" month="October"/>
             <abstract>
               <t>Many Internet applications are used to access resources such as pieces of information or server processes that are available in several equivalent replicas on different hosts.  This includes, but is not limited to, peer-to-peer file sharing applications.  The goal of Application-Layer Traffic Optimization (ALTO) is to provide guidance to applications that have to select one or several hosts from a set of candidates capable of providing a desired resource. This memo discusses deployment-related issues of ALTO.  It addresses different use cases of ALTO such as peer-to-peer file sharing and Content Delivery Networks (CDNs) and presents corresponding examples. The document also includes recommendations for network administrators and application designers planning to deploy ALTO, such as recommendations on how to generate ALTO map information.</t>
+            </abstract>
+          </front>
+          <seriesInfo name="RFC" value="7971"/>
+          <seriesInfo name="DOI" value="10.17487/RFC7971"/>
+        </reference>
+        <!-- requirements -->
+
+        <reference anchor="RFC9275" target="https://www.rfc-editor.org/info/rfc9275" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.9275.xml">
+          <front>
+            <title>An Extension for Application-Layer Traffic Optimization (ALTO): Path Vector</title>
+            <author initials="K." surname="Gao" fullname="K. Gao">
+              <organization/>
+            </author>
+            <author initials="Y." surname="Lee" fullname="Y. Lee">
+              <organization/>
+            </author>
+            <author initials="S." surname="Randriamasy" fullname="S. Randriamasy">
+              <organization/>
+            </author>
+            <author initials="Y." surname="Yang" fullname="Y. Yang">
+              <organization/>
+            </author>
+            <author initials="J." surname="Zhang" fullname="J. Zhang">
+              <organization/>
+            </author>
+            <date year="2022" month="September"/>
+            <abstract>
+              <t>This document is an extension to the base Application-Layer Traffic
+   Optimization (ALTO) protocol.  It extends the ALTO cost map and ALTO
+   property map services so that an application can decide to which
+   endpoint(s) to connect based not only on numerical/ordinal cost
+   values but also on fine-grained abstract information regarding the
+   paths.  This is useful for applications whose performance is impacted
+   by specific components of a network on the end-to-end paths, e.g.,
+   they may infer that several paths share common links and prevent
+   traffic bottlenecks by avoiding such paths.  This extension
+   introduces a new abstraction called the "Abstract Network Element"
+   (ANE) to represent these components and encodes a network path as a
+   vector of ANEs.  Thus, it provides a more complete but still abstract
+   graph representation of the underlying network(s) for informed
+   traffic optimization among endpoints.</t>
             </abstract>
           </front>
           <seriesInfo name="RFC" value="7971"/>
