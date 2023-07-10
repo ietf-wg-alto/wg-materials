@@ -12,7 +12,7 @@
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
   <front>
-    <title abbrev="ALTO TIPS">ALTO Multi-Domain Use Cases and Services</title>
+    <title abbrev="ALTO Multi-Domain">ALTO Multi-Domain Use Cases and Services</title>
     <seriesInfo name="Internet-Draft" value="draft-yang-alto-multi-domain-02"/>
 
     <author fullname="Danny Lachos" initials="D." surname="Lachos">
@@ -111,39 +111,59 @@
   <middle>
     <section anchor="intro" numbered="true" toc="default">
       <name>Introduction</name>
-      <t>Application-Layer Traffic Optimization (ALTO) 
-      provides means for network applications to obtain network information. For example, 
-      the Endpoint Cost Service (ECS) defined by ALTO in <xref target="RFC7285" format="default"/>  
-      can provide the network costs of data transmissions from a set of sources to a set of 
-      destinations. The costs (called distances) then can be used by Rucio to rank data sources or 
-      destinations to make data orchestration decisions, where Rucio is the de facto data orchestration system of CERN experiments. 
-      </t>
 
-      <t>As another example, to extend FTS, which is the data scheduling system of CERN experiments, to realize resource allocation to multiple 
-        experiments sharing the same network link, the ongoing TCN project need the ALTO 
-        path vector service to map each source-destination pair to the links used by the pair. The project then computes the total traffic sent by each activity of each experiment on a given link, where each experiment consists of a set of activities, each activity consists of a set of data transfers, and each data transfer has a given source-destination pair. With the aggregation, TCN computes scheduling of data transfers according to resource allocation policies.</t>
-  
-      <t>In the definitions of ALTO services ([RFC7285] and existing extensions), there is no 
-        requirement on whether the source and the destination endpoints must belong to the same 
-        autonomous network, which is a single-domain setting, or they can belong to different 
-        autonomous networks, which is a multi-domain setting. The unification of a single interface
-        covering both single-domain and multi-domain settings provides a simple-to-use interface to ALTO clients. However, it leaves standardization gaps in multi-domain settings. Although participating autonomous systems can define private mechanisms to realize ALTO services in multi-domain settings, standard mechanisms allow wider deployment.
-      </t>
+      <t>Application-Layer Traffic Optimization (ALTO) provides means 
+         for network applications to obtain network information. For 
+         example, the Endpoint Cost Service (ECS) and the Cost Map 
+         Service (CMS) defined by ALTO in 
+         <xref target="RFC7285" format="default"/> can provide the 
+         network-path properties (e.g., routing costs, or relative 
+         ranking) of data transmissions from a set of source network 
+         locations to a set of destination network locations. The 
+         Path Vector Service allows ALTO to provide bandwidth 
+         availability (bottlenecks) for a given set of flows defined
+         by a set of source-destination pairs. </t>
 
-      <t>This document first specifies the issues that may arise in providing ECS in multi-domain 
-        settings. It then provides initial designs, based on current implementation experiences to start the design conversation. To be concrete, this document is based on the basic ALTO 
-        ECS service. Additional complexities such as network maps and cost maps will be discussed in
-        the next iteration.</t>
+      <t>Although such services can provide values when only a single
+         network, called a single-domain, provides these services, there
+         are many use cases where multiple networks, called multi-domains, 
+         can be involved from a given source to a given destination. 
+         <xref target="RFC7971" format="default"/> states that "The 
+         ALTO protocol is designed for use cases where the ALTO server 
+         and client can be located in different organizations or trust 
+         domains. ALTO is inherently designed for use in multi-domain 
+         environments. Most importantly, ALTO is designed to enable 
+         deployments in which the ALTO server and the ALTO client are not 
+         located within the same administrative domain.”</t>
+
+      <t>This document first specifies three multi-domain use cases. It
+         then discuss the two challenges when deploying ALTO in multi-domain
+         settings. At the end, this document provides initial designs, 
+         based on current implementation experiences to start the design 
+         conversation. </t>
 
     </section>
 
-    <section anchor="problem" numbered="true" toc="default">
-      <name>Multi-domain Problem</name>
+    <section anchor="use-cases" numbered="true" toc="default">
+      <name>Multi-domain Use Cases</name>
+      <t>To be concrete, this document uses 3 use cases from the context of
+         data-intensive sciences for CERN/WLCG. </t>
 
-      <section anchor="problem-usecase" numbered="true" toc="default">
-        <name>Use Cases</name>
-      
-        <t>Consider the following ECS query realizing ALTO ECS for LHCONE to support Rucio. The source is located at CERN and the destination candidates are at multiple locations of the LHCONE network (BNL, Caltech, and KIT, for example).</t>
+      <section anchor="usecase-rucio" numbered="true" toc="default">
+        <name>Multi-domain Path Distance/Ranking for Rucio</name>
+
+        <t>The data orchestration system of CERN/WLCG is Rucio, which 
+           selects a source for a given downloading client, when multiple sources 
+           provide the data set. Rucio also conducts destination selection, when 
+           multiple destinations can be the target locations for replication.</t> 
+
+        <t>The main mechanism of source/destination selection in Rucio is distance, 
+           which is a perfect match for ALTO cost services; see appendix for a review 
+           of the full source/destination mecahnism of Rucio. Specifically, consider 
+           the following ECS query realizing ALTO ECS for Rucio to do destination 
+           selection. The source is located at CERN and the destination candidates 
+           are at multiple locations of the LHCONE network (BNL, Caltech, and KIT, 
+           for example).</t>
 
         <artwork name="" type="" align="left" alt=""><![CDATA[        
   POST /endpointcost/lookup HTTP/1.1
@@ -186,11 +206,11 @@
     }
   }
       ]]></artwork>
-
-
-        <t>It is straightforward to change the query to be the ALTO path vector service, to support TCN: the value is a vector of network links (e.g., [link-1, link-2, ...]), not the numerical routingcost (e.g., 20).</t>
         
-        <t>The use cases provide examples of multi-domain settings, which the figure below shows. We choose one of the destinations as an example. For such a query, the path from src to dst spans multiple autonomous networks.
+        <t>The use case provide an example of a multi-domain setting, because 
+           the source and the desintations are located at different networks and
+           the network paths span multiple autonomous networks. Figure 1 below
+           illustrates a network path from src to dst spanning 4 networks.
         </t>
 
         <artwork name="" type="" align="left" alt=""><![CDATA[                                                                                       
@@ -202,21 +222,77 @@
 |+--+    \    |se2  |         |   |     |   |       +--+ |     
 |         \__ |_____|ai2   ae2|---|     |---|di2         |     
 +-------------+     +---------+   +-----+   +------------+     
-       ]]></artwork>
 
+              Figure 1. Multi-domain Network.
+
+       ]]></artwork>
+        
+      </section> <!-- Rucio Use Case --> 
+
+      <section anchor="usecase-fts" numbered="true" toc="default">
+        <name>Multi-domain Path -> Link Mapping for FTS</name>
+
+        <t>The data transport scheduling system of CERN/WLCG is FTS, which 
+           schedules given transfers, where a transfer has a fixed dataset,
+           a source and a destination (for example, chosen by Rucio).</t> 
+
+        <t>One main function of FTS is to satisfy operator resource constraints. 
+           As an example, FTS may schedule concurrent transfers
+           from CERN to CalTech and KIT, under the constraint that the total
+           transmission rate for a given link should be within a threshold. </t>
+
+        <t>Consider Figure 1. Assume S is CERN and D is CalTech. The network path 
+          from CERN to CalTech uses the top inter-AS link (se1->ai1), and 
+          the network path from CERN to KIT uses the lower inter-AS 
+          link (se2->ai2). For FTS to know how much demand it is placing on each
+          one of these two links to stay within the constraint of each link, FTS
+          needs to know the network paths, and the paths span multiple autonomous networks.</t>
       
-      </section>
+      </section> <!-- FTS Use Case --> 
+
+      <section anchor="usecase-noted" numbered="true" toc="default">
+        <name>Multi-domain Resource Discovery for NOTED/SENSE</name>
+
+        <t>An emerging capacity for LHCONE/WLCG is the ability to create new
+           paths to obtain additional capacity when there is high demand from
+           a given source storage element (SE) to a destination element (SE). 
+           In particular, the NOTED project monitors the backlog at Rucio/FTS
+           for each source SE, destination SE pair, and may decide to create
+           a path if one pair has a large backlog. </t>
+
+        <t>To identify available networking capacity, ALTO Path Vector Service 
+          (PVS) is an ideal service. However, as we see from Figure 1, the setting
+           can be a multi-domain setting. </t>   
+
+      </section> <!-- NOTED Use Case --> 
+
+    </section><!-- Use Cases -->
+
+    <section anchor="challenges" numbered="true" toc="default">
+      <name>Multi-domain Challenges</name>
       
+      <t>Although implementing ECS/CMS/PVS is relatively straightforward in a 
+         single domain, there are challenges implementing these services in
+         multi-domain settings.</t>
 
       <section anchor="problem-challenge-distinfo" numbered="true" toc="default">
         <name>Challenge: Distributed Information</name>
 
-        <t>In the Internet setting which we consider, the network information
-        of the path from the src to the dst spreads into multiple autonomous networks: 4 autonomous networks (AS A, B, and D) in the example.  BGP collects information from multiple autonomous networks through back propagation from the destination, but the information is coarse-grained, and incomplete.
+        <t>Consider Figure 1, to compute the total routing cost of the path from 
+           the src to the dst. The routing costs will consist of multiple segments
+           spanning 4 autonomous networks: (1) from src to the link connecting the 
+           egress of AS S (se1) and the ingress of AS A (ia1); (2) from the ingress
+           of A to the ingress of B; (3) from the ingress of B to the ingress of D; (
+           4) from the ingress of D to dst.</t>
+
+        <t>One may think that BGP collects information from multiple autonomous 
+           networks through back propagation from the destination, and hence 
+           includes information for all 4 segments. But BGP information is 
+           distributed, coarse-grained, and incomplete.
         </t>
 
-        <t>Source: The BGP router at AS S knows that the path from src to dst consists of 
-           the AS-PATH [S A B D]. Combining BGP and intradomain routing, AS S will also know which one of the two egress routers (se1, se2) that it will use to forward traffic to dst. However, AS S does not know more details downstream: for example, it does not know whether the packet will use ae1 or ae2 as the egress router at AS A to enter AS B; neither does it know the internal routing inside AS A. Hence, an ALTO server provided by AS S cannot provide all of the information for the example ECS query.
+        <t>Source: The BGP router at AS S knows that the path from src to dst
+           consists of the AS-PATH [S A B D]. Combining BGP and intradomain routing, AS S will also know which one of the two egress routers (se1, se2) that it will use to forward traffic to dst. However, AS S does not know more details downstream: for example, it does not know whether the packet will use ae1 or ae2 as the egress router at AS A to enter AS B; neither does it know the internal routing inside AS A. Hence, an ALTO server provided by AS S cannot provide all of the information for the example ECS query.
         </t>
 
         <t>Non-Source AS: A non-source AS knows the AS-PATH starting from itself to dst. But it may not know the ingress point. For example, AS A does not know whether the packet will come in from ai1 or ai2. Hence, an ALTO server provided by AS A may consider the example ECS query as an ambiguous query (because it gives only source (src) and destination (dst), but it does not in general know the ingress point). 
@@ -225,16 +301,23 @@
 
       <section anchor="problem-challenge-partial-deploy" numbered="true" toc="default">
         <name>Challenge: Partial Deployment</name>
-        <t>It is possible to design protocol extensions to collect the aforementioned distributed information to provide complete information (see below), but one challenge is that the deployment may be only incremental and hence is partially deployed during the process. Consider the example, assume that AS B will run only standard protocols (also no traceroute) and will not provide extended ALTO, then the ingress point to D will be ambiguous.</t>
+        <t>It is possible to design protocol extensions to collect the aforementioned distributed information to provide complete information (see below), but one challenge is that the deployment may be only incremental and hence is partially deployed during the process.</t>
       </section>
 
     </section> <!-- problem -->
 
     <section anchor="solutions" numbered="true" toc="default">
-      <name>Candidate Solutions</name>
-      <t>During the process of integrating ALTO into Rucio and FTS, multiple solution candidates are discussed and below we enumerate each of them. 
+      <name>Solution Space Exploration</name>
+      <t>During the process of integrating ALTO to support the Rucio and FTS use 
+         cases, multiple potential solutions are implemented. Below we discuss them briefly to motivate discussions.
       </t>
 
+      <section anchor="solution-space" numbered="true" toc="default">
+        <name>Solution Space to Obtain Forwarding Information Base</name>
+
+        <t></t>
+      </section>
+      
       <section anchor="solution-routing-layer" numbered="true" toc="default">
         <name>Candidate Solution: Routing Layer Design</name>
         <t>This is a type of solution that makes it possible to collect all needed network information at a single autonomous network, and then use an ALTO server at the source network to abstract and expose the information. One natural candidate is to modify the routing control plane itself: BGP extensions, which can be extended to collect needed information and propagate upstream. For example, when a BGP router at AS A (e.g., ai1) propagates BGP info to its peer at AS S (se1), it includes not only the AS-PATH [A, B, D], but also additional information so that the upstream can construct the complete path cost (distance) metrics. The upside of this design is that it integrates with routing system and hence may even extend routing capabilities. However, routing protocol extensions can be complex in deployment. Further, it provides a different trust model: the original ALTO model is a star trust model, with the application (e.g., Rucio/FTS) at the hub and each AS needs to trust the application. The BGP extension model requires the trust of peers and recursive peers (BGP community may be used to impose policies).</t>
