@@ -12,19 +12,18 @@
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
   <front>
-    <title abbrev="ALTO TIPS">ALTO Multi-Domain Services</title>
-    <seriesInfo name="Internet-Draft" value="draft-yang-alto-multi-domain-01"/>
-    <author fullname="Y. Richard Yang" initials="Y." surname="Yang">
-      <organization>Yale University</organization>
+    <title abbrev="ALTO TIPS">ALTO Multi-Domain Use Cases and Services</title>
+    <seriesInfo name="Internet-Draft" value="draft-yang-alto-multi-domain-02"/>
+
+    <author fullname="Danny Lachos" initials="D." surname="Lachos">
+      <organization>Benocs</organization>
       <address>
         <postal>
-          <street>51 Prospect St</street>
-          <city>New Haven</city>
-          <region>CT</region>
-          <code>06520</code>
-          <country>USA</country>
+          <street/>
+          <city>Berlin</city>
+          <country>Germany</country>
         </postal>
-        <email>yry@cs.yale.edu</email>
+        <email>dlachos@benocs.com</email>
       </address>
     </author>
 
@@ -40,6 +39,47 @@
         <email>mario.lassnig@cern.ch</email>
       </address>
     </author>
+
+    <author fullname="Jordi Ros Giralt" initials="J." surname="Ros Giralt">
+      <organization>Qualcomm</organization>
+      <address>
+        <postal>
+          <street/>
+          <city>Madrid</city>
+          <country>Spain</country>
+        </postal>
+        <email>jros@qti.qualcomm.com</email>
+      </address>
+    </author>
+
+    <author fullname="Annie Gu" initials="A." surname="Gu">
+      <organization>Yale University</organization>
+      <address>
+        <postal>
+          <street>51 Prospect St</street>
+          <city>New Haven</city>
+          <region>CT</region>
+          <code>06520</code>
+          <country>USA</country>
+        </postal>
+        <email>annie.gu@yale.edu</email>
+      </address>
+    </author>
+
+    <author fullname="Y. Richard Yang" initials="Y." surname="Yang">
+      <organization>Yale University</organization>
+      <address>
+        <postal>
+          <street>51 Prospect St</street>
+          <city>New Haven</city>
+          <region>CT</region>
+          <code>06520</code>
+          <country>USA</country>
+        </postal>
+        <email>yry@cs.yale.edu</email>
+      </address>
+    </author>
+
 
     <date day="10" month="July" year="2023"/>
     <area>TSV Area</area>

@@ -2,14 +2,19 @@
 
 
 
-ALTO Working Group                                               Y. Yang
-Internet-Draft                                           Yale University
+ALTO Working Group                                             D. Lachos
+Internet-Draft                                                    Benocs
 Intended status: Standards Track                              M. Lassnig
 Expires: 11 January 2024                                            CERN
+                                                           J. Ros Giralt
+                                                                Qualcomm
+                                                                   A. Gu
+                                                                 Y. Yang
+                                                         Yale University
                                                             10 July 2023
 
 
-                       ALTO Multi-Domain Services
+                ALTO Multi-Domain Use Cases and Services
                     draft-yang-alto-multi-domain-01
 
 Abstract
@@ -42,21 +47,23 @@ Status of This Memo
    working documents as Internet-Drafts.  The list of current Internet-
    Drafts is at https://datatracker.ietf.org/drafts/current/.
 
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 1]
+
+Internet-Draft                  ALTO TIPS                      July 2023
+
+
    Internet-Drafts are draft documents valid for a maximum of six months
    and may be updated, replaced, or obsoleted by other documents at any
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
    This Internet-Draft will expire on 11 January 2024.
-
-
-
-
-
-Yang & Lassnig           Expires 11 January 2024                [Page 1]
-
-Internet-Draft                  ALTO TIPS                      July 2023
-
 
 Copyright Notice
 
@@ -74,9 +81,9 @@ Copyright Notice
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Multi-domain Problem  . . . . . . . . . . . . . . . . . . . .   3
-     2.1.  Use Cases . . . . . . . . . . . . . . . . . . . . . . . .   3
+     2.1.  Use Cases . . . . . . . . . . . . . . . . . . . . . . . .   4
      2.2.  Challenge: Distributed Information  . . . . . . . . . . .   5
      2.3.  Challenge: Partial Deployment . . . . . . . . . . . . . .   6
    3.  Candidate Solutions . . . . . . . . . . . . . . . . . . . . .   6
@@ -93,6 +100,20 @@ Table of Contents
      6.2.  Informative References  . . . . . . . . . . . . . . . . .   9
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   9
 
+
+
+
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 2]
+
+Internet-Draft                  ALTO TIPS                      July 2023
+
+
 1.  Introduction
 
    Application-Layer Traffic Optimization (ALTO) provides means for
@@ -103,16 +124,6 @@ Table of Contents
    by Rucio to rank data sources or destinations to make data
    orchestration decisions, where Rucio is the de facto data
    orchestration system of CERN experiments.
-
-
-
-
-
-
-Yang & Lassnig           Expires 11 January 2024                [Page 2]
-
-Internet-Draft                  ALTO TIPS                      July 2023
-
 
    As another example, to extend FTS, which is the data scheduling
    system of CERN experiments, to realize resource allocation to
@@ -147,27 +158,24 @@ Internet-Draft                  ALTO TIPS                      July 2023
 
 2.  Multi-domain Problem
 
+
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 3]
+
+Internet-Draft                  ALTO TIPS                      July 2023
+
+
 2.1.  Use Cases
 
    Consider the following ECS query realizing ALTO ECS for LHCONE to
    support Rucio.  The source is located at CERN and the destination
    candidates are at multiple locations of the LHCONE network (BNL,
    Caltech, and KIT, for example).
-
-
-
-
-
-
-
-
-
-
-
-
-Yang & Lassnig           Expires 11 January 2024                [Page 3]
-
-Internet-Draft                  ALTO TIPS                      July 2023
 
 
      POST /endpointcost/lookup HTTP/1.1
@@ -210,21 +218,18 @@ Internet-Draft                  ALTO TIPS                      July 2023
        }
      }
 
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 4]
+
+Internet-Draft                  ALTO TIPS                      July 2023
+
+
    It is straightforward to change the query to be the ALTO path vector
    service, to support TCN: the value is a vector of network links
    (e.g., [link-1, link-2, ...]), not the numerical routingcost (e.g.,
    20).
-
-
-
-
-
-
-
-Yang & Lassnig           Expires 11 January 2024                [Page 4]
-
-Internet-Draft                  ALTO TIPS                      July 2023
-
 
    The use cases provide examples of multi-domain settings, which the
    figure below shows.  We choose one of the destinations as an example.
@@ -272,12 +277,7 @@ Internet-Draft                  ALTO TIPS                      July 2023
 
 
 
-
-
-
-
-
-Yang & Lassnig           Expires 11 January 2024                [Page 5]
+Lachos, et al.           Expires 11 January 2024                [Page 5]
 
 Internet-Draft                  ALTO TIPS                      July 2023
 
@@ -333,7 +333,7 @@ Internet-Draft                  ALTO TIPS                      July 2023
 
 
 
-Yang & Lassnig           Expires 11 January 2024                [Page 6]
+Lachos, et al.           Expires 11 January 2024                [Page 6]
 
 Internet-Draft                  ALTO TIPS                      July 2023
 
@@ -389,7 +389,7 @@ Internet-Draft                  ALTO TIPS                      July 2023
 
 
 
-Yang & Lassnig           Expires 11 January 2024                [Page 7]
+Lachos, et al.           Expires 11 January 2024                [Page 7]
 
 Internet-Draft                  ALTO TIPS                      July 2023
 
@@ -445,7 +445,7 @@ Internet-Draft                  ALTO TIPS                      July 2023
 
 
 
-Yang & Lassnig           Expires 11 January 2024                [Page 8]
+Lachos, et al.           Expires 11 January 2024                [Page 8]
 
 Internet-Draft                  ALTO TIPS                      July 2023
 
@@ -475,12 +475,11 @@ Internet-Draft                  ALTO TIPS                      July 2023
 
 Authors' Addresses
 
-   Y. Richard Yang
-   Yale University
-   51 Prospect St
-   New Haven, CT 06520
-   United States of America
-   Email: yry@cs.yale.edu
+   Danny Lachos
+   Benocs
+   Berlin
+   Germany
+   Email: dlachos@benocs.com
 
 
    Mario Lassnig
@@ -490,6 +489,37 @@ Authors' Addresses
    Email: mario.lassnig@cern.ch
 
 
+   Jordi Ros Giralt
+   Qualcomm
+   Madrid
+   Spain
+   Email: jros@qti.qualcomm.com
+
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 9]
+
+Internet-Draft                  ALTO TIPS                      July 2023
+
+
+   Annie Gu
+   Yale University
+   51 Prospect St
+   New Haven, CT 06520
+   United States of America
+   Email: annie.gu@yale.edu
+
+
+   Y. Richard Yang
+   Yale University
+   51 Prospect St
+   New Haven, CT 06520
+   United States of America
+   Email: yry@cs.yale.edu
 
 
 
@@ -501,4 +531,30 @@ Authors' Addresses
 
 
 
-Yang & Lassnig           Expires 11 January 2024                [Page 9]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024               [Page 10]
