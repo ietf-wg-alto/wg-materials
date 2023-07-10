@@ -7,13 +7,13 @@
 ]>
 <!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
      by Daniel M Kohn (private) -->
-<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-ietf-alto-new-transport-05" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" category="std" docName="draft-yang-alto-multi-domain-01" ipr="trust200902" obsoletes="" updates="" submissionType="IETF" xml:lang="en" tocInclude="true" symRefs="true" sortRefs="true" version="3" consensus="true">
   <!-- xml2rfc v2v3 conversion 3.12.10 -->
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
   <front>
     <title abbrev="ALTO TIPS">ALTO Multi-Domain Services</title>
-    <seriesInfo name="Internet-Draft" value="draft-yang-alto-multi-domain-00"/>
+    <seriesInfo name="Internet-Draft" value="draft-yang-alto-multi-domain-01"/>
     <author fullname="Y. Richard Yang" initials="Y." surname="Yang">
       <organization>Yale University</organization>
       <address>
@@ -41,7 +41,7 @@
       </address>
     </author>
 
-    <date day="12" month="March" year="2023"/>
+    <date day="10" month="July" year="2023"/>
     <area>TSV Area</area>
     <workgroup>ALTO Working Group</workgroup>
     <keyword>RFC</keyword>
@@ -50,7 +50,9 @@
     <keyword>Internet-Draft</keyword>
     <keyword>Application-Layer Traffic Optimization, Multi-Domain, BGP</keyword>
     <abstract>
-      <t>This is abstract.
+      <t>Application-Layer Traffic Optimization (ALTO) provides means for network applications 
+         to obtain network information. In the definitions of ALTO services ([RFC7285] and existing extensions), there is no requirement on whether the source and the destination endpoints 
+         must belong to the same autonomous network, which is a single-domain setting, or they can belong to different autonomous networks, which is a multi-domain setting. This document explains problems of realizing ALTO in multi-domain settings and then presents 3 potential solutions to realize ALTO multi-domain services.
       </t>
     </abstract>
     <note>

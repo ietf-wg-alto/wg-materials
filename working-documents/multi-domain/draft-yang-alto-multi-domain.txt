@@ -5,16 +5,24 @@
 ALTO Working Group                                               Y. Yang
 Internet-Draft                                           Yale University
 Intended status: Standards Track                              M. Lassnig
-Expires: 13 September 2023                                          CERN
-                                                           12 March 2023
+Expires: 11 January 2024                                            CERN
+                                                            10 July 2023
 
 
                        ALTO Multi-Domain Services
-                    draft-ietf-alto-new-transport-05
+                    draft-yang-alto-multi-domain-01
 
 Abstract
 
-   This is abstract.
+   Application-Layer Traffic Optimization (ALTO) provides means for
+   network applications to obtain network information.  In the
+   definitions of ALTO services ([RFC7285] and existing extensions),
+   there is no requirement on whether the source and the destination
+   endpoints must belong to the same autonomous network, which is a
+   single-domain setting, or they can belong to different autonomous
+   networks, which is a multi-domain setting.  This document explains
+   problems of realizing ALTO in multi-domain settings and then presents
+   3 potential solutions to realize ALTO multi-domain services.
 
 Requirements Language
 
@@ -39,7 +47,16 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 September 2023.
+   This Internet-Draft will expire on 11 January 2024.
+
+
+
+
+
+Yang & Lassnig           Expires 11 January 2024                [Page 1]
+
+Internet-Draft                  ALTO TIPS                      July 2023
+
 
 Copyright Notice
 
@@ -50,14 +67,6 @@ Copyright Notice
    Provisions Relating to IETF Documents (https://trustee.ietf.org/
    license-info) in effect on the date of publication of this document.
    Please review these documents carefully, as they describe your rights
-
-
-
-Yang & Lassnig          Expires 13 September 2023               [Page 1]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
-
    and restrictions with respect to this document.  Code Components
    extracted from this document must include Revised BSD License text as
    described in Section 4.e of the Trust Legal Provisions and are
@@ -95,6 +104,16 @@ Table of Contents
    orchestration decisions, where Rucio is the de facto data
    orchestration system of CERN experiments.
 
+
+
+
+
+
+Yang & Lassnig           Expires 11 January 2024                [Page 2]
+
+Internet-Draft                  ALTO TIPS                      July 2023
+
+
    As another example, to extend FTS, which is the data scheduling
    system of CERN experiments, to realize resource allocation to
    multiple experiments sharing the same network link, the ongoing TCN
@@ -106,13 +125,6 @@ Table of Contents
    each data transfer has a given source-destination pair.  With the
    aggregation, TCN computes scheduling of data transfers according to
    resource allocation policies.
-
-
-
-Yang & Lassnig          Expires 13 September 2023               [Page 2]
-
-Internet-Draft                  ALTO TIPS                     March 2023
-
 
    In the definitions of ALTO services ([RFC7285] and existing
    extensions), there is no requirement on whether the source and the
@@ -153,21 +165,9 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-Yang & Lassnig          Expires 13 September 2023               [Page 3]
+Yang & Lassnig           Expires 11 January 2024                [Page 3]
 
-Internet-Draft                  ALTO TIPS                     March 2023
+Internet-Draft                  ALTO TIPS                      July 2023
 
 
      POST /endpointcost/lookup HTTP/1.1
@@ -221,9 +221,9 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Yang & Lassnig          Expires 13 September 2023               [Page 4]
+Yang & Lassnig           Expires 11 January 2024                [Page 4]
 
-Internet-Draft                  ALTO TIPS                     March 2023
+Internet-Draft                  ALTO TIPS                      July 2023
 
 
    The use cases provide examples of multi-domain settings, which the
@@ -277,9 +277,9 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Yang & Lassnig          Expires 13 September 2023               [Page 5]
+Yang & Lassnig           Expires 11 January 2024                [Page 5]
 
-Internet-Draft                  ALTO TIPS                     March 2023
+Internet-Draft                  ALTO TIPS                      July 2023
 
 
 2.3.  Challenge: Partial Deployment
@@ -333,9 +333,9 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Yang & Lassnig          Expires 13 September 2023               [Page 6]
+Yang & Lassnig           Expires 11 January 2024                [Page 6]
 
-Internet-Draft                  ALTO TIPS                     March 2023
+Internet-Draft                  ALTO TIPS                      July 2023
 
 
 3.3.  Candidate Solution: Multi-Domain ALTO Composition Refinement
@@ -389,9 +389,9 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Yang & Lassnig          Expires 13 September 2023               [Page 7]
+Yang & Lassnig           Expires 11 January 2024                [Page 7]
 
-Internet-Draft                  ALTO TIPS                     March 2023
+Internet-Draft                  ALTO TIPS                      July 2023
 
 
    To support incremental deployment, an ALTO server may respond to a
@@ -445,9 +445,9 @@ Internet-Draft                  ALTO TIPS                     March 2023
 
 
 
-Yang & Lassnig          Expires 13 September 2023               [Page 8]
+Yang & Lassnig           Expires 11 January 2024                [Page 8]
 
-Internet-Draft                  ALTO TIPS                     March 2023
+Internet-Draft                  ALTO TIPS                      July 2023
 
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
@@ -501,4 +501,4 @@ Authors' Addresses
 
 
 
-Yang & Lassnig          Expires 13 September 2023               [Page 9]
+Yang & Lassnig           Expires 11 January 2024                [Page 9]
