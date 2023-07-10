@@ -90,17 +90,17 @@ Table of Contents
      3.1.  Challenge: Distributed Information  . . . . . . . . . . .   6
      3.2.  Challenge: Partial Deployment . . . . . . . . . . . . . .   6
    4.  Solution Space Exploration  . . . . . . . . . . . . . . . . .   7
-     4.1.  Solution Space to Obtain Forwarding Information Base  . .   7
-     4.2.  Candidate Solution: Routing Layer Design  . . . . . . . .   7
-     4.3.  Candidate Solution: Data-Path Sampling/Collection . . . .   7
-     4.4.  Candidate Solution: Multi-Domain ALTO Composition
-           Refinement  . . . . . . . . . . . . . . . . . . . . . . .   7
+     4.1.  Solution Space to Obtain Forwarding Information Base
+           (FIB) . . . . . . . . . . . . . . . . . . . . . . . . . .   7
+     4.2.  Candidate Solution: FIB-Compute Based Design  . . . . . .   7
+     4.3.  Candidate Solution: FIB-Apply Based Design  . . . . . . .   8
+     4.4.  Candidate Solution: Multi-Domain ALTO Composition . . . .   8
        4.4.1.  ALTO Server Multi-Domain Information Model  . . . . .   8
-       4.4.2.  ALTO Client General-Path Model  . . . . . . . . . . .   8
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-   6.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   9
-   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
-     7.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
+       4.4.2.  ALTO Client General-Path Model  . . . . . . . . . . .   9
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+   6.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  10
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
      7.2.  Informative References  . . . . . . . . . . . . . . . . .  10
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  10
 
@@ -344,48 +344,48 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    use cases, multiple potential solutions are implemented.  Below we
    discuss them briefly to motivate discussions.
 
-4.1.  Solution Space to Obtain Forwarding Information Base
+4.1.  Solution Space to Obtain Forwarding Information Base (FIB)
 
+   Obtaining FIBs is a basic building block of implementing ALTO route-
+   related visibility services.  At a high-level, FIBs have the
+   following life cycle:
 
-4.2.  Candidate Solution: Routing Layer Design
+   FIB-Configure/input:
+      Each router is configured with its configuration.  Each router
+      also takes its external input such as BGP routes from peers.
 
-   This is a type of solution that makes it possible to collect all
-   needed network information at a single autonomous network, and then
-   use an ALTO server at the source network to abstract and expose the
-   information.  One natural candidate is to modify the routing control
-   plane itself: BGP extensions, which can be extended to collect needed
-   information and propagate upstream.  For example, when a BGP router
-   at AS A (e.g., ai1) propagates BGP info to its peer at AS S (se1), it
-   includes not only the AS-PATH [A, B, D], but also additional
-   information so that the upstream can construct the complete path cost
-   (distance) metrics.  The upside of this design is that it integrates
-   with routing system and hence may even extend routing capabilities.
-   However, routing protocol extensions can be complex in deployment.
-   Further, it provides a different trust model: the original ALTO model
-   is a star trust model, with the application (e.g., Rucio/FTS) at the
-   hub and each AS needs to trust the application.  The BGP extension
-   model requires the trust of peers and recursive peers (BGP community
-   may be used to impose policies).
+   FIB-Compute:
+      A distributed system computes the FIBs.  During the computing
+      process, the vendor specific configuration may be turned into
+      standard format such as IGP information model.
 
-4.3.  Candidate Solution: Data-Path Sampling/Collection
+   FIB-Apply:
+      The FIBs are applied.  When applied to data packets, the
+      application may be observed by NetFlow/sFlow or similar capturing
+      capabilities; it may also be applied to control such as traceoute,
+      which can be observed.
 
-   This is a type of solution that allows data path to collect control
-   plane information.  For example, a traceroute based system called
-   PerfSonar is widely deployed.  Such a system can collect other
-   network information such as delay and loss naturally as measurements.
-   However, this type of solution typically cannot collect full topology
-   information such as link capacity or handle more complex query such
-   as ALTO Path Vector.
+4.2.  Candidate Solution: FIB-Compute Based Design
 
-4.4.  Candidate Solution: Multi-Domain ALTO Composition Refinement
+   This is a type of solution that makes it possible to extends
+   FIB_Compute to collect all needed network information at a single
+   autonomous network, and then use an ALTO server at the source network
+   to abstract and expose the information.  One natural candidate is to
+   modify the routing control plane itself: BGP extensions, which can be
+   extended to collect needed information and propagate upstream.  For
+   example, when a BGP router at AS A (e.g., ai1) propagates BGP info to
+   its peer at AS S (se1), it includes not only the AS-PATH [A, B, D],
+   but also additional information so that the upstream can construct
+   the complete path cost (distance) metrics.
 
-   This is an ALTO based system, and consists of two components: (1) it
-   introduces a new abstraction of each autonomous network and
-   associated query process to allow multi-domain ALTO information
-   composition; and (2) it introduces a generic-path model at ALTO
-   clients so that they can use the acquired information to gradually
-   refine network information.
-
+   The upside of this design is that it integrates with routing system
+   and hence may even extend routing capabilities.  However, routing
+   protocol extensions can be complex in deployment.  Further, it
+   provides a different trust model: the original ALTO model is a star
+   trust model, with the application (e.g., Rucio/FTS) at the hub and
+   each AS needs to trust the application.  The BGP extension model
+   requires the trust of peers and recursive peers (BGP community may be
+   used to impose policies).
 
 
 
@@ -393,6 +393,29 @@ Lachos, et al.           Expires 11 January 2024                [Page 7]
 
 Internet-Draft              ALTO Multi-Domain                  July 2023
 
+
+4.3.  Candidate Solution: FIB-Apply Based Design
+
+   This is a type of solution that allows data path to collect control
+   plane information.  For example, a traceroute based system called
+   PerfSonar is widely deployed in our setting.  It is also natural to
+   use NetFlow/sFlow to identify ingress points.  Such a system can
+   collect other network information such as delay and loss naturally as
+   measurements.
+
+   However, this type of solutions can have many issues.  For example,
+   traceoute has issues including anonymous routers, uncertain router IP
+   resulting in node aliasing; load balancing routing resulting in link
+   aliasing.
+
+4.4.  Candidate Solution: Multi-Domain ALTO Composition
+
+   This is an ALTO based system, and consists of two components: (1) it
+   introduces a new abstraction of each autonomous network and
+   associated query process to allow multi-domain ALTO information
+   composition; and (2) it introduces a generic-path model at ALTO
+   clients so that they can use the acquired information to gradually
+   refine network information.
 
 4.4.1.  ALTO Server Multi-Domain Information Model
 
@@ -409,6 +432,22 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    point.  A general transit network will need an ingress point and
    return egress point.  For consistency, the egress point must be a
    valid ingress point, represented by a unique address, of the peer.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 8]
+
+Internet-Draft              ALTO Multi-Domain                  July 2023
 
 
                in-1   +-------------+  e-1
@@ -443,13 +482,6 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
    In particular, it allows the path from a src to a dst to be a
    directed acyclic graph, with the following components:
 
-
-
-Lachos, et al.           Expires 11 January 2024                [Page 8]
-
-Internet-Draft              ALTO Multi-Domain                  July 2023
-
-
    A set of nodes, where each node has both a type, and attributes,
    where the type can be (1) host: such as src/dst, with attributes such
    as IP address; (2) AS: which is a group of nodes, i.e., subgraph,
@@ -464,6 +496,15 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
 
    For the geo-distance ALTO cost derived from geo-ip: the src is a host
    and the dst is also a host, and the metric is the geo distance;
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024                [Page 9]
+
+Internet-Draft              ALTO Multi-Domain                  July 2023
+
 
    For CERN looking glass ALTO server, from a src host in CERN to a dst
    host in another network, say KIT, the src is a host, with two links,
@@ -499,13 +540,6 @@ Internet-Draft              ALTO Multi-Domain                  July 2023
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
-
-
-Lachos, et al.           Expires 11 January 2024                [Page 9]
-
-Internet-Draft              ALTO Multi-Domain                  July 2023
-
-
 7.2.  Informative References
 
    [RFC7971]  Stiemerling, M., Kiesel, S., Scharf, M., Seidel, H., and
@@ -520,6 +554,14 @@ Authors' Addresses
    Benocs
    Berlin
    Germany
+
+
+
+Lachos, et al.           Expires 11 January 2024               [Page 10]
+
+Internet-Draft              ALTO Multi-Domain                  July 2023
+
+
    Email: dlachos@benocs.com
 
 
@@ -557,4 +599,18 @@ Authors' Addresses
 
 
 
-Lachos, et al.           Expires 11 January 2024               [Page 10]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lachos, et al.           Expires 11 January 2024               [Page 11]

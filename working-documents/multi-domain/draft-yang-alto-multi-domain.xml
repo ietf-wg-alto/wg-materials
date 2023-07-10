@@ -313,27 +313,70 @@
       </t>
 
       <section anchor="solution-space" numbered="true" toc="default">
-        <name>Solution Space to Obtain Forwarding Information Base</name>
+        <name>Solution Space to Obtain Forwarding Information Base (FIB)</name>
 
-        <t></t>
+        <t>Obtaining FIBs is a basic building block of implementing ALTO route-related visibility services. At a high-level, FIBs have the following 
+          life cycle:</t>
+
+        <dl newline="true">
+          <dt>FIB-Configure/input:</dt>
+            <dd>Each router is configured with its configuration. Each router also
+                takes its external input such as BGP routes from peers.
+            </dd>
+
+          <dt>FIB-Compute:</dt>
+            <dd>A distributed system computes the FIBs. During the computing process,
+                the vendor specific configuration may be turned into standard format
+                such as IGP information model.</dd>
+
+          <dt>FIB-Apply:</dt>
+            <dd>The FIBs are applied. When applied to data packets, the application may be observed by NetFlow/sFlow or similar capturing capabilities; it may also be applied to control such as traceoute, which can be observed.
+            </dd>
+        </dl>
+
       </section>
       
       <section anchor="solution-routing-layer" numbered="true" toc="default">
-        <name>Candidate Solution: Routing Layer Design</name>
-        <t>This is a type of solution that makes it possible to collect all needed network information at a single autonomous network, and then use an ALTO server at the source network to abstract and expose the information. One natural candidate is to modify the routing control plane itself: BGP extensions, which can be extended to collect needed information and propagate upstream. For example, when a BGP router at AS A (e.g., ai1) propagates BGP info to its peer at AS S (se1), it includes not only the AS-PATH [A, B, D], but also additional information so that the upstream can construct the complete path cost (distance) metrics. The upside of this design is that it integrates with routing system and hence may even extend routing capabilities. However, routing protocol extensions can be complex in deployment. Further, it provides a different trust model: the original ALTO model is a star trust model, with the application (e.g., Rucio/FTS) at the hub and each AS needs to trust the application. The BGP extension model requires the trust of peers and recursive peers (BGP community may be used to impose policies).</t>
+        <name>Candidate Solution: FIB-Compute Based Design</name>
+        <t>This is a type of solution that makes it possible to extends FIB_Compute 
+           to collect all needed network information at a single autonomous network, 
+           and then use an ALTO server at the source network to abstract and expose 
+           the information. One natural candidate is to modify the routing control 
+           plane itself: BGP extensions, which can be extended to collect needed 
+           information and propagate upstream. For example, when a BGP router at AS A 
+           (e.g., ai1) propagates BGP info to its peer at AS S (se1), it includes not 
+           only the AS-PATH [A, B, D], but also additional information so that the 
+           upstream can construct the complete path cost (distance) metrics. </t>
+
+        <t>The upside of this design is that it integrates with routing system 
+           and hence may even extend routing capabilities. However, routing protocol 
+           extensions can be complex in deployment. Further, it provides a different 
+           trust model: the original ALTO model is a star trust model, with the 
+           application (e.g., Rucio/FTS) at the hub and each AS needs to trust the 
+           application. The BGP extension model requires the trust of peers and 
+           recursive peers (BGP community may be used to impose policies).</t>
       </section>
 
       <section anchor="solution-data-path-sampling" numbered="true" toc="default">
-        <name>Candidate Solution: Data-Path Sampling/Collection</name>
-        <t>This is a type of solution that allows data path to collect control plane information. For 
-          example, a traceroute based system called PerfSonar is widely deployed. Such a system can 
-          collect other network information such as delay and loss naturally as measurements. However, this type of solution typically cannot collect full topology information such as link capacity or handle more complex query such as ALTO Path Vector.
+        <name>Candidate Solution: FIB-Apply Based Design</name>
+        
+        <t>This is a type of solution that allows data path to collect control 
+           plane information. For example, a traceroute based system called PerfSonar 
+           is widely deployed in our setting. It is also natural to use NetFlow/sFlow 
+           to identify ingress points. Such a system can collect other network 
+           information such as delay and loss naturally as 
+           measurements. </t>
+
+        <t>However, this type of solutions can have many issues. For example, 
+           traceoute has issues including anonymous routers, uncertain router IP 
+           resulting in node aliasing; load balancing routing resulting in link 
+           aliasing.
         </t>
       </section>
 
 
       <section anchor="solution-alto" numbered="true" toc="default">
-        <name>Candidate Solution: Multi-Domain ALTO Composition Refinement</name>
+        <name>Candidate Solution: Multi-Domain ALTO Composition</name>
         <t>This is an ALTO based system, and consists of two components: (1) it introduces a new abstraction of each autonomous network and associated query process to allow multi-domain ALTO information composition; and (2) it introduces a generic-path model at ALTO clients so that they can use the acquired information to gradually refine network information.
         </t>
 
