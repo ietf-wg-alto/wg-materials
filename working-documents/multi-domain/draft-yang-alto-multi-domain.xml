@@ -104,7 +104,7 @@
       <t>Application-Layer Traffic Optimization (ALTO) provides means for network 
         applications to obtain network information. Although ALTO is inherently 
         multi-domain, in that the ALTO server representing the network and the ALTO client requesting the network information belong to different trust domains, 
-        there are more general cases where the path from the source and the destination spans multiple autonomous networks, which we call multi-domain settings. This document first gives 3 multi-domain use cases, and the challenges to address the challenges. It then gives a brief update on the implementation solutions that we explored to address the challenges.
+        there are more general cases where the path from the source and the destination spans multiple autonomous networks, which we call multi-domain settings. This document first gives three multi-domain use cases, and the challenges to address the challenges. It then gives a brief update on the implementation solutions that we explored to address the challenges.
       </t>
     </abstract>
     <note>
@@ -149,8 +149,8 @@
          located within the same administrative domain.”</t>
 
       <t>This document first specifies three multi-domain use cases. It
-         then discuss the two challenges when deploying ALTO in multi-domain
-         settings. At the end, this document provides initial designs, 
+         then discusses the two challenges when deploying ALTO in multi-domain
+         settings. At the end, this document provides initial designs 
          based on current implementation experiences to start the design 
          conversation. </t>
 
@@ -158,20 +158,20 @@
 
     <section anchor="use-cases" numbered="true" toc="default">
       <name>Multi-domain Use Cases</name>
-      <t>To be concrete, this document uses 3 use cases from the context of
+      <t>To be concrete, this document uses three use cases from the context of
          data-intensive sciences for CERN/WLCG. </t>
 
       <section anchor="usecase-rucio" numbered="true" toc="default">
         <name>Multi-domain Path Distance/Ranking for Rucio</name>
 
         <t>The data orchestration system of CERN/WLCG is Rucio, which 
-           selects a source for a given downloading client, when multiple sources 
+           selects a source for a given downloading client when multiple sources 
            provide the data set. Rucio also conducts destination selection, when 
            multiple destinations can be the target locations for replication.</t> 
 
         <t>The main mechanism of source/destination selection in Rucio is distance, 
            which is a perfect match for ALTO cost services; see appendix for a review 
-           of the full source/destination mecahnism of Rucio. Specifically, consider 
+           of the full source/destination mecahnisms of Rucio. Specifically, consider 
            the following ECS query realizing ALTO ECS for Rucio to do destination 
            selection. The source is located at CERN and the destination candidates 
            are at multiple locations of the LHCONE network (BNL, Caltech, and KIT, 
@@ -219,10 +219,10 @@
   }
       ]]></artwork>
         
-        <t>The use case provide an example of a multi-domain setting, because 
-           the source and the desintations are located at different networks and
+        <t>The use case provides an example of a multi-domain setting, because 
+           the source and the destinations are located at different networks and
            the network paths span multiple autonomous networks. Figure 1 below
-           illustrates a network path from src to dst spanning 4 networks.
+           illustrates a network path from src to dst spanning four networks.
         </t>
 
         <artwork name="" type="" align="left" alt=""><![CDATA[                                                                                       
@@ -245,20 +245,21 @@
         <name>Multi-domain Path -> Link Mapping for FTS</name>
 
         <t>The data transport scheduling system of CERN/WLCG is FTS, which 
-           schedules given transfers, where a transfer has a fixed dataset,
-           a source and a destination (for example, chosen by Rucio).</t> 
+           schedules given transfers, where a transfer is compromised of a fixed 
+           dataset, a source and a destination (for example, chosen by Rucio).</t> 
 
         <t>One main function of FTS is to satisfy operator resource constraints. 
            As an example, FTS may schedule concurrent transfers
            from CERN to CalTech and KIT, under the constraint that the total
-           transmission rate for a given link should be within a threshold. </t>
+           transmission rate for a given link should be within a certain threshold. 
+        </t>
 
         <t>Consider Figure 1. Assume S is CERN and D is CalTech. The network path 
           from CERN to CalTech uses the top inter-AS link (se1->ai1), and 
           the network path from CERN to KIT uses the lower inter-AS 
           link (se2->ai2). For FTS to know how much demand it is placing on each
-          one of these two links to stay within the constraint of each link, FTS
-          needs to know the network paths, and the paths span multiple autonomous networks.</t>
+          one of these two links so that it can stay within the constraint of each 
+          link, FTS needs to know the network paths, and the paths span multiple autonomous networks.</t>
       
       </section> <!-- FTS Use Case --> 
 
@@ -292,14 +293,14 @@
 
         <t>Consider Figure 1, to compute the total routing cost of the path from 
            the src to the dst. The routing costs will consist of multiple segments
-           spanning 4 autonomous networks: (1) from src to the link connecting the 
+           spanning four autonomous networks: (1) from src to the link connecting the 
            egress of AS S (se1) and the ingress of AS A (ia1); (2) from the ingress
            of A to the ingress of B; (3) from the ingress of B to the ingress of D; (
            4) from the ingress of D to dst.</t>
 
         <t>One may think that BGP collects information from multiple autonomous 
            networks through back propagation from the destination, and hence 
-           includes information for all 4 segments. But BGP information is 
+           includes information for all four segments. But BGP information is 
            distributed, coarse-grained, and incomplete.
         </t>
 
@@ -368,7 +369,7 @@
            only the AS-PATH [A, B, D], but also additional information so that the 
            upstream can construct the complete path cost (distance) metrics. </t>
 
-        <t>The upside of this design is that it integrates with routing system 
+        <t>The upside of this design is that it integrates with routing systems
            and hence may even extend routing capabilities. However, routing protocol 
            extensions can be complex in deployment. Further, it provides a different 
            trust model: the original ALTO model is a star trust model, with the 
@@ -387,8 +388,8 @@
            information such as delay and loss naturally as 
            measurements. </t>
 
-        <t>However, this type of solutions can have many issues. For example, 
-           traceoute has issues including anonymous routers, uncertain router IP 
+        <t>However, this solution type can have many issues. For example, 
+           traceoute has issues including: anonymous routers, uncertain router IP 
            resulting in node aliasing; load balancing routing resulting in link 
            aliasing.
         </t>
@@ -436,7 +437,7 @@
 
         <t>As an optional feature, the query should allow indication of iterative or recursive queries.</t>
 
-        <t>To support incremental deployment, an ALTO server may respond to a query without specifying an ingress point and the source is not in the domain of the ALTO server. In this case, the ALTO server will return the results from each potential ingress points. For each ingress point indicated, the server indicates information of the previous hop (e.g., peer AS number and potential address).</t>
+        <t>To support incremental deployment, an ALTO server may respond to a query without specifying an ingress point and the source is not in the domain of the ALTO server. In this case, the ALTO server will return the results from each potential ingress point. For each ingress point indicated, the server indicates information of the previous hop (e.g., peer AS number and potential address).</t>
 
       </section> <!-- x-alto -->
 
@@ -450,7 +451,7 @@
 
         <t>In particular, it allows the path from a src to a dst to be a directed acyclic graph, with the following components:</t>
 
-        <t>A set of nodes, where each node has both a type, and attributes, where the type 
+        <t>A set of nodes, where each node has both a type and attributes, where the type 
             can be 
             (1) host: such as src/dst, with attributes such as IP address; 
             (2) AS: which is a group of nodes, i.e., subgraph, with attributes including ASN; 
@@ -461,7 +462,7 @@
 
         <t>Now, some examples of this representation in our deployment use case:</t>
 
-        <t>For the geo-distance ALTO cost derived from geo-ip: the src is a host and the dst is also a host, and the metric is the geo distance;</t>
+        <t>For the geo-distance ALTO cost derived from geo-ip: the src is a host and the dst is also a host, and the metric is the geo distance.</t>
 
 
         <t>For CERN looking glass ALTO server, from a src host in CERN to a dst host in another network, say KIT, the src is a host, with two links, one for each of the two looking glass BGP routers from cern; each of these BGP routers links to its BGP peer, and each such BGP peer links to the next AS, in the AS-PATH exposed by CERN.</t>
