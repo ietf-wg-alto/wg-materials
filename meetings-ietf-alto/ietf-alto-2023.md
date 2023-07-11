@@ -11,6 +11,24 @@
 
 **IETF, ALTO Meeting: July 11, 2023**
 
+**Agenda**
+
+- Address comments from RFC Editor on ALTO Performance Metrics drafts.
+- IETF 117 work plan. Goal is to sort out concrete proposal to provide input to rechartering. The number of recharter items should be limited to one or two based on discussion. Med suggests us to focus on motivation, problem description and charter item proposal. We will not go into detailed to discuss the solution space. ALTO deployment catalyst will be the focus. 
+
+- ALTO Future Work: 
+  - List of topics: https://mailarchive.ietf.org/arch/msg/alto/uIFD6Dhikfu4J4PYcpJTbsiXbnE/
+    - Topic A: https://mailarchive.ietf.org/arch/msg/alto/nSBb2fJwwEEEeZ-Xxw-OmHhJdTs/ 
+    - Topic B: https://mailarchive.ietf.org/arch/msg/alto/IXYPC1joF17oPJ7MWz5NDplAqKk/
+    - Topic C: WIP
+    - Topic D: https://mailarchive.ietf.org/arch/msg/alto/IEAyQ2kv49AvT1hIGfYkHWLxisY/
+  - Root document for topics discussion: https://docs.google.com/document/d/1rpziU7NZEE8f84XkJSjMhEIHUA5G7rXkGB5c_7UFxUY/edit
+  - Root ticket for ALTO future work proposals: https://github.com/ietf-wg-alto/wg-materials/blob/main/FutureALTO/alto-direction-of-work.md
+- Preps for IETF 117:
+  - Drafts and presentations that the ALTO group plans to work on
+  - Hackathon projects
+  - Agenda
+
 **Minutes:** (*Note taker: Kai*)
 Focus: Preparation of IETF 117 and recharter conversation
 
