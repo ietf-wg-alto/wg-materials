@@ -30,6 +30,7 @@
   - Agenda
 
 **Minutes:** (*Note taker: Kai*)
+
 Focus: Preparation of IETF 117 and recharter conversation
 
 Action items:
@@ -43,7 +44,7 @@ Discussions:
 - Meeting with CATS on how to coordinate between Luis's document and CATS's document(s)
   - Metrics related to computing are defined in both working groups and need to be coordinated
   - Adrian will have 5 min to present at ALTO during IETF 117
-  - Richard suggests having a working session with CATS members earlier before IETF
+  - Richard suggested having a working session with CATS members earlier before IETF
   - Sabine: The CATS draft does not list the metrics. CATS is looking at low-level metrics for traffic steering, not necessarily the same way in ALTO.
   - Sabine: Both approaches are complementary. It is necessary to define the intersection and the (difference). For intersected metrics, there might be inter-dependency between the two WGs. For unrelated metrics, both WG can proceed on their own.
 - IETF 117 agenda
@@ -59,6 +60,7 @@ Discussions:
     - Qin: Luis might be overloaded and another person is needed to lead the efforts
     - Richard volunteered to take the responsibility
   - Discussion on integration with compute
+    - Richard shared the screen to show the CRIC database of CERN and argued that many systems are already collecting information including networking, compute and storage together
     - Qin: Concern is that IETF does not have protocols to connect computation.
     - Jordi: Two elements: 1. How to get information. 2. How to expose that information. There is a need to understand the space with some informational documents.
     - Richard: Protocol is connecting the dots: you have something already and define how things can be done. But no dots for computing in IETF now.
@@ -68,10 +70,11 @@ Discussions:
       - Qin suggested the boundary between ALTO and CATS is that CATS defines the metrics and common abstractions of computing while ALTO defines how to connect/query the metrics (?)
     - Jordi suggested focusing on new elements that weren't covered in IETF 116 for this topic
   - Green networking
-    - Richard: A large concern is energy consuming. Will that be a good starting metric to work on? 
+    - Richard: A large concern in CERN is energy consumption. Will that be a good starting metric to work on? 
     - Qin: IETF already has this energy mib (?) IETF has a side meeting. Green networking has been discussed in nmrg.
-  - Security
-    - Qin: The security part by Fujitsu is still in the research stage. Luis has prepared some slides to discuss security consolidation. Potential discuss on using JOSE object for ALTO.
+    - Qin：Some parts are not mature enough to become standards.
+  - Security (not enough time to discuss)
+    - Qin: The security part by Fujitsu is still in the research stage. Luis has prepared some slides to discuss security consolidation. Potential discussion on using JOSE object for ALTO.
     - Chunchi will take the lead for integration ALTO with JOSE (?) and engage Ayoub.
 
 **IETF, ALTO Meeting: June 27, 2023**
