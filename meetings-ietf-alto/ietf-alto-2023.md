@@ -9,6 +9,53 @@
 
 ------------------------------
 
+**IETF, ALTO Meeting: July 11, 2023**
+
+**Minutes:** (*Note taker: Kai*)
+Focus: Preparation of IETF 117 and recharter conversation
+
+Action items:
+
+- Richard will set up the meeting with CATS and send an invite to the mailing list
+- Identify the leader of the BGP community document. Come up with two concrete proposals.(Richard volunteers)
+- Chunchi will engage with Ayoub to work on the item.
+
+Discussions:
+
+- Meeting with CATS on how to coordinate between Luis's document and CATS's document(s)
+  - Metrics related to computing are defined in both working groups and need to be coordinated
+  - Adrian will have 5 min to present at ALTO during IETF 117
+  - Richard suggests having a working session with CATS members earlier before IETF
+  - Sabine: The CATS draft does not list the metrics. CATS is looking at low-level metrics for traffic steering, not necessarily the same way in ALTO.
+  - Sabine: Both approaches are complementary. It is necessary to define the intersection and the (difference). For intersected metrics, there might be inter-dependency between the two WGs. For unrelated metrics, both WG can proceed on their own.
+- IETF 117 agenda
+  - Jordi: Focus on priorities. 1 or 2 topics in IETF:
+    1. Suggestion by Med: motivation, problem description and charter item proposal
+    2. Deployment catalyst.
+  - Deployment catalyst discussion:
+    - Richard: A large amount of successful protocols are about HOW not WHAT. Deployment catalyst is difficult because it is missing HOW in ALTO.
+    - Qin: (Agree with the argument) To promote the ALTO deployment, focus on integration and operation.
+    - Jordi suggests targeting this as an informational document
+  - BGP community/BGP-LS & ALTO:
+    - Qin: Propose BGP community for ALTO map and BGP-LS integration with ALTO. Discuss the problem space and motivation.
+    - Qin: Luis might be overloaded and another person is needed to lead the efforts
+    - Richard volunteered to take the responsibility
+  - Discussion on integration with compute
+    - Qin: Concern is that IETF does not have protocols to connect computation.
+    - Jordi: Two elements: 1. How to get information. 2. How to expose that information. There is a need to understand the space with some informational documents.
+    - Richard: Protocol is connecting the dots: you have something already and define how things can be done. But no dots for computing in IETF now.
+    - Discussion by Richard, Jorid and Qin suggests an investigation of existing standards on exposing compute (as an informational document) is highly useful
+      - initial sources: COINRG, CATS (in progress), ETSI, 5G,
+      - Jordi suggested having a survey of use cases to obtain a list of required metrics
+      - Qin suggested the boundary between ALTO and CATS is that CATS defines the metrics and common abstractions of computing while ALTO defines how to connect/query the metrics (?)
+    - Jordi suggested focusing on new elements that weren't covered in IETF 116 for this topic
+  - Green networking
+    - Richard: A large concern is energy consuming. Will that be a good starting metric to work on? 
+    - Qin: IETF already has this energy mib (?) IETF has a side meeting. Green networking has been discussed in nmrg.
+  - Security
+    - Qin: The security part by Fujitsu is still in the research stage. Luis has prepared some slides to discuss security consolidation. Potential discuss on using JOSE object for ALTO.
+    - Chunchi will take the lead for integration ALTO with JOSE (?) and engage Ayoub.
+
 **IETF, ALTO Meeting: June 27, 2023**
 
 **Minutes:** (*Note taker: Ryan*)
