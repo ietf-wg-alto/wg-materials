@@ -5,7 +5,45 @@
 
 - **Location:** https://ietf.webex.com/ietf/j.php?MTID=ma0e97cc97c4cd71bb59cf1a094682686
 
-- **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Tong Meng, Yuhang, Ziyang Xing. 
+- **Minute takers:** Ayoub Messos, Jensen, Jordi, Kai, Lauren, Lei Yixue, Luis, Mahdi, Motoyoshi Sekiya, Qiao, Qin, Richard, Roland, Sabine, Tong Meng, Yuhang, Ziyang Xing.
+
+------------------------------
+
+**IETF, ALTO Meeting: July 18, 2023**
+
+Agenda
+
+- Address comments from RFC Editor on ALTO Performance Metrics drafts.
+- IETF 117.
+    - Chairs proposed this agenda: https://datatracker.ietf.org/doc/agenda-117-alto/
+    - Discussion about presentations
+    - Hackathon projects
+- ALTO Future Work:
+  - List of topics: https://mailarchive.ietf.org/arch/msg/alto/uIFD6Dhikfu4J4PYcpJTbsiXbnE/
+    - Topic A: https://mailarchive.ietf.org/arch/msg/alto/nSBb2fJwwEEEeZ-Xxw-OmHhJdTs/
+    - Topic B: https://mailarchive.ietf.org/arch/msg/alto/IXYPC1joF17oPJ7MWz5NDplAqKk/
+    - Topic C: WIP
+    - Topic D: https://mailarchive.ietf.org/arch/msg/alto/IEAyQ2kv49AvT1hIGfYkHWLxisY/
+
+**Minutes:** (*Note taker: Jensen*)
+
+- Performance metrics:
+    - Sabine is working on the response
+    - Qin has sent a response to reviewers: include Luis, Young Lee, and IANA
+- New transport:
+    - Authors are working on revision to address comments by the AD review
+    - Richard suggests waiting for new transport stable before obsoleting RFC 8895 (ALTO SSE)
+    - Discussion: Whether remove server push or not?
+        - Richard: investigate how gRPC streaming works to motivate server push for ALTO new transport
+- Recharter Topics:
+    - Richard: call for volunteers to work on SBI
+        - Question 1: Is BGP-LS enough to compute ALTO cost metrics?
+        - Question 2: Can IGP control plane info (link states, TE) collected by BGP-LS guarantee the computed IGP routes are the same as the actual ones?
+- IETF 117 Preparation:
+    - CATS/ALTO: Focus on motivation and concrete use cases
+    - Compute information: what kinds of SBI can be used
+- Others:
+    - There will be a meeting with Orange in discussing ALTO this Wednesday
 
 ------------------------------
 
